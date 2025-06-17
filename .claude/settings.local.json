@@ -5,7 +5,13 @@
       "Bash(find:*)",
       "WebFetch(domain:cloud.google.com)",
       "Bash(mkdir:*)",
-      "WebFetch(domain:docs.malloydata.dev)"
+      "WebFetch(domain:docs.malloydata.dev)",
+      "Bash(git checkout:*)",
+      "Bash(chmod:*)",
+      "Bash(python:*)",
+      "Bash(rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
