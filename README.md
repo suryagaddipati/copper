@@ -41,7 +41,7 @@ model: sales_performance {
 ### Developer Experience
 
 - **Familiar Syntax** - LookML-inspired structure
-- **Formal Grammar** - Complete EBNF specification for tool builders
+- **Multi-Language Parsers** - ANTLR4 grammar generates parsers for 8+ languages
 - **Rich Examples** - Production-ready models included
 - **Extensible** - View inheritance and modular design
 - **Type Safe** - Comprehensive validation rules
@@ -193,7 +193,9 @@ vars:
 
 ## Roadmap
 
-### Coming Soon
+### Parser & Tooling
+- [x] **ANTLR4 Grammar** - Multi-language parser generation (Java, Python, JS, C#, Go, C++, Swift)
+- [x] **Build System** - Automated parser generation for all supported languages
 - [ ] **VS Code Extension** - Syntax highlighting, autocomplete, validation
 - [ ] **CLI Tools** - Copper compiler, validator, and formatter
 - [ ] **dbt Integration** - Reference Copper views in dbt models via git submodules
@@ -204,6 +206,37 @@ vars:
 - [ ] **Semantic Layer API** - REST/GraphQL interface for metrics
 - [ ] **Multi-dialect Support** - Target multiple execution engines
 - [ ] **ML Integration** - Built-in support for predictive metrics
+
+## Parser & Tools
+
+Copper includes a comprehensive ANTLR4 grammar that generates parsers for multiple programming languages:
+
+### Supported Languages
+- **Java** - Enterprise applications, Spring Boot services
+- **Python** - Data science, analytics, web APIs
+- **JavaScript/TypeScript** - Web applications, Node.js services
+- **C#** - .NET applications, Azure functions
+- **Go** - Cloud services, microservices
+- **C++** - High-performance applications
+- **Swift** - iOS/macOS applications
+
+### Quick Start
+
+```bash
+# Navigate to grammar directory
+cd grammar
+
+# Generate parsers for all languages
+./build.sh generate
+
+# Or generate specific languages
+./build.sh generate java python javascript
+
+# Test against example files
+./build.sh test
+```
+
+See [Grammar Documentation](grammar/README.md) for detailed usage instructions.
 
 ## Contributing
 
@@ -221,4 +254,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**[Read the Specification](spec/SPECIFICATION.md)** | **[View Examples](examples/)** | **[Getting Started](#getting-started)**
+**[Read the Specification](spec/SPECIFICATION.md)** | **[View Examples](examples/)** | **[Parser Documentation](grammar/README.md)** | **[Grammar Files](grammar/antlr/)**
