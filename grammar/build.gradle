@@ -109,7 +109,7 @@ task testGrammar(type: JavaExec) {
     args = ['com.copper.parser.Copper', 'program', '-gui']
     
     // Add example files as arguments
-    file('../examples').listFiles()
+    file('../../examples').listFiles()
         .findAll { it.name.endsWith('.copper') }
         .each { args += it.absolutePath }
 }

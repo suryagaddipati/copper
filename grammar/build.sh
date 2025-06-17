@@ -328,7 +328,7 @@ EOF
 test_parsers() {
     print_status $BLUE "Testing generated parsers..."
     
-    local example_file="../examples/ecommerce_orders.copper"
+    local example_file="../../examples/ecommerce_orders.copper"
     
     if [ ! -f "$example_file" ]; then
         print_status $YELLOW "⚠ No example files found for testing"
@@ -347,7 +347,7 @@ test_parsers() {
         print_status $BLUE "Testing Python parser..."
         if command_exists python3; then
             cd "$BUILD_DIR/python"
-            if python3 copper_parser_main.py "$SCRIPT_DIR/$example_file" --tree >/dev/null 2>&1; then
+            if python3 copper_parser_main.py "$example_file" --tree >/dev/null 2>&1; then
                 print_status $GREEN "✓ Python parser test passed"
             else
                 print_status $RED "✗ Python parser test failed"
