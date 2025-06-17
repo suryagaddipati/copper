@@ -254,4 +254,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**[Read the Specification](spec/SPECIFICATION.md)** | **[View Examples](examples/)** | **[Parser Documentation](grammar/README.md)** | **[Grammar Files](grammar/antlr/)**
+**[Read the Specification](spec/SPECIFICATION.md)** | **[View Examples](examples/)** | **[Parser Documentation](grammar/README.md)** | **[Grammar Files](grammar/)**

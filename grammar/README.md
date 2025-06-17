@@ -31,20 +31,18 @@ This directory contains the ANTLR4 grammar files and build system for generating
 
 ```
 grammar/
-├── antlr/
-│   ├── Copper.g4          # Main Copper grammar
-│   └── DAX.g4             # DAX lexer grammar (comprehensive)
-├── build/                 # Generated parsers (created during build)
+├── Copper.g4             # Main Copper grammar
+├── DAX.g4                # DAX lexer grammar (comprehensive)
+├── build/                # Generated parsers (created during build)
 │   ├── java/
 │   ├── python/
 │   ├── javascript/
 │   └── ...
-├── examples/              # Test files for validation
-├── build.gradle           # Gradle build script (Java)
-├── setup.py              # Python setuptools script
-├── build.sh              # Universal build script
-├── requirements.txt      # Python dependencies
-└── README.md            # This file
+├── build.gradle          # Gradle build script (Java)
+├── setup.py             # Python setuptools script
+├── build.sh             # Universal build script
+├── requirements.txt     # Python dependencies
+└── README.md           # This file
 ```
 
 ## Quick Start
@@ -375,7 +373,7 @@ The ANTLR parsers provide the same functionality as the hand-written Python pars
 **Grammar compilation errors:**
 ```bash
 # Check grammar syntax
-antlr4 -encoding UTF-8 antlr/Copper.g4
+antlr4 -encoding UTF-8 Copper.g4
 ```
 
 **Missing ANTLR4:**
@@ -402,7 +400,7 @@ Enable ANTLR debug mode for troubleshooting:
 
 ```bash
 # Generate with debug info
-antlr4 -Dlanguage=Java -visitor -listener -Xlog antlr/Copper.g4
+antlr4 -Dlanguage=Java -visitor -listener -Xlog Copper.g4
 ```
 
 ## License

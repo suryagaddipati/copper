@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ANTLR_DIR="$SCRIPT_DIR/antlr"
+ANTLR_DIR="$SCRIPT_DIR"
 BUILD_DIR="$SCRIPT_DIR/build"
 GRAMMAR_FILE="Copper.g4"
 

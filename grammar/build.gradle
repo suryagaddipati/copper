@@ -31,6 +31,7 @@ generateGrammarSource {
         '-Dlanguage=Java'
     ]
     outputDirectory = file("build/generated-src/antlr/main/com/copper/parser")
+    source = fileTree(dir: '.', include: '*.g4')
 }
 
 // Task to generate Python parser
@@ -38,9 +39,9 @@ task generatePythonParser(type: Exec) {
     group = 'antlr'
     description = 'Generate Python3 parser from ANTLR grammar'
     
-    workingDir file('antlr')
+    workingDir file('.')
     commandLine 'antlr4', '-Dlanguage=Python3', '-visitor', '-listener', 
-                '-o', '../build/python/', 'Copper.g4'
+                '-o', 'build/python/', 'Copper.g4'
 }
 
 // Task to generate JavaScript parser
@@ -48,9 +49,9 @@ task generateJavaScriptParser(type: Exec) {
     group = 'antlr'
     description = 'Generate JavaScript parser from ANTLR grammar'
     
-    workingDir file('antlr')
+    workingDir file('.')
     commandLine 'antlr4', '-Dlanguage=JavaScript', '-visitor', '-listener',
-                '-o', '../build/javascript/', 'Copper.g4'
+                '-o', 'build/javascript/', 'Copper.g4'
 }
 
 // Task to generate C# parser
@@ -58,9 +59,9 @@ task generateCSharpParser(type: Exec) {
     group = 'antlr'
     description = 'Generate C# parser from ANTLR grammar'
     
-    workingDir file('antlr')
+    workingDir file('.')
     commandLine 'antlr4', '-Dlanguage=CSharp', '-visitor', '-listener',
-                '-o', '../build/csharp/', 'Copper.g4'
+                '-o', 'build/csharp/', 'Copper.g4'
 }
 
 // Task to generate Go parser
@@ -68,9 +69,9 @@ task generateGoParser(type: Exec) {
     group = 'antlr'
     description = 'Generate Go parser from ANTLR grammar'
     
-    workingDir file('antlr')
+    workingDir file('.')
     commandLine 'antlr4', '-Dlanguage=Go', '-visitor', '-listener',
-                '-o', '../build/go/', 'Copper.g4'
+                '-o', 'build/go/', 'Copper.g4'
 }
 
 // Task to generate C++ parser
@@ -78,9 +79,9 @@ task generateCppParser(type: Exec) {
     group = 'antlr'
     description = 'Generate C++ parser from ANTLR grammar'
     
-    workingDir file('antlr')
+    workingDir file('.')
     commandLine 'antlr4', '-Dlanguage=Cpp', '-visitor', '-listener',
-                '-o', '../build/cpp/', 'Copper.g4'
+                '-o', 'build/cpp/', 'Copper.g4'
 }
 
 // Task to generate all parsers
