@@ -1,0 +1,238 @@
+# E-commerce Orders Model
+# Defines the structure of order data with dimensions and measures
+
+model: orders {
+  # Primary Key
+  dimension: order_id {
+    type: string
+    expression: Orders[OrderID] ;;
+    primary_key: yes
+    label: "Order ID"
+    description: "Unique identifier for each order"
+  }
+  
+  # Date Dimensions
+  dimension: order_date {
+    type: date
+    expression: Orders[OrderDate] ;;
+    label: "Order Date"
+    description: "Date when the order was placed"
+  }
+  
+  dimension: created_at {
+    type: date_time
+    expression: Orders[CreatedDateTime] ;;
+    label: "Created At"
+    description: "Timestamp when order was created in system"
+  }
+  
+  # Customer Information
+  dimension: customer_id {
+    type: string
+    expression: Orders[CustomerID] ;;
+    label: "Customer ID"
+    description: "Reference to customer who placed the order"
+  }
+  
+  dimension: customer_name {
+    type: string
+    expression: RELATED(Customers[CustomerName]) ;;
+    label: "Customer Name"
+    description: "Name of the customer"
+  }
+  
+  dimension: customer_email {
+    type: string
+    expression: RELATED(Customers[Email]) ;;
+    label: "Customer Email"
+    description: "Email address of the customer"
+  }
+  
+  # Order Classification
+  dimension: order_status {
+    type: string
+    expression: Orders[Status] ;;
+    label: "Order Status"
+    description: "Current status of the order"
+  }
+  
+  dimension: is_completed {
+    type: yesno
+    expression: Orders[Status] = "Completed" ;;
+    label: "Is Completed"
+    description: "Whether the order has been completed"
+  }
+  
+  dimension: is_weekend_order {
+    type: yesno
+    expression: WEEKDAY(Orders[OrderDate]) IN {1, 7} ;;
+    label: "Weekend Order"
+    description: "Whether the order was placed on a weekend"
+  }
+  
+  # Order Value Tiers
+  dimension: order_value_tier {
+    type: tier
+    expression: Orders[TotalAmount] ;;
+    tiers: [0, 50, 200, 500, 1000]
+    label: "Order Value Tier"
+    description: "Categorical grouping of orders by value"
+  }
+  
+  # Geographic Information
+  dimension: shipping_country {
+    type: string
+    expression: Orders[ShippingCountry] ;;
+    label: "Shipping Country"
+    description: "Country where the order is being shipped"
+  }
+  
+  dimension: shipping_zipcode {
+    type: zipcode
+    expression: Orders[ShippingZipCode] ;;
+    label: "Shipping ZIP Code"
+    description: "ZIP code for shipping address"
+  }
+  
+  # Numeric Dimensions
+  dimension: total_amount {
+    type: number
+    expression: Orders[TotalAmount] ;;
+    value_format: usd
+    label: "Total Amount"
+    description: "Total value of the order including tax and shipping"
+  }
+  
+  dimension: item_count {
+    type: number
+    expression: Orders[ItemCount] ;;
+    value_format: decimal_0
+    label: "Item Count"
+    description: "Number of items in the order"
+  }
+  
+  # Measures
+  measure: total_orders {
+    type: count
+    expression: Orders[OrderID] ;;
+    label: "Total Orders"
+    description: "Total number of orders"
+  }
+  
+  measure: completed_orders {
+    type: count
+    expression: Orders[OrderID] ;;
+    label: "Completed Orders"
+    description: "Number of completed orders"
+  }
+  
+  measure: total_revenue {
+    type: sum
+    expression: Orders[TotalAmount] ;;
+    value_format: usd
+    label: "Total Revenue"
+    description: "Sum of all order amounts"
+  }
+  
+  measure: average_order_value {
+    type: average
+    expression: Orders[TotalAmount] ;;
+    value_format: usd
+    label: "Average Order Value"
+    description: "Average value per order"
+  }
+  
+  measure: median_order_value {
+    type: median
+    expression: Orders[TotalAmount] ;;
+    value_format: usd
+    label: "Median Order Value"
+    description: "Median value of orders"
+  }
+  
+  measure: unique_customers {
+    type: count_distinct
+    expression: Orders[CustomerID] ;;
+    label: "Unique Customers"
+    description: "Number of unique customers who placed orders"
+  }
+  
+  measure: max_order_value {
+    type: max
+    expression: Orders[TotalAmount] ;;
+    value_format: usd
+    label: "Maximum Order Value"
+    description: "Highest single order value"
+  }
+  
+  measure: min_order_value {
+    type: min
+    expression: Orders[TotalAmount] ;;
+    value_format: usd
+    label: "Minimum Order Value"
+    description: "Lowest single order value"
+  }
+  
+  # Complex Calculated Measures
+  measure: completion_rate {
+    type: number
+    expression: DIVIDE(
+      COUNTROWS(FILTER(Orders, Orders[Status] = "Completed")),
+      COUNTROWS(Orders)
+    ) ;;
+    value_format: "0.0%"
+    label: "Completion Rate"
+    description: "Percentage of orders that have been completed"
+  }
+  
+  measure: revenue_per_customer {
+    type: number
+    expression: DIVIDE(
+      SUM(Orders[TotalAmount]),
+      DISTINCTCOUNT(Orders[CustomerID])
+    ) ;;
+    value_format: usd
+    label: "Revenue per Customer"
+    description: "Average revenue generated per unique customer"
+  }
+  
+  measure: weekend_order_percentage {
+    type: number
+    expression: DIVIDE(
+      COUNTROWS(FILTER(Orders, WEEKDAY(Orders[OrderDate]) IN {1, 7})),
+      COUNTROWS(Orders)
+    ) ;;
+    value_format: "0.0%"
+    label: "Weekend Order %"
+    description: "Percentage of orders placed on weekends"
+  }
+  
+  # Time Intelligence Measures
+  measure: revenue_growth_yoy {
+    type: number
+    expression: 
+      VAR CurrentRevenue = SUM(Orders[TotalAmount])
+      VAR PreviousRevenue = CALCULATE(
+        SUM(Orders[TotalAmount]),
+        DATEADD(Orders[OrderDate], -1, YEAR)
+      )
+      RETURN DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue) ;;
+    value_format: "0.0%"
+    label: "Revenue Growth YoY"
+    description: "Year-over-year revenue growth percentage"
+  }
+  
+  measure: orders_growth_mom {
+    type: number
+    expression:
+      VAR CurrentOrders = COUNTROWS(Orders)
+      VAR PreviousOrders = CALCULATE(
+        COUNTROWS(Orders),
+        DATEADD(Orders[OrderDate], -1, MONTH)
+      )
+      RETURN DIVIDE(CurrentOrders - PreviousOrders, PreviousOrders) ;;
+    value_format: "0.0%"
+    label: "Orders Growth MoM"
+    description: "Month-over-month orders growth percentage"
+  }
+}
