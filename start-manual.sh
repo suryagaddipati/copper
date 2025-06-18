@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Start script for Copper Parser Demo
-# Runs both API backend and webapp frontend
+# Start script for Copper Parser Demo using manual HTTP server
+# Works without FastAPI - uses built-in Python HTTP server
 
 set -e
 
@@ -19,32 +19,26 @@ if ! command -v node &> /dev/null; then
     exit 1
 fi
 
-# Install API dependencies
-echo "📦 Installing API dependencies..."
-cd api
+# Test the parser first
+echo "🧪 Testing Copper parser..."
+python3 -c "
+import sys
+sys.path.append('./api')
+from copper_parser import validate_copper_syntax
 
-# Try to create virtual environment, fall back to user install if it fails
-if command -v python3 &> /dev/null; then
-    if python3 -m venv venv 2>/dev/null && [ -f "venv/bin/activate" ]; then
-        echo "✅ Using virtual environment"
-        source venv/bin/activate
-        pip install -r requirements.txt
-    else
-        echo "⚠️  Virtual environment not available, installing for user"
-        # Check if pip is available
-        if python3 -m pip --version &> /dev/null; then
-            python3 -m pip install --user -r requirements.txt
-        else
-            echo "❌ pip is not available. Please install python3-pip"
-            echo "   Try: sudo apt install python3-pip python3-venv"
-            exit 1
-        fi
-    fi
-else
-    echo "❌ Python3 is required but not installed"
-    exit 1
-fi
-cd ..
+# Test basic parsing
+result = validate_copper_syntax('model: test { dimension: id { type: string } }')
+print('✅ Basic parser works!' if result['valid'] else '❌ Basic parser failed!')
+
+# Test with example file
+try:
+    with open('./examples/ecommerce_orders.copper', 'r') as f:
+        content = f.read()
+    result = validate_copper_syntax(content)
+    print(f'✅ Example file parsed: {result[\"statistics\"][\"total_models\"]} models, {result[\"statistics\"][\"total_dimensions\"]} dimensions')
+except Exception as e:
+    print(f'❌ Example file test failed: {e}')
+"
 
 # Install webapp dependencies
 echo "📦 Installing webapp dependencies..."
@@ -56,14 +50,10 @@ echo "✅ Setup complete!"
 echo ""
 echo "🚀 Starting services..."
 
-# Start API in background
+# Start manual API server in background
 echo "🔥 Starting API server on http://localhost:8000"
 cd api
-# Use virtual environment if it exists, otherwise run directly
-if [ -f "venv/bin/activate" ]; then
-    source venv/bin/activate
-fi
-python3 main.py &
+python3 server-manual.py &
 API_PID=$!
 cd ..
 
