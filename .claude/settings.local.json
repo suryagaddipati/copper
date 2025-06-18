@@ -16,7 +16,15 @@
       "Bash(git branch:*)",
       "Bash(cp:*)",
       "Bash(git rm:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(./build.sh generate:*)",
+      "Bash(sudo apt:*)",
+      "Bash(sudo apt install:*)",
+      "Bash(curl:*)",
+      "Bash(PATH=\"/home/surya/code/copper:$PATH\" ./build.sh generate python)",
+      "Bash(source:*)",
+      "Bash(java:*)",
+      "Bash(pip install:*)"
     ],
     "deny": []
   }
