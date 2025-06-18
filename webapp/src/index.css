@@ -103,6 +103,54 @@ body {
   border-radius: 8px;
   overflow: hidden;
   min-height: 500px;
+  position: relative;
+}
+
+.editor-container .monaco-editor {
+  border-radius: 8px;
+}
+
+.editor-container .monaco-editor .margin {
+  background-color: #1e1e1e;
+}
+
+.editor-container .monaco-editor .monaco-editor-background {
+  background-color: #1e1e1e;
+}
+
+/* Enhanced syntax highlighting visibility */
+.monaco-editor .token.keyword.declaration {
+  font-weight: bold;
+}
+
+.monaco-editor .token.entity.name {
+  font-weight: bold;
+}
+
+.monaco-editor .token.support.function {
+  font-weight: bold;
+}
+
+/* Better visibility for DAX expressions */
+.monaco-editor .token.delimiter.dax.start,
+.monaco-editor .token.delimiter.dax.end {
+  font-weight: bold;
+  background-color: rgba(255, 215, 0, 0.1);
+}
+
+/* Improve bracket matching */
+.monaco-editor .bracket-match {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Better error and warning squiggles */
+.monaco-editor .red-squiggly {
+  border-bottom: 2px wavy #f44747;
+}
+
+.monaco-editor .yellow-squiggly {
+  border-bottom: 2px wavy #ffcc02;
 }
 
 .examples-list {

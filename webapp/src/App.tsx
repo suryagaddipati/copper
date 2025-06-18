@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import { Check, X, FileText, BarChart3, Loader2 } from 'lucide-react'
 import axios from 'axios'
 import { registerCopperLanguage } from './copper-language'
+import * as monaco from 'monaco-editor'
 
 const API_BASE_URL = 'http://localhost:8000'
 
@@ -29,20 +30,44 @@ interface ParseResult {
 
 const defaultCode = `# Welcome to the Copper Language Live Parser
 # Select an example from the sidebar or start typing your own Copper code
+# This demonstrates enhanced syntax highlighting
 
 model: sample_orders {
+  # Primary key dimension
   dimension: order_id {
     type: string
     expression: Orders[OrderID] ;;
     primary_key: yes
     label: "Order ID"
+    description: "Unique identifier for each order"
   }
   
+  # Date dimension with DAX function
+  dimension: order_date {
+    type: date
+    expression: DATE(YEAR(Orders[OrderDate]), MONTH(Orders[OrderDate]), DAY(Orders[OrderDate])) ;;
+    label: "Order Date"
+  }
+  
+  # Complex measure with multi-line DAX
   measure: total_revenue {
     type: sum
-    expression: Orders[Amount] ;;
+    expression: 
+      VAR CurrentRevenue = SUM(Orders[Amount])
+      VAR FilteredRevenue = CALCULATE(
+        CurrentRevenue,
+        FILTER(Orders, Orders[Status] = "Completed")
+      )
+      RETURN FilteredRevenue ;;
     value_format: usd
     label: "Total Revenue"
+  }
+  
+  # Boolean dimension
+  dimension: is_weekend {
+    type: yesno
+    expression: WEEKDAY(Orders[OrderDate]) IN {1, 7} ;;
+    label: "Weekend Order"
   }
 }`
 
@@ -52,6 +77,8 @@ function App() {
   const [parseResult, setParseResult] = useState<ParseResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingExamples, setLoadingExamples] = useState(true)
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<typeof monaco | null>(null)
 
   // Fetch examples on component mount and register language
   useEffect(() => {
@@ -59,7 +86,7 @@ function App() {
     registerCopperLanguage()
   }, [])
 
-  // Parse code whenever it changes
+  // Parse code whenever it changes and update editor markers
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       parseCode(code)
@@ -67,6 +94,13 @@ function App() {
 
     return () => clearTimeout(timeoutId)
   }, [code])
+
+  // Update editor markers when parse results change
+  useEffect(() => {
+    if (editorRef.current && monacoRef.current && parseResult) {
+      updateEditorMarkers()
+    }
+  }, [parseResult])
 
   const fetchExamples = async () => {
     try {
@@ -117,6 +151,61 @@ function App() {
     setCode(example.content)
   }
 
+  const updateEditorMarkers = () => {
+    if (!editorRef.current || !monacoRef.current || !parseResult) return
+
+    const model = editorRef.current.getModel()
+    if (!model) return
+
+    const markers: monaco.editor.IMarkerData[] = []
+
+    // Add error markers
+    parseResult.errors.forEach((error, index) => {
+      // Try to extract line number from error message
+      const lineMatch = error.match(/Line (\d+):/)
+      const lineNumber = lineMatch ? parseInt(lineMatch[1]) : 1
+
+      markers.push({
+        severity: monacoRef.current!.MarkerSeverity.Error,
+        startLineNumber: lineNumber,
+        startColumn: 1,
+        endLineNumber: lineNumber,
+        endColumn: model.getLineContent(lineNumber).length + 1,
+        message: error,
+        source: 'copper-parser'
+      })
+    })
+
+    // Add warning markers
+    parseResult.warnings.forEach((warning, index) => {
+      const lineMatch = warning.match(/Line (\d+):/)
+      const lineNumber = lineMatch ? parseInt(lineMatch[1]) : 1
+
+      markers.push({
+        severity: monacoRef.current!.MarkerSeverity.Warning,
+        startLineNumber: lineNumber,
+        startColumn: 1,
+        endLineNumber: lineNumber,
+        endColumn: model.getLineContent(lineNumber).length + 1,
+        message: warning,
+        source: 'copper-parser'
+      })
+    })
+
+    // Set markers on the model
+    monacoRef.current.editor.setModelMarkers(model, 'copper-parser', markers)
+  }
+
+  const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => {
+    editorRef.current = editor
+    monacoRef.current = monacoInstance
+    
+    // Update markers if we already have parse results
+    if (parseResult) {
+      updateEditorMarkers()
+    }
+  }
+
   const handleEditorChange = useCallback((value: string | undefined) => {
     setCode(value || '')
   }, [])
@@ -159,6 +248,7 @@ function App() {
                 theme="copper-dark"
                 value={code}
                 onChange={handleEditorChange}
+                onMount={handleEditorDidMount}
                 options={{
                   minimap: { enabled: false },
                   scrollBeyondLastLine: false,
@@ -166,7 +256,15 @@ function App() {
                   wordWrap: 'on',
                   automaticLayout: true,
                   suggestOnTriggerCharacters: true,
-                  quickSuggestions: true
+                  quickSuggestions: true,
+                  folding: true,
+                  foldingStrategy: 'indentation',
+                  showFoldingControls: 'always',
+                  bracketPairColorization: { enabled: true },
+                  guides: {
+                    bracketPairs: true,
+                    indentation: true
+                  }
                 }}
               />
             </div>
