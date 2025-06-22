@@ -1,101 +1,50 @@
 #!/bin/bash
 
-# Start script for Copper Parser Demo
-# Runs both API backend and webapp frontend
+# Simple start script for Copper Parser Demo
+# Just run: ./start.sh then go to http://localhost:3000
 
 set -e
 
-echo "🔧 Setting up Copper Parser Demo..."
+echo "🚀 Starting Copper Parser Demo..."
 
-# Check if Python is available
+# Quick checks
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Python3 is required but not installed"
+    echo "❌ Need Python3"
     exit 1
 fi
 
-# Check if Node.js is available
 if ! command -v node &> /dev/null; then
-    echo "❌ Node.js is required but not installed"
+    echo "❌ Need Node.js"
     exit 1
 fi
 
-# Install API dependencies
-echo "📦 Installing API dependencies..."
-cd api
-
-# Try to create virtual environment, fall back to user install if it fails
-if command -v python3 &> /dev/null; then
-    if python3 -m venv venv 2>/dev/null && [ -f "venv/bin/activate" ]; then
-        echo "✅ Using virtual environment"
-        source venv/bin/activate
-        pip install -r requirements.txt
-    else
-        echo "⚠️  Virtual environment not available, installing for user"
-        # Check if pip is available
-        if python3 -m pip --version &> /dev/null; then
-            python3 -m pip install --user -r requirements.txt
-        else
-            echo "❌ pip is not available. Please install python3-pip"
-            echo "   Try: sudo apt install python3-pip python3-venv"
-            exit 1
-        fi
-    fi
-else
-    echo "❌ Python3 is required but not installed"
-    exit 1
+# Install webapp deps if needed
+if [ ! -d "webapp/node_modules" ]; then
+    echo "📦 Installing dependencies..."
+    cd webapp && npm install && cd ..
 fi
-cd ..
 
-# Install webapp dependencies
-echo "📦 Installing webapp dependencies..."
-cd webapp
-npm install
-cd ..
-
-echo "✅ Setup complete!"
-echo ""
-echo "🚀 Starting services..."
-
-# Start API in background
-echo "🔥 Starting API server on http://localhost:8000"
-cd api
-# Use virtual environment if it exists, otherwise run directly
-if [ -f "venv/bin/activate" ]; then
-    source venv/bin/activate
-fi
-python3 main.py &
+# Start API server
+echo "🔥 Starting API server..."
+cd api && python3 server-manual.py &
 API_PID=$!
 cd ..
 
-# Wait a moment for API to start
-sleep 2
-
-# Start webapp in background
-echo "🌐 Starting webapp on http://localhost:3000"
-cd webapp
-npm run dev &
+# Start webapp
+echo "🌐 Starting webapp..."
+cd webapp && npm run dev &
 WEBAPP_PID=$!
 cd ..
 
+sleep 2
 echo ""
-echo "✅ Both services are running!"
-echo "   📡 API: http://localhost:8000"
-echo "   🌐 Webapp: http://localhost:3000"
+echo "✅ Ready! Open: http://localhost:3000"
+echo "   (API: http://localhost:8000)"
 echo ""
-echo "Press Ctrl+C to stop both services"
+echo "Press Ctrl+C to stop"
 
-# Function to cleanup processes
-cleanup() {
-    echo ""
-    echo "🛑 Stopping services..."
-    kill $API_PID 2>/dev/null || true
-    kill $WEBAPP_PID 2>/dev/null || true
-    echo "✅ Services stopped"
-    exit 0
-}
+# Cleanup on exit
+trap 'echo "🛑 Stopping..."; kill $API_PID $WEBAPP_PID 2>/dev/null; exit' SIGINT
 
-# Trap Ctrl+C
-trap cleanup SIGINT
-
-# Wait for both processes
-wait $API_PID $WEBAPP_PID
+# Wait
+wait

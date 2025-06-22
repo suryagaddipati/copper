@@ -24,7 +24,11 @@
       "Bash(PATH=\"/home/surya/code/copper:$PATH\" ./build.sh generate python)",
       "Bash(source:*)",
       "Bash(java:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(npm run dev:*)",
+      "Bash(ss:*)",
+      "Bash(./start-manual.sh:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

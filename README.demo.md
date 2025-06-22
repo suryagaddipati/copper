@@ -13,29 +13,16 @@ This demo provides a live web interface for parsing and validating Copper langua
 
 ## Quick Start
 
-### Option 1: Manual Server (No Dependencies)
 ```bash
-# Run with built-in Python HTTP server (recommended)
-./start-manual.sh
-```
-
-### Option 2: FastAPI Server (Requires pip)
-```bash
-# Run with FastAPI (requires: pip install fastapi uvicorn)
 ./start.sh
 ```
 
-### Option 3: Simple Mode (Webapp Only)
-```bash
-# Run just the webapp (API features won't work)
-./start-simple.sh
-```
+Then open: **http://localhost:3000**
 
-This will:
-1. Test the Copper parser
-2. Install Node.js dependencies for the webapp
-3. Start the API server on http://localhost:8000
-4. Start the webapp on http://localhost:3000
+That's it. The script will:
+1. Install dependencies if needed
+2. Start API server (http://localhost:8000)
+3. Start webapp (http://localhost:3000)
 
 ## Manual Setup
 
