@@ -327,7 +327,10 @@ class CopperANTLRParser:
 def validate_copper_syntax(content: str) -> Dict[str, Any]:
     """Validate Copper syntax and return analysis using ANTLR parser"""
     if not ANTLR_AVAILABLE:
-        raise ImportError("ANTLR4 runtime not available. Please install antlr4-python3-runtime>=4.13.1")
+        # Temporary fallback to minimal parser
+        print("⚠️  ANTLR not available, using minimal fallback parser")
+        from copper_parser_minimal import validate_copper_syntax as minimal_parser
+        return minimal_parser(content)
     
     parser = CopperANTLRParser()
     result = parser.parse(content)
