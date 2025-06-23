@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import Editor from '@monaco-editor/react'
 import { registerCopperLanguage } from './copper-language'
 
