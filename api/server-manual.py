@@ -9,7 +9,7 @@ import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import os
 import glob
-from copper_parser import validate_copper_syntax
+from antlr_parser import validate_copper_syntax
 
 
 class CopperAPIHandler(BaseHTTPRequestHandler):
