@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import { Check, X, FileText, BarChart3, Loader2, Sun, Moon } from 'lucide-react'
 import axios from 'axios'
-import { registerCopperLanguage } from './copper-language'
+import { registerCopperLanguage, copperLanguageDefinition } from './copper-language'
 import * as monaco from 'monaco-editor'
 
 const API_BASE_URL = 'http://localhost:8000'
@@ -204,61 +204,33 @@ function App() {
   }
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => {
-    console.log('Editor mounted, current theme:', isDarkTheme ? 'dark' : 'light')
+    console.log('Editor mounted')
     editorRef.current = editor
     monacoRef.current = monacoInstance
     
-    // Ensure language is registered and create new model with correct language
-    const setupCopperEditor = () => {
-      // Register the language first
-      const success = registerCopperLanguage()
-      console.log('Language registration result:', success)
-      
-      // Get current content
-      const currentModel = editor.getModel()
-      const content = currentModel ? currentModel.getValue() : ''
-      
-      // Try to set the language on the existing model first
-      if (currentModel) {
-        try {
-          // First try to set language directly
-          monacoInstance.editor.setModelLanguage(currentModel, 'copper')
-          console.log('Language set on existing model, ID:', currentModel.getLanguageId())
-          
-          // If that didn't work, dispose and create new model
-          if (currentModel.getLanguageId() !== 'copper') {
-            console.log('Direct language setting failed, creating new model...')
-            currentModel.dispose()
-            
-            // Try creating with javascript first (which definitely exists), then set language
-            const newModel = monacoInstance.editor.createModel(content, 'javascript')
-            editor.setModel(newModel)
-            
-            // Now try to switch to copper
-            setTimeout(() => {
-              monacoInstance.editor.setModelLanguage(newModel, 'copper')
-              console.log('Final model language:', newModel.getLanguageId())
-              
-              // Force apply copper theme regardless of language ID
-              const currentTheme = isDarkTheme ? "copper-dark" : "copper-light"
-              monacoInstance.editor.setTheme(currentTheme)
-              console.log('Force applied theme after model creation:', currentTheme)
-              
-              // Force apply copper tokenizer even if language ID is wrong
-              if (newModel.getLanguageId() !== 'copper') {
-                console.log('Language setting still failed - but tokenizer should work')
-                // The Monarch tokenizer should still apply syntax highlighting
-              }
-            }, 50)
-          }
-        } catch (error) {
-          console.error('Error setting copper language:', error)
-        }
-      }
-    }
+    // Get current content
+    const currentModel = editor.getModel()
+    const content = currentModel ? currentModel.getValue() : ''
+    console.log('Current model language:', currentModel?.getLanguageId())
     
-    // Run setup with a slight delay to ensure registration is complete
-    setTimeout(setupCopperEditor, 100)
+    // Apply our Copper tokenizer to plaintext language
+    monacoInstance.languages.setMonarchTokensProvider('plaintext', copperLanguageDefinition)
+    console.log('Applied Copper tokenizer to plaintext')
+    
+    // Force apply theme
+    const currentTheme = isDarkTheme ? "copper-dark" : "copper-light"
+    monacoInstance.editor.setTheme(currentTheme)
+    console.log('Applied theme:', currentTheme)
+    
+    // Force re-tokenization by updating model content
+    if (currentModel) {
+      setTimeout(() => {
+        const currentContent = currentModel.getValue()
+        currentModel.setValue('')
+        currentModel.setValue(currentContent)
+        console.log('Forced re-tokenization for proper syntax highlighting')
+      }, 100)
+    }
     
     // Update markers if we already have parse results
     if (parseResult) {

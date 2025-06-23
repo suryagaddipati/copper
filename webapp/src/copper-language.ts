@@ -123,11 +123,11 @@ export const copperLanguageDefinition: monaco.languages.IMonarchLanguage = {
   // The main tokenizer for our languages
   tokenizer: {
     root: [
+      // Comments MUST be first to take precedence - use custom token name
+      [/#.*$/, 'copper-comment'],
+      
       // Whitespace
       [/\s+/, ''],
-
-      // Comments
-      [/#.*$/, 'comment'],
 
       // Block declarations with highlighting for names
       [/(model|view|dimension|measure|join|parameter)(\s*)(:)(\s*)([a-zA-Z_][a-zA-Z0-9_]*)/, [
@@ -251,8 +251,8 @@ export const copperLanguageDefinition: monaco.languages.IMonarchLanguage = {
       [/[,;]/, 'delimiter.dax'],
       
       // Comments within DAX
-      [/\/\/.*$/, 'comment.dax'],
-      [/\/\*/, { token: 'comment.dax', next: '@daxComment' }],
+      [/\/\/.*$/, 'copper-comment-dax'],
+      [/\/\*/, { token: 'copper-comment-dax', next: '@daxComment' }],
       
       // Identifiers in DAX
       [/[A-Za-z_][A-Za-z0-9_]*/, 'identifier.dax'],
@@ -262,9 +262,9 @@ export const copperLanguageDefinition: monaco.languages.IMonarchLanguage = {
     ],
     
     daxComment: [
-      [/[^\/*]+/, 'comment.dax'],
-      [/\*\//, { token: 'comment.dax', next: '@pop' }],
-      [/[\/*]/, 'comment.dax']
+      [/[^\/*]+/, 'copper-comment-dax'],
+      [/\*\//, { token: 'copper-comment-dax', next: '@pop' }],
+      [/[\/*]/, 'copper-comment-dax']
     ],
 
     string: [
@@ -286,11 +286,11 @@ export const copperLanguageDefinition: monaco.languages.IMonarchLanguage = {
 // Light theme configuration for Copper language
 export const copperLightTheme: monaco.editor.IStandaloneThemeData = {
   base: 'vs',
-  inherit: true,
+  inherit: true, // Restore inheritance to get basic syntax highlighting back
   rules: [
-    // Comments - bright forest green
-    { token: 'comment', foreground: '228B22', fontStyle: 'italic bold' },
-    { token: 'comment.dax', foreground: '228B22', fontStyle: 'italic bold' },
+    // Comments - FORCE subtle gray with custom token names
+    { token: 'copper-comment', foreground: '999999', fontStyle: 'italic' },
+    { token: 'copper-comment-dax', foreground: '999999', fontStyle: 'italic' },
 
     // Copper language keywords - very vibrant colors
     { token: 'keyword', foreground: 'FF1493' },
@@ -408,11 +408,11 @@ export const copperLightTheme: monaco.editor.IStandaloneThemeData = {
 // Enhanced dark theme configuration for Copper language
 export const copperDarkTheme: monaco.editor.IStandaloneThemeData = {
   base: 'vs-dark',
-  inherit: true,
+  inherit: true, // Restore inheritance to get basic syntax highlighting back
   rules: [
-    // Comments - bright green
-    { token: 'comment', foreground: '00FF00', fontStyle: 'italic bold' },
-    { token: 'comment.dax', foreground: '00FF00', fontStyle: 'italic bold' },
+    // Comments - FORCE subtle gray with custom token names
+    { token: 'copper-comment', foreground: 'AAAAAA', fontStyle: 'italic' },
+    { token: 'copper-comment-dax', foreground: 'AAAAAA', fontStyle: 'italic' },
 
     // Copper language keywords - very bright colors
     { token: 'keyword', foreground: 'FF69B4' },
@@ -713,14 +713,28 @@ export function registerCopperLanguage() {
   console.log('Registering Copper language...')
   
   try {
-    // Register the language directly without checking if it exists
-    // This forces re-registration which might be needed
+    // Use a unique language ID to avoid caching issues
+    const languageId = 'copper-lang-' + Date.now()
+    
+    // Register the language with unique ID
     monaco.languages.register({ 
-      id: 'copper',
+      id: languageId,
       extensions: ['.copper'],
       aliases: ['Copper', 'copper'],
       mimetypes: ['text/copper']
     })
+    
+    // Also register with static 'copper' ID
+    try {
+      monaco.languages.register({ 
+        id: 'copper',
+        extensions: ['.copper'],
+        aliases: ['Copper', 'copper'],
+        mimetypes: ['text/copper']
+      })
+    } catch(e) {
+      console.log('Static copper registration failed (expected if already registered)')
+    }
     console.log('Copper language registration called')
     
     // Immediately verify registration

@@ -204,47 +204,7 @@ body {
   color: #237893 !important;
 }
 
-/* Enhanced syntax highlighting visibility - Force colors with CSS using Monaco's actual class structure */
-
-/* Monaco uses .mtk (Monaco token) classes for syntax highlighting */
-.monaco-editor .mtk1 { color: #000000 !important; } /* Default text */
-.monaco-editor .mtk2 { color: #228B22 !important; font-style: italic; font-weight: bold; } /* Comments */
-.monaco-editor .mtk3 { color: #0000FF !important; font-weight: bold; } /* Keywords (model, dimension, measure) */
-.monaco-editor .mtk4 { color: #FF4500 !important; font-weight: bold; } /* Property keywords (type, expression) */
-.monaco-editor .mtk5 { color: #CC0000 !important; font-weight: bold; } /* Strings */
-.monaco-editor .mtk6 { color: #00AA00 !important; font-weight: bold; } /* Data types */
-.monaco-editor .mtk7 { color: #FF0000 !important; font-weight: bold; } /* Boolean values */
-.monaco-editor .mtk8 { color: #0000FF !important; font-weight: bold; } /* Numbers */
-.monaco-editor .mtk9 { color: #1E90FF !important; font-weight: bold; } /* Entity names */
-.monaco-editor .mtk10 { color: #FF8C00 !important; font-weight: bold; } /* Functions/operators */
-
-/* Also try targeting Monaco's token classes directly */
-.monaco-editor .token.comment { color: #228B22 !important; font-style: italic; font-weight: bold; }
-.monaco-editor .token.keyword { color: #0000FF !important; font-weight: bold; }
-.monaco-editor .token.string { color: #CC0000 !important; font-weight: bold; }
-.monaco-editor .token.type { color: #00AA00 !important; font-weight: bold; }
-.monaco-editor .token.number { color: #0000FF !important; font-weight: bold; }
-
-/* Target specific content using CSS attribute selectors */
-.monaco-editor span[class*="comment"] { color: #228B22 !important; font-style: italic; font-weight: bold; }
-.monaco-editor span[class*="keyword"] { color: #0000FF !important; font-weight: bold; }
-.monaco-editor span[class*="string"] { color: #CC0000 !important; font-weight: bold; }
-
-/* Dark theme overrides */
-[data-theme="dark"] .monaco-editor .mtk2 { color: #00FF00 !important; } /* Comments */
-[data-theme="dark"] .monaco-editor .mtk3 { color: #00BFFF !important; } /* Keywords */
-[data-theme="dark"] .monaco-editor .mtk4 { color: #FF8C00 !important; } /* Properties */
-[data-theme="dark"] .monaco-editor .mtk5 { color: #FA8072 !important; } /* Strings */
-[data-theme="dark"] .monaco-editor .mtk6 { color: #00FFFF !important; } /* Types */
-
-[data-theme="dark"] .monaco-editor .token.comment { color: #00FF00 !important; }
-[data-theme="dark"] .monaco-editor .token.keyword { color: #00BFFF !important; }
-[data-theme="dark"] .monaco-editor .token.string { color: #FA8072 !important; }
-[data-theme="dark"] .monaco-editor .token.type { color: #00FFFF !important; }
-
-[data-theme="dark"] .monaco-editor span[class*="comment"] { color: #00FF00 !important; }
-[data-theme="dark"] .monaco-editor span[class*="keyword"] { color: #00BFFF !important; }
-[data-theme="dark"] .monaco-editor span[class*="string"] { color: #FA8072 !important; }
+/* Remove all the ineffective CSS overrides */
 
 /* Better visibility for DAX expressions */
 .monaco-editor .token.delimiter.dax.start,
