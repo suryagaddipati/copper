@@ -80,6 +80,9 @@ class CopperParser:
                     self.nodes.append(node)
                 i += consumed_lines
             else:
+                # Invalid top-level syntax
+                if line.strip():  # Only flag non-empty lines
+                    self.errors.append(f"Line {self.current_line}: Invalid syntax - expected 'model:', 'view:', or comment. Found: '{line[:50]}{'...' if len(line) > 50 else ''}'")
                 i += 1
     
     def _parse_block(self, lines: List[str], start_idx: int) -> tuple[Optional[ParsedNode], int]:
@@ -137,6 +140,7 @@ class CopperParser:
             
             # Parse properties
             if ':' in line_content and not line_content.startswith(('dimension:', 'measure:', 'join:')):
+                self.current_line = i + 1
                 key, value = self._parse_property(line_content)
                 if key:
                     properties[key] = value
@@ -146,6 +150,35 @@ class CopperParser:
                 child_node, _ = self._parse_child_block(lines, i)
                 if child_node:
                     children.append(child_node)
+            else:
+                # Invalid content inside block
+                # Check if this line might be part of a multi-line DAX expression
+                dax_patterns = [
+                    'DIVIDE(', 'CALCULATE(', 'FILTER(', 'SUM(', 'COUNT(', 'SUMX(',
+                    'VAR ', 'RETURN ', ') ;;', ';;', 'WEEKDAY(', 'DISTINCTCOUNT(',
+                    'RELATED(', 'DATE(', 'YEAR(', 'MONTH(', 'DAY(', 'DATEADD(',
+                    'COUNTROWS(', 'Orders[', 'Customers[', 'Products[', ',',
+                    ')', '(', 'CurrentRevenue', 'FilteredRevenue', 'PreviousRevenue',
+                    'CurrentStock', 'NewCustomers', 'TotalCustomers'
+                ]
+                
+                is_likely_dax = any(pattern in line_content for pattern in dax_patterns)
+                
+                if (line_content and 
+                    not line_content in ['{', '}'] and 
+                    not is_likely_dax and
+                    not line_content.startswith(('IN {', 'IN(', '))', ','))):
+                    self.current_line = i + 1
+                    self.errors.append(f"Line {self.current_line}: Invalid content inside {block_type.value} block: '{line_content[:30]}{'...' if len(line_content) > 30 else ''}'")
+        
+        # Validate required elements for models
+        if block_type == NodeType.MODEL and not children:
+            self.warnings.append(f"Line {start_idx + 1}: Model '{name}' has no dimensions or measures")
+        
+        # Validate dimensions and measures have type
+        for child in children:
+            if child.type in [NodeType.DIMENSION, NodeType.MEASURE] and 'type' not in child.properties:
+                self.errors.append(f"Line {child.line_number}: {child.type.value} '{child.name}' missing required 'type' property")
         
         return ParsedNode(
             type=block_type,
@@ -212,17 +245,40 @@ class CopperParser:
     def _parse_property(self, line: str) -> tuple[Optional[str], str]:
         """Parse a property line like 'type: string'"""
         if ':' not in line:
+            self.errors.append(f"Line {self.current_line}: Invalid property syntax - missing colon. Found: '{line[:30]}{'...' if len(line) > 30 else ''}'")
             return None, ""
         
         parts = line.split(':', 1)
         key = parts[0].strip()
         value = parts[1].strip()
         
+        if not key:
+            self.errors.append(f"Line {self.current_line}: Property missing name before colon")
+            return None, ""
+        
+        if not value:
+            # Allow empty values for 'expression' as it might continue on next lines
+            if key == 'expression':
+                return key, ""  # Return empty value, will be handled by multi-line logic
+            else:
+                self.errors.append(f"Line {self.current_line}: Property '{key}' missing value after colon")
+                return None, ""
+        
         # Remove trailing semicolons
         if value.endswith(';;'):
             value = value[:-2].strip()
         elif value.endswith(';'):
             value = value[:-1].strip()
+        
+        # Validate common property names
+        valid_properties = {
+            'type', 'expression', 'label', 'description', 'value_format',
+            'primary_key', 'hidden', 'tiers', 'sql_latitude', 'sql_longitude',
+            'units', 'relationship', 'from', 'extends', 'extension', 'required'
+        }
+        
+        if key not in valid_properties:
+            self.warnings.append(f"Line {self.current_line}: Unknown property '{key}' - might be a typo")
         
         return key, value
 

@@ -283,34 +283,156 @@ export const copperLanguageDefinition: monaco.languages.IMonarchLanguage = {
   },
 }
 
-// Enhanced theme configuration for Copper language
-export const copperTheme: monaco.editor.IStandaloneThemeData = {
+// Light theme configuration for Copper language
+export const copperLightTheme: monaco.editor.IStandaloneThemeData = {
+  base: 'vs',
+  inherit: true,
+  rules: [
+    // Comments - bright forest green
+    { token: 'comment', foreground: '228B22', fontStyle: 'italic bold' },
+    { token: 'comment.dax', foreground: '228B22', fontStyle: 'italic bold' },
+
+    // Copper language keywords - very vibrant colors
+    { token: 'keyword', foreground: 'FF1493' },
+    { token: 'keyword.declaration', foreground: '0000FF', fontStyle: 'bold' },      // Bright blue for model/view/dimension/measure
+    { token: 'keyword.property', foreground: 'FF4500', fontStyle: 'bold' },        // Orange-red for type/expression/etc
+    { token: 'keyword.join', foreground: '9932CC', fontStyle: 'bold' },
+    { token: 'keyword.relationship', foreground: '9932CC', fontStyle: 'bold' },
+
+    // Entity names
+    { token: 'entity.name', foreground: '1E90FF', fontStyle: 'bold' },
+    { token: 'entity.name.table', foreground: '4169E1', fontStyle: 'bold' },
+    { token: 'entity.name.column', foreground: '228B22' },
+
+    // Data types - bright green
+    { token: 'type', foreground: '00AA00', fontStyle: 'bold' },
+
+    // Constants and literals
+    { token: 'constant.format', foreground: 'DAA520', fontStyle: 'bold' },
+    { token: 'constant.boolean', foreground: 'FF0000', fontStyle: 'bold' },        // Bright red for yes/no
+    { token: 'constant.boolean.dax', foreground: 'FF0000', fontStyle: 'bold' },
+    { token: 'constant.array', foreground: '9932CC' },
+    { token: 'constant.array.dax', foreground: '9932CC' },
+    { token: 'constant.date', foreground: 'FF4500' },
+    { token: 'constant.blank.dax', foreground: '696969', fontStyle: 'italic' },
+
+    // DAX functions by category
+    { token: 'support.function.aggregation', foreground: 'FF8C00', fontStyle: 'bold' },
+    { token: 'support.function.filter', foreground: 'DC143C', fontStyle: 'bold' },
+    { token: 'support.function.relationship', foreground: '32CD32', fontStyle: 'bold' },
+    { token: 'support.function.table', foreground: '4682B4', fontStyle: 'bold' },
+    { token: 'support.function.iterator', foreground: 'BA55D3', fontStyle: 'bold' },
+    { token: 'support.function.logical', foreground: 'C71585', fontStyle: 'bold' },
+    { token: 'support.function.math', foreground: '008B8B', fontStyle: 'bold' },
+    { token: 'support.function.text', foreground: 'CD853F', fontStyle: 'bold' },
+    { token: 'support.function.datetime', foreground: 'FF6347', fontStyle: 'bold' },
+    { token: 'support.function.timeintel', foreground: 'DA70D6', fontStyle: 'bold' },
+    { token: 'support.function.info', foreground: '708090', fontStyle: 'bold' },
+
+    // DAX keywords
+    { token: 'keyword.dax', foreground: '8B008B', fontStyle: 'bold' },
+
+    // Table and column references - bright blue
+    { token: 'variable.table-column', foreground: '0066CC', fontStyle: 'bold' },
+
+    // Numbers - bright blue
+    { token: 'number', foreground: '0000FF', fontStyle: 'bold' },
+    { token: 'number.float', foreground: '0000FF', fontStyle: 'bold' },
+    { token: 'number.hex', foreground: '0000FF', fontStyle: 'bold' },
+    { token: 'number.dax', foreground: '0000FF', fontStyle: 'bold' },
+    { token: 'number.float.dax', foreground: '0000FF', fontStyle: 'bold' },
+
+    // Strings - bright red
+    { token: 'string', foreground: 'CC0000', fontStyle: 'bold' },
+    { token: 'string.quote', foreground: 'CC0000', fontStyle: 'bold' },
+    { token: 'string.format', foreground: 'B8860B', fontStyle: 'italic bold' },
+    { token: 'string.dax', foreground: 'CC0000', fontStyle: 'bold' },
+    { token: 'string.escape', foreground: 'FF0000' },
+    { token: 'string.escape.invalid', foreground: 'FF0000' },
+    { token: 'string.invalid', foreground: 'FF0000', fontStyle: 'underline' },
+
+    // Operators
+    { token: 'operator', foreground: '000000' },
+    { token: 'operator.arithmetic', foreground: '000000' },
+    { token: 'operator.comparison.dax', foreground: '000000' },
+    { token: 'operator.logical.dax', foreground: '0000FF' },
+    { token: 'operator.arithmetic.dax', foreground: '000000' },
+    { token: 'operator.concatenation.dax', foreground: '000000' },
+
+    // Delimiters
+    { token: 'delimiter', foreground: '000000' },
+    { token: 'delimiter.colon', foreground: 'FF8C00', fontStyle: 'bold' },
+    { token: 'delimiter.dax.start', foreground: 'FF8C00', fontStyle: 'bold' },
+    { token: 'delimiter.dax.end', foreground: 'FF8C00', fontStyle: 'bold' },
+    { token: 'delimiter.dax', foreground: '000000' },
+    { token: 'delimiter.bracket', foreground: '000000' },
+    { token: 'delimiter.bracket.dax', foreground: '000000' },
+    { token: 'delimiter.curly', foreground: '000000' },
+    { token: 'delimiter.parenthesis', foreground: '000000' },
+    { token: 'delimiter.parenthesis.dax', foreground: '000000' },
+
+    // Identifiers
+    { token: 'identifier', foreground: '001080' },
+    { token: 'identifier.dax', foreground: '001080' },
+
+    // Other
+    { token: 'text.dax', foreground: '000000' },
+  ],
+  colors: {
+    'editor.background': '#FFFFFF',
+    'editor.foreground': '#000000',
+    'editorLineNumber.foreground': '#237893',
+    'editorLineNumber.activeForeground': '#0B216F',
+    'editorIndentGuide.background': '#D3D3D3',
+    'editorIndentGuide.activeBackground': '#939393',
+    'editor.selectionBackground': '#ADD6FF',
+    'editor.selectionHighlightBackground': '#ADD6FF4D',
+    'editor.inactiveSelectionBackground': '#E5EBF1',
+    'editorBracketMatch.background': '#0064001a',
+    'editorBracketMatch.border': '#B9B9B9',
+    'editorCursor.foreground': '#000000',
+    'editorWhitespace.foreground': '#BFBFBF',
+    'editorError.foreground': '#FF0000',
+    'editorWarning.foreground': '#FFA500',
+    'editorInfo.foreground': '#1E90FF',
+    'editor.findMatchBackground': '#A8AC94',
+    'editor.findMatchHighlightBackground': '#EA5C004D',
+    'editor.findRangeHighlightBackground': '#B4B4B44D',
+    'editorGutter.background': '#F7F7F7',
+    'editorGutter.modifiedBackground': '#1E90FF',
+    'editorGutter.addedBackground': '#587C0C',
+    'editorGutter.deletedBackground': '#AD0707'
+  }
+}
+
+// Enhanced dark theme configuration for Copper language
+export const copperDarkTheme: monaco.editor.IStandaloneThemeData = {
   base: 'vs-dark',
   inherit: true,
   rules: [
-    // Comments
-    { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-    { token: 'comment.dax', foreground: '6A9955', fontStyle: 'italic' },
+    // Comments - bright green
+    { token: 'comment', foreground: '00FF00', fontStyle: 'italic bold' },
+    { token: 'comment.dax', foreground: '00FF00', fontStyle: 'italic bold' },
 
-    // Copper language keywords
-    { token: 'keyword', foreground: 'C586C0' },
-    { token: 'keyword.declaration', foreground: '569CD6', fontStyle: 'bold' },
-    { token: 'keyword.property', foreground: 'FF7F50' },
-    { token: 'keyword.join', foreground: 'FFB6C1' },
-    { token: 'keyword.relationship', foreground: 'DDA0DD' },
+    // Copper language keywords - very bright colors
+    { token: 'keyword', foreground: 'FF69B4' },
+    { token: 'keyword.declaration', foreground: '00BFFF', fontStyle: 'bold' },      // Deep sky blue for model/view/dimension/measure
+    { token: 'keyword.property', foreground: 'FF8C00', fontStyle: 'bold' },        // Dark orange for type/expression/etc
+    { token: 'keyword.join', foreground: 'FF69B4', fontStyle: 'bold' },
+    { token: 'keyword.relationship', foreground: 'DA70D6', fontStyle: 'bold' },
 
     // Entity names
     { token: 'entity.name', foreground: '4FC1FF', fontStyle: 'bold' },
     { token: 'entity.name.table', foreground: '87CEEB', fontStyle: 'bold' },
     { token: 'entity.name.column', foreground: '98FB98' },
 
-    // Data types
-    { token: 'type', foreground: '4EC9B0', fontStyle: 'bold' },
+    // Data types - bright cyan
+    { token: 'type', foreground: '00FFFF', fontStyle: 'bold' },
 
     // Constants and literals
-    { token: 'constant.format', foreground: 'F0E68C' },
-    { token: 'constant.boolean', foreground: '569CD6', fontStyle: 'bold' },
-    { token: 'constant.boolean.dax', foreground: '569CD6', fontStyle: 'bold' },
+    { token: 'constant.format', foreground: 'FFFF00', fontStyle: 'bold' },          // Bright yellow
+    { token: 'constant.boolean', foreground: 'FF4500', fontStyle: 'bold' },        // Orange-red for yes/no
+    { token: 'constant.boolean.dax', foreground: 'FF4500', fontStyle: 'bold' },
     { token: 'constant.array', foreground: 'DDA0DD' },
     { token: 'constant.array.dax', foreground: 'DDA0DD' },
     { token: 'constant.date', foreground: 'FFA07A' },
@@ -332,21 +454,21 @@ export const copperTheme: monaco.editor.IStandaloneThemeData = {
     // DAX keywords
     { token: 'keyword.dax', foreground: 'DA70D6', fontStyle: 'bold' },
 
-    // Table and column references
-    { token: 'variable.table-column', foreground: '87CEEB' },
+    // Table and column references - bright light blue
+    { token: 'variable.table-column', foreground: '87CEFA', fontStyle: 'bold' },
 
-    // Numbers
-    { token: 'number', foreground: 'B5CEA8' },
-    { token: 'number.float', foreground: 'B5CEA8' },
-    { token: 'number.hex', foreground: 'B5CEA8' },
-    { token: 'number.dax', foreground: 'B5CEA8' },
-    { token: 'number.float.dax', foreground: 'B5CEA8' },
+    // Numbers - bright light green
+    { token: 'number', foreground: '90EE90', fontStyle: 'bold' },
+    { token: 'number.float', foreground: '90EE90', fontStyle: 'bold' },
+    { token: 'number.hex', foreground: '90EE90', fontStyle: 'bold' },
+    { token: 'number.dax', foreground: '90EE90', fontStyle: 'bold' },
+    { token: 'number.float.dax', foreground: '90EE90', fontStyle: 'bold' },
 
-    // Strings
-    { token: 'string', foreground: 'CE9178' },
-    { token: 'string.quote', foreground: 'CE9178' },
-    { token: 'string.format', foreground: 'F0E68C', fontStyle: 'italic' },
-    { token: 'string.dax', foreground: 'CE9178' },
+    // Strings - bright salmon
+    { token: 'string', foreground: 'FFA07A', fontStyle: 'bold' },
+    { token: 'string.quote', foreground: 'FFA07A', fontStyle: 'bold' },
+    { token: 'string.format', foreground: 'FFFF00', fontStyle: 'italic bold' },
+    { token: 'string.dax', foreground: 'FFA07A', fontStyle: 'bold' },
     { token: 'string.escape', foreground: 'D7BA7D' },
     { token: 'string.escape.invalid', foreground: 'F44747' },
     { token: 'string.invalid', foreground: 'F44747', fontStyle: 'underline' },
@@ -588,8 +710,35 @@ const hoverProvider: monaco.languages.HoverProvider = {
 
 // Register the Copper language with Monaco
 export function registerCopperLanguage() {
-  // Register language
-  monaco.languages.register({ id: 'copper' })
+  console.log('Registering Copper language...')
+  
+  try {
+    // Register the language directly without checking if it exists
+    // This forces re-registration which might be needed
+    monaco.languages.register({ 
+      id: 'copper',
+      extensions: ['.copper'],
+      aliases: ['Copper', 'copper'],
+      mimetypes: ['text/copper']
+    })
+    console.log('Copper language registration called')
+    
+    // Immediately verify registration
+    const verifyLanguages = monaco.languages.getLanguages()
+    const isNowRegistered = verifyLanguages.some(lang => lang.id === 'copper')
+    console.log('Registration verification:', isNowRegistered)
+    
+    if (!isNowRegistered) {
+      console.error('❌ Language registration failed - copper not found in languages list')
+      return false
+    } else {
+      console.log('✅ Language registration successful')
+    }
+    
+  } catch (error) {
+    console.error('Error registering Copper language:', error)
+    return false
+  }
 
   // Set language configuration
   monaco.languages.setLanguageConfiguration('copper', {
@@ -626,10 +775,27 @@ export function registerCopperLanguage() {
   })
 
   // Set monarch tokenizer
-  monaco.languages.setMonarchTokensProvider('copper', copperLanguageDefinition)
+  try {
+    monaco.languages.setMonarchTokensProvider('copper', copperLanguageDefinition)
+    console.log('Monarch tokenizer set for Copper')
+  } catch (error) {
+    console.error('Error setting Monarch tokenizer:', error)
+  }
 
-  // Define theme
-  monaco.editor.defineTheme('copper-dark', copperTheme)
+  // Define themes
+  try {
+    console.log('Defining Copper themes...')
+    monaco.editor.defineTheme('copper-light', copperLightTheme)
+    monaco.editor.defineTheme('copper-dark', copperDarkTheme)
+    console.log('Copper themes defined: copper-light, copper-dark')
+    
+    // Also set the tokenizer for plaintext to use our copper tokenizer
+    // This is a fallback in case the language setting doesn't work
+    monaco.languages.setMonarchTokensProvider('plaintext', copperLanguageDefinition)
+    console.log('Applied Copper tokenizer to plaintext as fallback')
+  } catch (error) {
+    console.error('Error defining themes:', error)
+  }
 
   // Register completion provider
   monaco.languages.registerCompletionItemProvider('copper', completionProvider)
@@ -724,4 +890,7 @@ export function registerCopperLanguage() {
       return ranges
     }
   })
+
+  console.log('Copper language registration completed successfully')
+  return true
 }

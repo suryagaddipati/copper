@@ -4,243 +4,243 @@
 model: customers {
   # Primary Key
   dimension: customer_id {
-    type: string
+    type: string ;;
     expression: Customers[CustomerID] ;;
-    primary_key: yes
-    label: "Customer ID"
-    description: "Unique identifier for each customer"
+    primary_key: yes ;;
+    label: "Customer ID" ;;
+    description: "Unique identifier for each customer" ;;
   }
   
   # Basic Customer Information
   dimension: customer_name {
-    type: string
+    type: string ;;
     expression: Customers[CustomerName] ;;
-    label: "Customer Name"
-    description: "Full name of the customer"
+    label: "Customer Name" ;;
+    description: "Full name of the customer" ;;
   }
   
   dimension: email {
-    type: string
+    type: string ;;
     expression: Customers[Email] ;;
-    label: "Email Address"
-    description: "Customer's email address"
+    label: "Email Address" ;;
+    description: "Customer's email address" ;;
   }
   
   dimension: phone {
-    type: string
+    type: string ;;
     expression: Customers[Phone] ;;
-    label: "Phone Number"
-    description: "Customer's phone number"
+    label: "Phone Number" ;;
+    description: "Customer's phone number" ;;
   }
   
   # Customer Registration
   dimension: registration_date {
-    type: date
+    type: date ;;
     expression: Customers[RegistrationDate] ;;
-    label: "Registration Date"
-    description: "Date when customer registered"
+    label: "Registration Date" ;;
+    description: "Date when customer registered" ;;
   }
   
   dimension: account_status {
-    type: string
+    type: string ;;
     expression: Customers[AccountStatus] ;;
-    label: "Account Status"
-    description: "Current status of customer account"
+    label: "Account Status" ;;
+    description: "Current status of customer account" ;;
   }
   
   dimension: is_active {
-    type: yesno
+    type: yesno ;;
     expression: Customers[AccountStatus] = "Active" ;;
-    label: "Is Active"
-    description: "Whether the customer account is active"
+    label: "Is Active" ;;
+    description: "Whether the customer account is active" ;;
   }
   
   # Demographics
   dimension: age {
-    type: number
+    type: number ;;
     expression: Customers[Age] ;;
-    value_format: decimal_0
-    label: "Age"
-    description: "Customer's age in years"
+    value_format: decimal_0 ;;
+    label: "Age" ;;
+    description: "Customer's age in years" ;;
   }
   
   dimension: age_group {
-    type: tier
+    type: tier ;;
     expression: Customers[Age] ;;
-    tiers: [0, 18, 25, 35, 45, 55, 65, 100]
-    label: "Age Group"
-    description: "Age grouping for demographic analysis"
+    tiers: [0, 18, 25, 35, 45, 55, 65, 100] ;;
+    label: "Age Group" ;;
+    description: "Age grouping for demographic analysis" ;;
   }
   
   dimension: gender {
-    type: string
+    type: string ;;
     expression: Customers[Gender] ;;
-    label: "Gender"
-    description: "Customer's gender"
+    label: "Gender" ;;
+    description: "Customer's gender" ;;
   }
   
   # Geographic Information
   dimension: country {
-    type: string
+    type: string ;;
     expression: Customers[Country] ;;
-    label: "Country"
-    description: "Customer's country"
+    label: "Country" ;;
+    description: "Customer's country" ;;
   }
   
   dimension: state {
-    type: string
+    type: string ;;
     expression: Customers[State] ;;
-    label: "State"
-    description: "Customer's state or province"
+    label: "State" ;;
+    description: "Customer's state or province" ;;
   }
   
   dimension: city {
-    type: string
+    type: string ;;
     expression: Customers[City] ;;
-    label: "City"
-    description: "Customer's city"
+    label: "City" ;;
+    description: "Customer's city" ;;
   }
   
   dimension: zipcode {
-    type: zipcode
+    type: zipcode ;;
     expression: Customers[ZipCode] ;;
-    label: "ZIP Code"
-    description: "Customer's postal code"
+    label: "ZIP Code" ;;
+    description: "Customer's postal code" ;;
   }
   
   dimension: customer_location {
-    type: location
+    type: location ;;
     sql_latitude: Customers[Latitude] ;;
     sql_longitude: Customers[Longitude] ;;
-    label: "Customer Location"
-    description: "Geographic coordinates of customer"
+    label: "Customer Location" ;;
+    description: "Geographic coordinates of customer" ;;
   }
   
   # Customer Value
   dimension: total_spent {
-    type: number
+    type: number ;;
     expression: Customers[TotalSpent] ;;
-    value_format: usd
-    label: "Total Spent"
-    description: "Total amount spent by customer"
+    value_format: usd ;;
+    label: "Total Spent" ;;
+    description: "Total amount spent by customer" ;;
   }
   
   dimension: customer_tier {
-    type: tier
+    type: tier ;;
     expression: Customers[TotalSpent] ;;
-    tiers: [0, 100, 500, 1000, 5000, 10000]
-    label: "Customer Tier"
-    description: "Customer segmentation based on spending"
+    tiers: [0, 100, 500, 1000, 5000, 10000] ;;
+    label: "Customer Tier" ;;
+    description: "Customer segmentation based on spending" ;;
   }
   
   dimension: lifetime_orders {
-    type: number
+    type: number ;;
     expression: Customers[LifetimeOrders] ;;
-    value_format: decimal_0
-    label: "Lifetime Orders"
-    description: "Total number of orders placed by customer"
+    value_format: decimal_0 ;;
+    label: "Lifetime Orders" ;;
+    description: "Total number of orders placed by customer" ;;
   }
   
   dimension: is_vip {
-    type: yesno
+    type: yesno ;;
     expression: Customers[TotalSpent] >= 10000 ;;
-    label: "Is VIP"
-    description: "Whether customer qualifies as VIP (>=$10k spent)"
+    label: "Is VIP" ;;
+    description: "Whether customer qualifies as VIP (>=$10k spent)" ;;
   }
   
   # Customer Preferences
   dimension: preferred_category {
-    type: string
+    type: string ;;
     expression: Customers[PreferredCategory] ;;
-    label: "Preferred Category"
-    description: "Customer's most purchased product category"
+    label: "Preferred Category" ;;
+    description: "Customer's most purchased product category" ;;
   }
   
   dimension: marketing_opt_in {
-    type: yesno
+    type: yesno ;;
     expression: Customers[MarketingOptIn] = 1 ;;
-    label: "Marketing Opt-in"
-    description: "Whether customer opted in for marketing communications"
+    label: "Marketing Opt-in" ;;
+    description: "Whether customer opted in for marketing communications" ;;
   }
   
   # Measures
   measure: total_customers {
-    type: count
+    type: count ;;
     expression: Customers[CustomerID] ;;
-    label: "Total Customers"
-    description: "Total number of customers"
+    label: "Total Customers" ;;
+    description: "Total number of customers" ;;
   }
   
   measure: active_customers {
-    type: count
+    type: count ;;
     expression: Customers[CustomerID] ;;
-    label: "Active Customers"
-    description: "Number of active customers"
+    label: "Active Customers" ;;
+    description: "Number of active customers" ;;
   }
   
   measure: new_customers {
-    type: count
+    type: count ;;
     expression: Customers[CustomerID] ;;
-    label: "New Customers"
-    description: "Number of new customer registrations"
+    label: "New Customers" ;;
+    description: "Number of new customer registrations" ;;
   }
   
   measure: average_age {
-    type: average
+    type: average ;;
     expression: Customers[Age] ;;
-    value_format: "0.0"
-    label: "Average Age"
-    description: "Average age of customers"
+    value_format: "0.0" ;;
+    label: "Average Age" ;;
+    description: "Average age of customers" ;;
   }
   
   measure: total_customer_value {
-    type: sum
+    type: sum ;;
     expression: Customers[TotalSpent] ;;
-    value_format: usd
-    label: "Total Customer Value"
-    description: "Sum of all customer lifetime values"
+    value_format: usd ;;
+    label: "Total Customer Value" ;;
+    description: "Sum of all customer lifetime values" ;;
   }
   
   measure: average_customer_value {
-    type: average
+    type: average ;;
     expression: Customers[TotalSpent] ;;
-    value_format: usd
-    label: "Average Customer Value"
-    description: "Average lifetime value per customer"
+    value_format: usd ;;
+    label: "Average Customer Value" ;;
+    description: "Average lifetime value per customer" ;;
   }
   
   measure: vip_customers {
-    type: count
+    type: count ;;
     expression: Customers[CustomerID] ;;
-    label: "VIP Customers"
-    description: "Number of VIP customers"
+    label: "VIP Customers" ;;
+    description: "Number of VIP customers" ;;
   }
   
   measure: vip_percentage {
-    type: number
+    type: number ;;
     expression: DIVIDE(
       COUNTROWS(FILTER(Customers, Customers[TotalSpent] >= 10000)),
       COUNTROWS(Customers)
     ) ;;
-    value_format: "0.0%"
-    label: "VIP Percentage"
-    description: "Percentage of customers who are VIP"
+    value_format: "0.0%" ;;
+    label: "VIP Percentage" ;;
+    description: "Percentage of customers who are VIP" ;;
   }
   
   measure: opt_in_rate {
-    type: number
+    type: number ;;
     expression: DIVIDE(
       COUNTROWS(FILTER(Customers, Customers[MarketingOptIn] = 1)),
       COUNTROWS(Customers)
     ) ;;
-    value_format: "0.0%"
-    label: "Marketing Opt-in Rate"
-    description: "Percentage of customers opted in for marketing"
+    value_format: "0.0%" ;;
+    label: "Marketing Opt-in Rate" ;;
+    description: "Percentage of customers opted in for marketing" ;;
   }
   
   # Complex Calculated Measures
   measure: customer_acquisition_rate {
-    type: number
+    type: number ;;
     expression:
       VAR CurrentMonthCustomers = COUNTROWS(
         FILTER(Customers, 
@@ -255,19 +255,19 @@ model: customers {
         )
       )
       RETURN DIVIDE(CurrentMonthCustomers - PreviousMonthCustomers, PreviousMonthCustomers) ;;
-    value_format: "0.0%"
-    label: "Customer Acquisition Rate"
-    description: "Month-over-month customer acquisition growth rate"
+    value_format: "0.0%" ;;
+    label: "Customer Acquisition Rate" ;;
+    description: "Month-over-month customer acquisition growth rate" ;;
   }
   
   measure: average_orders_per_customer {
-    type: number
+    type: number ;;
     expression: DIVIDE(
       SUM(Customers[LifetimeOrders]),
       COUNTROWS(Customers)
     ) ;;
-    value_format: "0.0"
-    label: "Avg Orders per Customer"
-    description: "Average number of orders per customer"
+    value_format: "0.0" ;;
+    label: "Avg Orders per Customer" ;;
+    description: "Average number of orders per customer" ;;
   }
 }

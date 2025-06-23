@@ -328,7 +328,7 @@ EOF
 test_parsers() {
     print_status $BLUE "Testing generated parsers..."
     
-    local example_file="../../examples/ecommerce_orders.copper"
+    local example_file="../examples/ecommerce_orders.copper"
     
     if [ ! -f "$example_file" ]; then
         print_status $YELLOW "⚠ No example files found for testing"

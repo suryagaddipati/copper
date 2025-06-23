@@ -6,29 +6,29 @@ view: sales_analysis {
   
   # Join customer information
   join: customers {
-    type: left_outer
-    relationship: many_to_one
+    type: left_outer ;;
+    relationship: many_to_one ;;
     expression: Orders[CustomerID] = Customers[CustomerID] ;;
   }
   
   # Join product information
   join: products {
-    type: inner
-    relationship: many_to_one
+    type: inner ;;
+    relationship: many_to_one ;;
     expression: Orders[ProductID] = Products[ProductID] ;;
   }
   
   # Join order items for detailed analysis
   join: order_items {
-    type: left_outer
-    relationship: one_to_many
+    type: left_outer ;;
+    relationship: one_to_many ;;
     expression: Orders[OrderID] = OrderItems[OrderID] ;;
   }
   
   # Join product categories
   join: product_categories {
-    type: left_outer
-    relationship: many_to_one
+    type: left_outer ;;
+    relationship: many_to_one ;;
     expression: Products[CategoryID] = ProductCategories[CategoryID] ;;
   }
 }

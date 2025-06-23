@@ -4,302 +4,302 @@
 model: products {
   # Primary Key
   dimension: product_id {
-    type: string
+    type: string ;;
     expression: Products[ProductID] ;;
-    primary_key: yes
-    label: "Product ID"
-    description: "Unique identifier for each product"
+    primary_key: yes ;;
+    label: "Product ID" ;;
+    description: "Unique identifier for each product" ;;
   }
   
   # Basic Product Information
   dimension: product_name {
-    type: string
+    type: string ;;
     expression: Products[ProductName] ;;
-    label: "Product Name"
-    description: "Name of the product"
+    label: "Product Name" ;;
+    description: "Name of the product" ;;
   }
   
   dimension: product_description {
-    type: string
+    type: string ;;
     expression: Products[Description] ;;
-    label: "Product Description"
-    description: "Detailed description of the product"
-    hidden: yes
+    label: "Product Description" ;;
+    description: "Detailed description of the product" ;;
+    hidden: yes ;;
   }
   
   dimension: sku {
-    type: string
+    type: string ;;
     expression: Products[SKU] ;;
-    label: "SKU"
-    description: "Stock Keeping Unit identifier"
+    label: "SKU" ;;
+    description: "Stock Keeping Unit identifier" ;;
   }
   
   dimension: brand {
-    type: string
+    type: string ;;
     expression: Products[Brand] ;;
-    label: "Brand"
-    description: "Product brand name"
+    label: "Brand" ;;
+    description: "Product brand name" ;;
   }
   
   # Product Classification
   dimension: category_id {
-    type: string
+    type: string ;;
     expression: Products[CategoryID] ;;
-    label: "Category ID"
-    description: "Reference to product category"
+    label: "Category ID" ;;
+    description: "Reference to product category" ;;
   }
   
   dimension: category_name {
-    type: string
+    type: string ;;
     expression: RELATED(ProductCategories[CategoryName]) ;;
-    label: "Category"
-    description: "Product category name"
+    label: "Category" ;;
+    description: "Product category name" ;;
   }
   
   dimension: subcategory {
-    type: string
+    type: string ;;
     expression: RELATED(ProductCategories[Subcategory]) ;;
-    label: "Subcategory"
-    description: "Product subcategory"
+    label: "Subcategory" ;;
+    description: "Product subcategory" ;;
   }
   
   # Pricing Information
   dimension: list_price {
-    type: number
+    type: number ;;
     expression: Products[ListPrice] ;;
-    value_format: usd
-    label: "List Price"
-    description: "Manufacturer's suggested retail price"
+    value_format: usd ;;
+    label: "List Price" ;;
+    description: "Manufacturer's suggested retail price" ;;
   }
   
   dimension: cost {
-    type: number
+    type: number ;;
     expression: Products[Cost] ;;
-    value_format: usd
-    label: "Cost"
-    description: "Cost of the product"
+    value_format: usd ;;
+    label: "Cost" ;;
+    description: "Cost of the product" ;;
   }
   
   dimension: margin_amount {
-    type: number
+    type: number ;;
     expression: Products[ListPrice] - Products[Cost] ;;
-    value_format: usd
-    label: "Margin Amount"
-    description: "Profit margin per unit in dollars"
+    value_format: usd ;;
+    label: "Margin Amount" ;;
+    description: "Profit margin per unit in dollars" ;;
   }
   
   dimension: margin_percentage {
-    type: number
+    type: number ;;
     expression: DIVIDE(
       Products[ListPrice] - Products[Cost],
       Products[ListPrice]
     ) ;;
-    value_format: "0.0%"
-    label: "Margin %"
-    description: "Profit margin as percentage of list price"
+    value_format: "0.0%" ;;
+    label: "Margin %" ;;
+    description: "Profit margin as percentage of list price" ;;
   }
   
   # Price Tiers
   dimension: price_tier {
-    type: tier
+    type: tier ;;
     expression: Products[ListPrice] ;;
-    tiers: [0, 25, 50, 100, 250, 500, 1000]
-    label: "Price Tier"
-    description: "Price range categorization"
+    tiers: [0, 25, 50, 100, 250, 500, 1000] ;;
+    label: "Price Tier" ;;
+    description: "Price range categorization" ;;
   }
   
   # Product Status
   dimension: status {
-    type: string
+    type: string ;;
     expression: Products[Status] ;;
-    label: "Status"
-    description: "Current product status"
+    label: "Status" ;;
+    description: "Current product status" ;;
   }
   
   dimension: is_active {
-    type: yesno
+    type: yesno ;;
     expression: Products[Status] = "Active" ;;
-    label: "Is Active"
-    description: "Whether product is currently active"
+    label: "Is Active" ;;
+    description: "Whether product is currently active" ;;
   }
   
   dimension: is_discontinued {
-    type: yesno
+    type: yesno ;;
     expression: Products[Status] = "Discontinued" ;;
-    label: "Is Discontinued"
-    description: "Whether product has been discontinued"
+    label: "Is Discontinued" ;;
+    description: "Whether product has been discontinued" ;;
   }
   
   # Product Dates
   dimension: launch_date {
-    type: date
+    type: date ;;
     expression: Products[LaunchDate] ;;
-    label: "Launch Date"
-    description: "Date when product was launched"
+    label: "Launch Date" ;;
+    description: "Date when product was launched" ;;
   }
   
   dimension: discontinue_date {
-    type: date
+    type: date ;;
     expression: Products[DiscontinueDate] ;;
-    label: "Discontinue Date"
-    description: "Date when product was discontinued"
+    label: "Discontinue Date" ;;
+    description: "Date when product was discontinued" ;;
   }
   
   # Physical Properties
   dimension: weight {
-    type: number
+    type: number ;;
     expression: Products[Weight] ;;
-    value_format: "0.00"
-    label: "Weight (lbs)"
-    description: "Product weight in pounds"
+    value_format: "0.00" ;;
+    label: "Weight (lbs)" ;;
+    description: "Product weight in pounds" ;;
   }
   
   dimension: length {
-    type: number
+    type: number ;;
     expression: Products[Length] ;;
-    value_format: "0.0"
-    label: "Length (inches)"
-    description: "Product length in inches"
+    value_format: "0.0" ;;
+    label: "Length (inches)" ;;
+    description: "Product length in inches" ;;
   }
   
   dimension: width {
-    type: number
+    type: number ;;
     expression: Products[Width] ;;
-    value_format: "0.0"
-    label: "Width (inches)"
-    description: "Product width in inches"
+    value_format: "0.0" ;;
+    label: "Width (inches)" ;;
+    description: "Product width in inches" ;;
   }
   
   dimension: height {
-    type: number
+    type: number ;;
     expression: Products[Height] ;;
-    value_format: "0.0"
-    label: "Height (inches)"
-    description: "Product height in inches"
+    value_format: "0.0" ;;
+    label: "Height (inches)" ;;
+    description: "Product height in inches" ;;
   }
   
   dimension: color {
-    type: string
+    type: string ;;
     expression: Products[Color] ;;
-    label: "Color"
-    description: "Primary color of the product"
+    label: "Color" ;;
+    description: "Primary color of the product" ;;
   }
   
   dimension: size {
-    type: string
+    type: string ;;
     expression: Products[Size] ;;
-    label: "Size"
-    description: "Size designation (S, M, L, XL, etc.)"
+    label: "Size" ;;
+    description: "Size designation (S, M, L, XL, etc.)" ;;
   }
   
   # Supplier Information
   dimension: supplier_id {
-    type: string
+    type: string ;;
     expression: Products[SupplierID] ;;
-    label: "Supplier ID"
-    description: "Reference to product supplier"
+    label: "Supplier ID" ;;
+    description: "Reference to product supplier" ;;
   }
   
   dimension: supplier_name {
-    type: string
+    type: string ;;
     expression: RELATED(Suppliers[SupplierName]) ;;
-    label: "Supplier"
-    description: "Name of the product supplier"
+    label: "Supplier" ;;
+    description: "Name of the product supplier" ;;
   }
   
   # Inventory
   dimension: current_stock {
-    type: number
+    type: number ;;
     expression: RELATED(Inventory[CurrentStock]) ;;
-    value_format: decimal_0
-    label: "Current Stock"
-    description: "Current inventory level"
+    value_format: decimal_0 ;;
+    label: "Current Stock" ;;
+    description: "Current inventory level" ;;
   }
   
   dimension: reorder_level {
-    type: number
+    type: number ;;
     expression: RELATED(Inventory[ReorderLevel]) ;;
-    value_format: decimal_0
-    label: "Reorder Level"
-    description: "Minimum stock level before reordering"
+    value_format: decimal_0 ;;
+    label: "Reorder Level" ;;
+    description: "Minimum stock level before reordering" ;;
   }
   
   dimension: is_low_stock {
-    type: yesno
+    type: yesno ;;
     expression: RELATED(Inventory[CurrentStock]) <= RELATED(Inventory[ReorderLevel]) ;;
-    label: "Is Low Stock"
-    description: "Whether product is below reorder level"
+    label: "Is Low Stock" ;;
+    description: "Whether product is below reorder level" ;;
   }
   
   # Measures
   measure: total_products {
-    type: count
+    type: count ;;
     expression: Products[ProductID] ;;
-    label: "Total Products"
-    description: "Total number of products in catalog"
+    label: "Total Products" ;;
+    description: "Total number of products in catalog" ;;
   }
   
   measure: active_products {
-    type: count
+    type: count ;;
     expression: Products[ProductID] ;;
-    label: "Active Products"
-    description: "Number of active products"
+    label: "Active Products" ;;
+    description: "Number of active products" ;;
   }
   
   measure: discontinued_products {
-    type: count
+    type: count ;;
     expression: Products[ProductID] ;;
-    label: "Discontinued Products"
-    description: "Number of discontinued products"
+    label: "Discontinued Products" ;;
+    description: "Number of discontinued products" ;;
   }
   
   measure: average_list_price {
-    type: average
+    type: average ;;
     expression: Products[ListPrice] ;;
-    value_format: usd
-    label: "Average List Price"
-    description: "Average list price across all products"
+    value_format: usd ;;
+    label: "Average List Price" ;;
+    description: "Average list price across all products" ;;
   }
   
   measure: average_cost {
-    type: average
+    type: average ;;
     expression: Products[Cost] ;;
-    value_format: usd
-    label: "Average Cost"
-    description: "Average cost across all products"
+    value_format: usd ;;
+    label: "Average Cost" ;;
+    description: "Average cost across all products" ;;
   }
   
   measure: average_margin_percentage {
-    type: average
+    type: average ;;
     expression: DIVIDE(
       Products[ListPrice] - Products[Cost],
       Products[ListPrice]
     ) ;;
-    value_format: "0.0%"
-    label: "Average Margin %"
-    description: "Average profit margin percentage"
+    value_format: "0.0%" ;;
+    label: "Average Margin %" ;;
+    description: "Average profit margin percentage" ;;
   }
   
   measure: total_inventory_value {
-    type: number
+    type: number ;;
     expression: SUMX(
       Products,
       Products[Cost] * RELATED(Inventory[CurrentStock])
     ) ;;
-    value_format: usd
-    label: "Total Inventory Value"
-    description: "Total value of current inventory at cost"
+    value_format: usd ;;
+    label: "Total Inventory Value" ;;
+    description: "Total value of current inventory at cost" ;;
   }
   
   measure: low_stock_products {
-    type: count
+    type: count ;;
     expression: Products[ProductID] ;;
-    label: "Low Stock Products"
-    description: "Number of products below reorder level"
+    label: "Low Stock Products" ;;
+    description: "Number of products below reorder level" ;;
   }
   
   measure: low_stock_percentage {
-    type: number
+    type: number ;;
     expression: DIVIDE(
       COUNTROWS(
         FILTER(Products, 
@@ -308,30 +308,30 @@ model: products {
       ),
       COUNTROWS(Products)
     ) ;;
-    value_format: "0.0%"
-    label: "Low Stock %"
-    description: "Percentage of products that are low stock"
+    value_format: "0.0%" ;;
+    label: "Low Stock %" ;;
+    description: "Percentage of products that are low stock" ;;
   }
   
   # Category Analysis Measures
   measure: categories_count {
-    type: count_distinct
+    type: count_distinct ;;
     expression: Products[CategoryID] ;;
-    label: "Number of Categories"
-    description: "Count of distinct product categories"
+    label: "Number of Categories" ;;
+    description: "Count of distinct product categories" ;;
   }
   
   measure: brands_count {
-    type: count_distinct
+    type: count_distinct ;;
     expression: Products[Brand] ;;
-    label: "Number of Brands"
-    description: "Count of distinct brands"
+    label: "Number of Brands" ;;
+    description: "Count of distinct brands" ;;
   }
   
   measure: suppliers_count {
-    type: count_distinct
+    type: count_distinct ;;
     expression: Products[SupplierID] ;;
-    label: "Number of Suppliers"
-    description: "Count of distinct suppliers"
+    label: "Number of Suppliers" ;;
+    description: "Count of distinct suppliers" ;;
   }
 }

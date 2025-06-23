@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Editor from '@monaco-editor/react'
-import { Check, X, FileText, BarChart3, Loader2 } from 'lucide-react'
+import { Check, X, FileText, BarChart3, Loader2, Sun, Moon } from 'lucide-react'
 import axios from 'axios'
 import { registerCopperLanguage } from './copper-language'
 import * as monaco from 'monaco-editor'
@@ -77,14 +77,21 @@ function App() {
   const [parseResult, setParseResult] = useState<ParseResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingExamples, setLoadingExamples] = useState(true)
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof monaco | null>(null)
 
-  // Fetch examples on component mount and register language
+  // Fetch examples on component mount and register language early
   useEffect(() => {
     fetchExamples()
+    // Register language immediately when component mounts, before editor initialization
     registerCopperLanguage()
   }, [])
+
+  // Update document theme attribute when theme changes
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light')
+  }, [isDarkTheme])
 
   // Parse code whenever it changes and update editor markers
   useEffect(() => {
@@ -197,12 +204,65 @@ function App() {
   }
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => {
+    console.log('Editor mounted, current theme:', isDarkTheme ? 'dark' : 'light')
     editorRef.current = editor
     monacoRef.current = monacoInstance
     
+    // Ensure language is registered and create new model with correct language
+    const setupCopperEditor = () => {
+      // Register the language first
+      const success = registerCopperLanguage()
+      console.log('Language registration result:', success)
+      
+      // Get current content
+      const currentModel = editor.getModel()
+      const content = currentModel ? currentModel.getValue() : ''
+      
+      // Try to set the language on the existing model first
+      if (currentModel) {
+        try {
+          // First try to set language directly
+          monacoInstance.editor.setModelLanguage(currentModel, 'copper')
+          console.log('Language set on existing model, ID:', currentModel.getLanguageId())
+          
+          // If that didn't work, dispose and create new model
+          if (currentModel.getLanguageId() !== 'copper') {
+            console.log('Direct language setting failed, creating new model...')
+            currentModel.dispose()
+            
+            // Try creating with javascript first (which definitely exists), then set language
+            const newModel = monacoInstance.editor.createModel(content, 'javascript')
+            editor.setModel(newModel)
+            
+            // Now try to switch to copper
+            setTimeout(() => {
+              monacoInstance.editor.setModelLanguage(newModel, 'copper')
+              console.log('Final model language:', newModel.getLanguageId())
+              
+              // Force apply copper theme regardless of language ID
+              const currentTheme = isDarkTheme ? "copper-dark" : "copper-light"
+              monacoInstance.editor.setTheme(currentTheme)
+              console.log('Force applied theme after model creation:', currentTheme)
+              
+              // Force apply copper tokenizer even if language ID is wrong
+              if (newModel.getLanguageId() !== 'copper') {
+                console.log('Language setting still failed - but tokenizer should work')
+                // The Monarch tokenizer should still apply syntax highlighting
+              }
+            }, 50)
+          }
+        } catch (error) {
+          console.error('Error setting copper language:', error)
+        }
+      }
+    }
+    
+    // Run setup with a slight delay to ensure registration is complete
+    setTimeout(setupCopperEditor, 100)
+    
     // Update markers if we already have parse results
     if (parseResult) {
-      updateEditorMarkers()
+      setTimeout(() => updateEditorMarkers(), 300)
     }
   }
 
@@ -240,15 +300,35 @@ function App() {
               >
                 Clear
               </button>
+              <button 
+                className="btn" 
+                onClick={() => setIsDarkTheme(!isDarkTheme)}
+                title={isDarkTheme ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              >
+                {isDarkTheme ? <Sun size={14} /> : <Moon size={14} />}
+                {isDarkTheme ? ' Light' : ' Dark'}
+              </button>
             </div>
             <div className="editor-container">
               <Editor
                 height="500px"
-                defaultLanguage="copper"
-                theme="copper-dark"
+                defaultLanguage="plaintext"
+                theme={isDarkTheme ? "copper-dark" : "copper-light"}
                 value={code}
                 onChange={handleEditorChange}
                 onMount={handleEditorDidMount}
+                beforeMount={(monacoInstance) => {
+                  console.log('Before mount - ensuring language is registered')
+                  // Ensure language is registered before editor initialization
+                  registerCopperLanguage()
+                  
+                  // Force set the theme immediately after registration
+                  setTimeout(() => {
+                    const currentTheme = isDarkTheme ? "copper-dark" : "copper-light"
+                    monacoInstance.editor.setTheme(currentTheme)
+                    console.log('Force applied theme:', currentTheme)
+                  }, 50)
+                }}
                 options={{
                   minimap: { enabled: false },
                   scrollBeyondLastLine: false,

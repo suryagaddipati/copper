@@ -28,7 +28,14 @@
       "Bash(npm run dev:*)",
       "Bash(ss:*)",
       "Bash(./start-manual.sh:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "mcp__playwright__browser_navigate",
+      "Bash(./start.sh:*)",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_console_messages"
     ],
     "deny": []
   }
