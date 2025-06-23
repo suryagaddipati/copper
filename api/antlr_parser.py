@@ -19,9 +19,6 @@ try:
     ANTLR_AVAILABLE = True
 except ImportError:
     ANTLR_AVAILABLE = False
-    # Fall back to old parser if ANTLR not available
-    from copper_parser_old import validate_copper_syntax as _old_validate_copper_syntax
-    
     # Mock classes for when ANTLR is not available
     class ErrorListener:
         pass
@@ -328,35 +325,27 @@ class CopperANTLRParser:
 
 
 def validate_copper_syntax(content: str) -> Dict[str, Any]:
-    """Validate Copper syntax and return analysis using ANTLR parser (with fallback)"""
+    """Validate Copper syntax and return analysis using ANTLR parser"""
     if not ANTLR_AVAILABLE:
-        # Fall back to old regex-based parser
-        print("ANTLR not available, using fallback regex parser")
-        return _old_validate_copper_syntax(content)
+        raise ImportError("ANTLR4 runtime not available. Please install antlr4-python3-runtime>=4.13.1")
     
-    try:
-        parser = CopperANTLRParser()
-        result = parser.parse(content)
-        
-        # Convert to same format as original parser for API compatibility
-        analysis = {
-            "valid": result.success,
-            "errors": result.errors,
-            "warnings": result.warnings,
-            "models": [node for node in result.nodes if node.type == NodeType.MODEL],
-            "views": [node for node in result.nodes if node.type == NodeType.VIEW],
-            "statistics": {
-                "total_models": len([n for n in result.nodes if n.type == NodeType.MODEL]),
-                "total_views": len([n for n in result.nodes if n.type == NodeType.VIEW]),
-                "total_dimensions": sum(len([c for c in n.children if c.type == NodeType.DIMENSION]) for n in result.nodes),
-                "total_measures": sum(len([c for c in n.children if c.type == NodeType.MEASURE]) for n in result.nodes),
-                "total_joins": sum(len([c for c in n.children if c.type == NodeType.JOIN]) for n in result.nodes)
-            }
+    parser = CopperANTLRParser()
+    result = parser.parse(content)
+    
+    # Convert to same format as original parser for API compatibility
+    analysis = {
+        "valid": result.success,
+        "errors": result.errors,
+        "warnings": result.warnings,
+        "models": [node for node in result.nodes if node.type == NodeType.MODEL],
+        "views": [node for node in result.nodes if node.type == NodeType.VIEW],
+        "statistics": {
+            "total_models": len([n for n in result.nodes if n.type == NodeType.MODEL]),
+            "total_views": len([n for n in result.nodes if n.type == NodeType.VIEW]),
+            "total_dimensions": sum(len([c for c in n.children if c.type == NodeType.DIMENSION]) for n in result.nodes),
+            "total_measures": sum(len([c for c in n.children if c.type == NodeType.MEASURE]) for n in result.nodes),
+            "total_joins": sum(len([c for c in n.children if c.type == NodeType.JOIN]) for n in result.nodes)
         }
-        
-        return analysis
+    }
     
-    except Exception as e:
-        # Fall back to old parser on any error
-        print(f"ANTLR parser failed: {e}, using fallback regex parser")
-        return _old_validate_copper_syntax(content)
+    return analysis
