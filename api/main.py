@@ -7,7 +7,7 @@ from typing import Dict, List, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from copper_parser import validate_copper_syntax
+from antlr_parser import validate_copper_syntax
 
 app = FastAPI(
     title="Copper Parser API",
