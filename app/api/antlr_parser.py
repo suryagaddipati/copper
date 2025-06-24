@@ -179,34 +179,36 @@ class CopperParseTreeListener(CopperListener):
     def enterExpressionParameter(self, ctx):
         """Enter an expression parameter"""
         if self.current_node:
-            # Try to extract DAX expression content from multiple possible contexts
+            # Extract DAX expression content from token-based parsing
             dax_text = ""
-            if hasattr(ctx, 'daxContent') and ctx.daxContent():
-                dax_text = ctx.daxContent().getText()
-            elif hasattr(ctx, 'daxContentSimple') and ctx.daxContentSimple():
-                dax_text = ctx.daxContentSimple().getText()
-            else:
-                # Fallback: extract everything between COLON and SEMICOLON SEMICOLON
-                # This handles cases where DAX parsing fails but we can still extract the content
-                tokens = []
-                if hasattr(ctx, 'children') and ctx.children:
-                    collecting = False
-                    for child in ctx.children:
-                        child_text = child.getText() if hasattr(child, 'getText') else str(child)
-                        if child_text == ':':
-                            collecting = True
-                            continue
-                        elif child_text == ';;':
-                            break
-                        elif child_text == ';' and collecting:
-                            # Check if this is the start of double semicolon
-                            continue
-                        elif collecting:
-                            tokens.append(child_text)
-                    dax_text = ''.join(tokens)
+            if hasattr(ctx, 'daxExpression') and ctx.daxExpression():
+                # Get the content from daxContent, excluding the trailing ;;
+                dax_expr_ctx = ctx.daxExpression()
+                if hasattr(dax_expr_ctx, 'daxContent') and dax_expr_ctx.daxContent():
+                    dax_text = dax_expr_ctx.daxContent().getText()
+                else:
+                    # Fallback: get all text and remove trailing ;;
+                    full_text = dax_expr_ctx.getText()
+                    dax_text = full_text.rstrip(';').strip()
             
             if dax_text:
-                self.current_node.properties['expression'] = dax_text.strip()
+                # Store the raw DAX expression
+                self.current_node.properties['expression'] = dax_text
+                
+                # Validate using external DAX parser module
+                try:
+                    from dax_parser import validate_dax_expression
+                    validation_result = validate_dax_expression(dax_text)
+                    
+                    # Store validation results for debugging/analysis
+                    self.current_node.properties['dax_validation'] = validation_result
+                    
+                    if not validation_result['valid']:
+                        for error in validation_result['errors']:
+                            self._add_error(f"DAX validation error: {error}", ctx.start.line)
+                except ImportError:
+                    # DAX parser module not available, skip validation
+                    pass
     
     def enterLabelParameter(self, ctx):
         """Enter a label parameter"""

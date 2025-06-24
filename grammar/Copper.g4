@@ -235,30 +235,26 @@ unitsParameter
     ;
 
 // ============================================================================
-// DAX EXPRESSIONS (Blackbox for now)
+// DAX EXPRESSIONS (Delegated to external DAX parser module)
 // ============================================================================
 
 daxExpression
-    : daxToken+ SEMICOLON_SEMICOLON
+    : daxContent SEMICOLON_SEMICOLON
+    ;
+
+daxContent
+    : daxToken+
     ;
 
 daxToken
     : IDENTIFIER
     | NUMBER_LITERAL
     | STRING_LITERAL
-    | LBRACKET
-    | RBRACKET
-    | LPAREN
-    | RPAREN
-    | DOT
-    | COMMA
-    | PLUS
-    | MINUS
-    | MULTIPLY
-    | DIVIDE
-    | EQUALS
-    | LESS_THAN
-    | GREATER_THAN
+    | LBRACKET | RBRACKET
+    | LPAREN | RPAREN
+    | DOT | COMMA
+    | PLUS | MINUS | MULTIPLY | DIVIDE
+    | EQUALS | LESS_THAN | GREATER_THAN
     | contextualKeyword
     ;
 
@@ -453,6 +449,3 @@ WS              : [ \t]+ -> skip;
 // Character classes
 fragment LETTER : [a-zA-Z];
 fragment DIGIT  : [0-9];
-fragment DAX_CHAR : [a-zA-Z0-9_\[\]().] | ' ' | '\t' | '\r' | '\n';
-
-// DAX expressions are now handled by parser rules above
