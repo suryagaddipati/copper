@@ -239,7 +239,27 @@ unitsParameter
 // ============================================================================
 
 daxExpression
-    : DAX_EXPRESSION
+    : daxToken+ SEMICOLON_SEMICOLON
+    ;
+
+daxToken
+    : IDENTIFIER
+    | NUMBER_LITERAL
+    | STRING_LITERAL
+    | LBRACKET
+    | RBRACKET
+    | LPAREN
+    | RPAREN
+    | DOT
+    | COMMA
+    | PLUS
+    | MINUS
+    | MULTIPLY
+    | DIVIDE
+    | EQUALS
+    | LESS_THAN
+    | GREATER_THAN
+    | contextualKeyword
     ;
 
 // ============================================================================
@@ -405,6 +425,16 @@ RBRACE          : '}';
 LBRACKET        : '[';
 RBRACKET        : ']';
 COMMA           : ',';
+LPAREN          : '(';
+RPAREN          : ')';
+DOT             : '.';
+PLUS            : '+';
+MINUS           : '-';
+MULTIPLY        : '*';
+DIVIDE          : '/';
+EQUALS          : '=';
+LESS_THAN       : '<';
+GREATER_THAN    : '>';
 
 // Literals
 IDENTIFIER      : LETTER (LETTER | DIGIT | '_')*;
@@ -425,5 +455,4 @@ fragment LETTER : [a-zA-Z];
 fragment DIGIT  : [0-9];
 fragment DAX_CHAR : [a-zA-Z0-9_\[\]().] | ' ' | '\t' | '\r' | '\n';
 
-// DAX expressions - very permissive rule that captures everything until ;;
-DAX_EXPRESSION  : ~[;]+ ';;';
+// DAX expressions are now handled by parser rules above

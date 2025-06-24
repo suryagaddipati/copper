@@ -1,7 +1,7 @@
 # Copper Development Environment Makefile
 # A beautiful way to build and run the Copper parser and web application
 
-.PHONY: all build parser clean start dev stop install-web install-api test help
+.PHONY: all build parser clean start dev stop install-web install-api test test-all test-verbose help
 
 # Default target
 all: build start
@@ -34,7 +34,9 @@ help:
 	@echo "  $(YELLOW)make stop$(NC)       - Stop all running servers"
 	@echo "  $(YELLOW)make install$(NC)    - Install all dependencies"
 	@echo "  $(YELLOW)make clean$(NC)      - Clean generated files"
-	@echo "  $(YELLOW)make test$(NC)       - Test parser functionality"
+	@echo "  $(YELLOW)make test$(NC)       - Quick parser smoke test"
+	@echo "  $(YELLOW)make test-all$(NC)   - Run comprehensive unit tests"
+	@echo "  $(YELLOW)make test-verbose$(NC) - Run unit tests with verbose output"
 	@echo "  $(YELLOW)make help$(NC)       - Show this help message"
 	@echo ""
 	@echo "$(GREEN)Quick start:$(NC)"
@@ -123,10 +125,22 @@ stop:
 	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
 	@echo "$(GREEN)✅ All servers stopped$(NC)"
 
-# Test parser functionality
+# Test parser functionality (quick smoke test)
 test: parser
 	@echo "$(BLUE)🧪 Testing parser functionality...$(NC)"
 	@cd $(API_DIR) && python3 -c "from antlr_parser import validate_copper_syntax; result = validate_copper_syntax('view: test { from: orders }'); print('$(GREEN)✅ Parser test passed!$(NC)' if result['valid'] else '$(RED)❌ Parser test failed$(NC)'); print('Views:', result['statistics']['total_views']); print('Errors:', result['errors'] if result['errors'] else 'None')"
+
+# Run comprehensive unit tests
+test-all: parser
+	@echo "$(BLUE)🧪 Running comprehensive unit tests...$(NC)"
+	@cd $(API_DIR) && python3 test_parser.py
+	@echo "$(GREEN)✅ All tests completed!$(NC)"
+
+# Run unit tests with verbose output
+test-verbose: parser
+	@echo "$(BLUE)🧪 Running unit tests with verbose output...$(NC)"
+	@cd $(API_DIR) && python3 -m unittest test_parser.py -v
+	@echo "$(GREEN)✅ Verbose tests completed!$(NC)"
 
 # Clean generated files
 clean:

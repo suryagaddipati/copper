@@ -1,0 +1,16 @@
+model: sales {
+  dimension: order_id {
+    type: string
+    expression: Orders[OrderID] ;;
+  }
+  
+  dimension: customer_name {
+    type: string
+    expression: RELATED(Customers[Name]) ;;
+  }
+  
+  dimension: order_total {
+    type: number
+    expression: Orders[Quantity] * Orders[Price] ;;
+  }
+}

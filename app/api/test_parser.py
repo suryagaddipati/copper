@@ -119,6 +119,30 @@ view: order_view {
         
         print("✅ Model and view test passed!")
     
+    def test_dax_expressions(self):
+        """Test parsing models with DAX expressions"""
+        copper_code = """model: orders {
+  dimension: order_id {
+    type: string
+    expression: Orders[OrderID] ;;
+  }
+  dimension: calculated_value {
+    type: number
+    expression: SUM(Orders[Amount]) + 100 ;;
+  }
+}"""
+        
+        result = validate_copper_syntax(copper_code)
+        
+        # Check that parsing succeeded
+        self.assertTrue(result['valid'], f"Parser failed with errors: {result['errors']}")
+        
+        # Check statistics
+        self.assertEqual(result['statistics']['total_models'], 1)
+        self.assertEqual(result['statistics']['total_dimensions'], 2)
+        
+        print("✅ DAX expressions test passed!")
+    
     def test_all_example_files(self):
         """Test parsing all example files"""
         import glob

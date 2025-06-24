@@ -235,8 +235,14 @@ npm run build       # Test production build
 
 ### Parser Testing
 ```bash
-# Test parser functionality using Makefile
+# Quick smoke test
 make test
+
+# Run comprehensive unit tests
+make test-all
+
+# Run unit tests with verbose output
+make test-verbose
 
 # Manual testing of parser
 cd app/api
@@ -250,6 +256,10 @@ with open('../../examples/customers.copper', 'r') as f:
     result = validate_copper_syntax(f.read())
     print(f'Valid: {result[\"valid\"]}, Models: {result[\"statistics\"][\"total_models\"]}, Views: {result[\"statistics\"][\"total_views\"]}')
 "
+
+# Run individual test file directly
+cd app/api
+python3 test_parser.py
 ```
 
 ### API Testing
