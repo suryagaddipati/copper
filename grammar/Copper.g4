@@ -320,15 +320,15 @@ JOIN            : 'join';
 EXTENDS         : 'extends';
 EXTENSION       : 'extension';
 TYPE            : 'type';
-EXPRESSION      : 'expression' -> pushMode(DAX_MODE);
+EXPRESSION      : 'expression';
 PRIMARY_KEY     : 'primary_key';
 VALUE_FORMAT    : 'value_format';
 LABEL           : 'label';
 DESCRIPTION     : 'description';
-HIDDEN          : 'hidden';
+HIDDEN_PARAM    : 'hidden';
 TIERS           : 'tiers';
-SQL_LATITUDE    : 'sql_latitude' -> pushMode(DAX_MODE);
-SQL_LONGITUDE   : 'sql_longitude' -> pushMode(DAX_MODE);
+SQL_LATITUDE    : 'sql_latitude';
+SQL_LONGITUDE   : 'sql_longitude';
 UNITS           : 'units';
 RELATIONSHIP    : 'relationship';
 
@@ -424,12 +424,5 @@ WS              : [ \t]+ -> skip;
 fragment LETTER : [a-zA-Z];
 fragment DIGIT  : [0-9];
 
-// ============================================================================
-// DAX MODE for parsing DAX expressions as strings
-// ============================================================================
-
-mode DAX_MODE;
-
-DAX_STRING      : ':' WS_DAX* (~[;] | ';' ~[;])+ -> popMode;
-WS_DAX          : [ \t\r\n]+ -> skip;
-DAX_COMMENT     : '#' ~[\r\n]* -> channel(HIDDEN);
+// DAX expressions handled as simple tokens
+DAX_EXPRESSION  : ':' ~';'* ';;';

@@ -37,7 +37,16 @@
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_console_messages",
       "Bash(wget:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(antlr4:*)",
+      "Bash(grep:*)",
+      "Bash(pip3 install:*)",
+      "Bash(PYTHONPATH=.:*)",
+      "Bash(./build_parser.sh)",
+      "Bash(make:*)",
+      "Bash(pip3 list:*)",
+      "Bash(apt list:*)",
+      "Bash(apt search:*)"
     ],
     "deny": []
   }

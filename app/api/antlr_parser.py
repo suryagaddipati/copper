@@ -8,22 +8,13 @@ from dataclasses import dataclass
 from enum import Enum
 
 # Add the generated parser to path
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'grammar', 'build', 'python'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'generated'))
 
-try:
-    from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
-    from antlr4.error.ErrorListener import ErrorListener
-    from CopperSimpleLexer import CopperSimpleLexer
-    from CopperSimpleParser import CopperSimpleParser
-    from CopperSimpleListener import CopperSimpleListener
-    ANTLR_AVAILABLE = True
-except ImportError:
-    ANTLR_AVAILABLE = False
-    # Mock classes for when ANTLR is not available
-    class ErrorListener:
-        pass
-    class CopperSimpleListener:
-        pass
+from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
+from antlr4.error.ErrorListener import ErrorListener
+from CopperLexer import CopperLexer
+from CopperParser import CopperParser
+from CopperListener import CopperListener
 
 
 class NodeType(Enum):
@@ -71,7 +62,7 @@ class CopperErrorListener(ErrorListener):
         self.errors.append(error_msg)
 
 
-class CopperParseTreeListener(CopperSimpleListener):
+class CopperParseTreeListener(CopperListener):
     """Parse tree listener to extract structured data from ANTLR parse tree"""
     
     def __init__(self):
@@ -297,7 +288,7 @@ class CopperANTLRParser:
             input_stream = InputStream(content)
             
             # Create lexer
-            lexer = CopperSimpleLexer(input_stream)
+            lexer = CopperLexer(input_stream)
             
             # Create error listener
             error_listener = CopperErrorListener()
@@ -308,7 +299,7 @@ class CopperANTLRParser:
             stream = CommonTokenStream(lexer)
             
             # Create parser
-            parser = CopperSimpleParser(stream)
+            parser = CopperParser(stream)
             parser.removeErrorListeners()
             parser.addErrorListener(error_listener)
             
@@ -354,12 +345,6 @@ class CopperANTLRParser:
 
 def validate_copper_syntax(content: str) -> Dict[str, Any]:
     """Validate Copper syntax and return analysis using ANTLR parser"""
-    if not ANTLR_AVAILABLE:
-        # Temporary fallback to minimal parser
-        print("⚠️  ANTLR not available, using minimal fallback parser")
-        from copper_parser_minimal import validate_copper_syntax as minimal_parser
-        return minimal_parser(content)
-    
     parser = CopperANTLRParser()
     result = parser.parse(content)
     
