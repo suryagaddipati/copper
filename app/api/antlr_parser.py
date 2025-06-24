@@ -173,8 +173,8 @@ class CopperParseTreeListener(CopperListener):
     
     def enterTypeParameter(self, ctx):
         """Enter a type parameter"""
-        if self.current_node and ctx.typeValue():
-            self.current_node.properties['type'] = ctx.typeValue().getText()
+        if self.current_node and ctx.dimensionType():
+            self.current_node.properties['type'] = ctx.dimensionType().getText()
     
     def enterExpressionParameter(self, ctx):
         """Enter an expression parameter"""

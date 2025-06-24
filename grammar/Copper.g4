@@ -195,7 +195,7 @@ relationshipType
 // ============================================================================
 
 expressionParameter
-    : EXPRESSION COLON daxExpression SEMICOLON_SEMICOLON
+    : EXPRESSION COLON daxExpression
     ;
 
 primaryKeyParameter
@@ -239,7 +239,7 @@ unitsParameter
 // ============================================================================
 
 daxExpression
-    : DAX_STRING
+    : DAX_EXPRESSION
     ;
 
 // ============================================================================
@@ -423,6 +423,7 @@ WS              : [ \t]+ -> skip;
 // Character classes
 fragment LETTER : [a-zA-Z];
 fragment DIGIT  : [0-9];
+fragment DAX_CHAR : [a-zA-Z0-9_\[\]().] | ' ' | '\t' | '\r' | '\n';
 
-// DAX expressions handled as simple tokens
-DAX_EXPRESSION  : ':' ~';'* ';;';
+// DAX expressions - very permissive rule that captures everything until ;;
+DAX_EXPRESSION  : ~[;]+ ';;';

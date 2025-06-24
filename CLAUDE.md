@@ -78,14 +78,22 @@ When working on Copper:
 
 ### Quick Start - Full Development Environment
 ```bash
-# Start both API and webapp with one command
-cd app && ./start.sh
+# Start both API and webapp using Makefile (recommended)
+make dev
 
 # This will:
-# 1. Install webapp dependencies if needed
-# 2. Start FastAPI server on localhost:8000
-# 3. Start React webapp on localhost:3000
-# Press Ctrl+C to stop both servers
+# 1. Generate ANTLR parser from grammar
+# 2. Install webapp dependencies if needed
+# 3. Start FastAPI server on localhost:8000
+# 4. Start React webapp on localhost:3000
+# Press Ctrl+C to stop both servers, or run 'make stop'
+
+# Alternative targets:
+make all     # Build everything and start
+make build   # Just build parser and install dependencies
+make stop    # Stop running servers
+make clean   # Clean generated files
+make test    # Test parser functionality
 ```
 
 ### Webapp Development
@@ -130,36 +138,17 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ### Parser Generation
 ```bash
-# Navigate to grammar directory first
-cd grammar
+# Generate Python parser for API (using Makefile)
+make parser
 
-# Generate parsers for all languages (Java, Python, JavaScript, TypeScript, C#, Go, C++, Swift)
-./build.sh generate
+# Manual parser generation using ANTLR4 directly
+cd app/api
+antlr4 -Dlanguage=Python3 -o generated ../../grammar/Copper.g4
 
-# Generate specific language parsers
-./build.sh generate java python javascript
-
-# Clean build directory
-./build.sh clean
-
-# Test generated parsers against example files
-./build.sh test
-```
-
-### Java Parser (Gradle)
-```bash
-cd grammar
-gradle generateGrammarSource  # Generate Java parser only
-gradle generateAllParsers     # Generate all language parsers
-gradle build                  # Build Java parser
-gradle test                   # Run Java tests
-```
-
-### Python Parser
-```bash
-cd grammar
-python setup.py build_py     # Generate Python parser
-pip install -e .             # Install in development mode
+# The generated parser files will be in app/api/generated/:
+# - CopperLexer.py
+# - CopperParser.py  
+# - CopperListener.py
 ```
 
 ## Development Environment Setup
@@ -167,7 +156,7 @@ pip install -e .             # Install in development mode
 ### Python Environment
 ```bash
 # API development requires Python virtual environment
-cd api
+cd app/api
 python3 -m venv venv
 source venv/bin/activate     # Linux/Mac
 # venv\Scripts\activate      # Windows
@@ -177,7 +166,7 @@ pip install -r requirements.txt
 ### Node.js Environment
 ```bash
 # Webapp development requires Node.js
-cd webapp
+cd app/web
 npm install
 ```
 
@@ -192,31 +181,31 @@ pip install -r requirements.txt  # Install ANTLR4 tools
 
 This project uses two complementary parsing approaches:
 
-1. **Live Demo Parser** (`api/antlr_parser.py`):
+1. **Live Demo Parser** (`app/api/antlr_parser.py`):
    - ANTLR-based Python parser for real-time web demo
    - Fast parsing for immediate feedback in Monaco Editor
    - Used by FastAPI backend for live validation
 
 2. **Production Parser System** (`grammar/` directory):
-   - Complete ANTLR4 grammar generating parsers for 8+ languages
-   - Full AST generation with visitors and listeners
-   - Comprehensive error recovery and position tracking
-   - Used for production tooling and language integrations
+   - Complete ANTLR4 grammar definitions for Copper language
+   - DAX expression handling with lexer modes
+   - Currently generates Python parser, extensible to other languages
+   - Parser files generated in `app/api/generated/` directory
 
 ## Architecture
 
 ### Live Parsing System
-- **FastAPI Backend**: `api/main.py` provides REST endpoints for real-time parsing
-- **React Frontend**: `webapp/src/App.tsx` with Monaco Editor and custom Copper syntax highlighting
-- **Monaco Integration**: `webapp/src/copper-language.ts` provides advanced syntax highlighting for Copper
+- **FastAPI Backend**: `app/api/main.py` provides REST endpoints for real-time parsing
+- **React Frontend**: `app/web/src/App.tsx` with Monaco Editor and custom Copper syntax highlighting
+- **Monaco Integration**: `app/web/src/copper-language.ts` provides advanced syntax highlighting for Copper
 - **Real-time Validation**: Live parsing results with error reporting and statistics
 
 ### Multi-Language Parser System
 - **ANTLR4 Grammar**: `grammar/Copper.g4` defines the complete Copper syntax
 - **DAX Grammar**: `grammar/DAX.g4` handles DAX expressions as blackbox strings using lexer modes
-- **Build System**: Universal `build.sh` script generates parsers for 8+ programming languages
-- **Language Targets**: Java, Python, JavaScript, TypeScript, C#, Go, C++, Swift
-- **Python Integration**: `api/antlr_parser.py` wraps generated Python parser for API use
+- **Build System**: Makefile-based parser generation for Python (extensible to other languages)
+- **Python Integration**: `app/api/antlr_parser.py` wraps generated Python parser for API use
+- **Generated Files**: Parser files are created in `app/api/generated/` directory
 
 ### Frontend Architecture
 - **Vite + React**: Modern development setup with hot module replacement
@@ -238,7 +227,7 @@ This project uses two complementary parsing approaches:
 
 ### Frontend Testing
 ```bash
-cd webapp
+cd app/web
 npm run lint        # ESLint TypeScript/React checking
 npm run type-check  # TypeScript type checking without compilation
 npm run build       # Test production build
@@ -246,30 +235,46 @@ npm run build       # Test production build
 
 ### Parser Testing
 ```bash
-cd grammar
-./build.sh test     # Test all generated parsers against example files
-gradle test         # Run Java parser tests
+# Test parser functionality using Makefile
+make test
+
+# Manual testing of parser
+cd app/api
+python3 -c "from antlr_parser import validate_copper_syntax; print(validate_copper_syntax('view: test { from: orders }'))"
+
+# Test with example files
+cd app/api
+python3 -c "
+from antlr_parser import validate_copper_syntax
+with open('../../examples/customers.copper', 'r') as f:
+    result = validate_copper_syntax(f.read())
+    print(f'Valid: {result[\"valid\"]}, Models: {result[\"statistics\"][\"total_models\"]}, Views: {result[\"statistics\"][\"total_views\"]}')
+"
 ```
 
 ### API Testing
 ```bash
-cd api
+cd app/api
 # Test live parsing endpoints
 curl -X POST "http://localhost:8000/parse" \
   -H "Content-Type: application/json" \
   -d '{"code": "model: test { dimension: id { type: string } }"}'
+
+# Or use the Makefile test target
+make test
 ```
 
 ## Configuration
 
 ### Key Configuration Files
 - `.claude/settings.local.json` - Claude Code permissions configuration
-- `webapp/vite.config.ts` - Vite dev server configuration (port 3000)
-- `webapp/tsconfig.json` - TypeScript strict mode with React JSX
-- `webapp/package.json` - Dependencies: React, Monaco Editor, Vite, ESLint
-- `api/requirements.txt` - Python dependencies: FastAPI, uvicorn, pydantic
-- `grammar/build.gradle` - Multi-language ANTLR4 parser generation
-- `grammar/requirements.txt` - ANTLR4 development tools
+- `app/web/vite.config.ts` - Vite dev server configuration (port 3000)
+- `app/web/tsconfig.json` - TypeScript strict mode with React JSX
+- `app/web/package.json` - Dependencies: React, Monaco Editor, Vite, ESLint
+- `app/api/requirements.txt` - Python dependencies: FastAPI, uvicorn, pydantic
+- `Makefile` - Development environment automation and build system
+- `grammar/Copper.g4` - Complete ANTLR4 grammar for Copper language
+- `grammar/DAX.g4` - DAX expression grammar for lexer modes
 
 ### Port Configuration
 - **Webapp**: http://localhost:3000 (Vite dev server)
@@ -288,7 +293,7 @@ pip install -r requirements.txt  # Install ANTLR4 tools
 
 **"Module not found" errors in API**
 ```bash
-cd api
+cd app/api
 source venv/bin/activate  # Activate Python virtual environment
 pip install -r requirements.txt
 ```
@@ -301,13 +306,16 @@ lsof -ti:8000 | xargs kill -9
 ```
 
 **Monaco Editor syntax highlighting not working**
-- Check `webapp/src/copper-language.ts` for language definition
+- Check `app/web/src/copper-language.ts` for language definition
 - Verify Monaco Editor is properly imported in `App.tsx`
 - Check browser console for JavaScript errors
 
 **Parser generation fails**
 ```bash
-cd grammar
-./build.sh clean    # Clean build directory
-./build.sh generate # Regenerate all parsers
+# Clean and regenerate parser
+make clean
+make parser
+
+# Check if ANTLR4 is installed
+antlr4 --version
 ```

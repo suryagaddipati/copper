@@ -1,0 +1,5 @@
+model: orders {
+  dimension: order_id {
+    type: string
+  }
+}

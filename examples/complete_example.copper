@@ -1,0 +1,18 @@
+model: products {
+  dimension: product_id {
+    type: string
+  }
+  dimension: product_name {
+    type: string
+  }
+  dimension: price {
+    type: number
+  }
+  dimension: category {
+    type: string
+  }
+}
+
+view: product_analytics {
+  from: products
+}
