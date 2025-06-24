@@ -12,8 +12,8 @@ Copper is a metadata format for describing data dimensions and measures, inspire
 /spec/          - Language specification documents
 /grammar/       - Parser grammar definition (ANTLR4)
 /examples/      - Sample .copper files demonstrating syntax
-/api/           - FastAPI backend for live parsing
-/webapp/        - React TypeScript frontend with Monaco Editor
+/app/api/       - FastAPI backend for live parsing
+/app/web/       - React TypeScript frontend with Monaco Editor
 /docs/          - Documentation (future)
 ```
 
@@ -23,9 +23,9 @@ Copper is a metadata format for describing data dimensions and measures, inspire
 - `grammar/Copper.g4` - ANTLR4 grammar definition for Copper syntax
 - `grammar/DAX.g4` - Complete DAX expression grammar
 - `examples/*.copper` - Example models and views demonstrating various features
-- `webapp/src/App.tsx` - Main React frontend component with Monaco Editor
-- `api/main.py` - FastAPI backend with live parsing endpoints
-- `start.sh` - Simple startup script for the full development environment
+- `app/web/src/App.tsx` - Main React frontend component with Monaco Editor
+- `app/api/main.py` - FastAPI backend with live parsing endpoints
+- `app/start.sh` - Simple startup script for the full development environment
 
 ## Copper Language Basics
 
@@ -79,7 +79,7 @@ When working on Copper:
 ### Quick Start - Full Development Environment
 ```bash
 # Start both API and webapp with one command
-./start.sh
+cd app && ./start.sh
 
 # This will:
 # 1. Install webapp dependencies if needed
@@ -90,7 +90,7 @@ When working on Copper:
 
 ### Webapp Development
 ```bash
-cd webapp
+cd app/web
 
 # Install dependencies
 npm install
@@ -113,7 +113,7 @@ npm run type-check
 
 ### API Development
 ```bash
-cd api
+cd app/api
 
 # Install Python dependencies
 pip install -r requirements.txt
@@ -192,8 +192,8 @@ pip install -r requirements.txt  # Install ANTLR4 tools
 
 This project uses two complementary parsing approaches:
 
-1. **Live Demo Parser** (`api/copper_parser.py`):
-   - Simple regex-based Python parser for real-time web demo
+1. **Live Demo Parser** (`api/antlr_parser.py`):
+   - ANTLR-based Python parser for real-time web demo
    - Fast parsing for immediate feedback in Monaco Editor
    - Used by FastAPI backend for live validation
 
@@ -216,7 +216,7 @@ This project uses two complementary parsing approaches:
 - **DAX Grammar**: `grammar/DAX.g4` handles DAX expressions as blackbox strings using lexer modes
 - **Build System**: Universal `build.sh` script generates parsers for 8+ programming languages
 - **Language Targets**: Java, Python, JavaScript, TypeScript, C#, Go, C++, Swift
-- **Python Integration**: `api/copper_parser.py` wraps generated Python parser for API use
+- **Python Integration**: `api/antlr_parser.py` wraps generated Python parser for API use
 
 ### Frontend Architecture
 - **Vite + React**: Modern development setup with hot module replacement

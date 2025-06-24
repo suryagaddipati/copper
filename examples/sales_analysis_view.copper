@@ -2,33 +2,29 @@
 # Combines orders with customer and product data for comprehensive sales reporting
 
 view: sales_analysis {
-  from: orders
+  from: orders ;;
   
   # Join customer information
   join: customers {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[CustomerID] = Customers[CustomerID] ;;
   }
   
   # Join product information
   join: products {
-    type: inner ;;
-    relationship: many_to_one ;;
+    relationship: inner ;;
     expression: Orders[ProductID] = Products[ProductID] ;;
   }
   
   # Join order items for detailed analysis
   join: order_items {
-    type: left_outer ;;
-    relationship: one_to_many ;;
+    relationship: left_outer ;;
     expression: Orders[OrderID] = OrderItems[OrderID] ;;
   }
   
   # Join product categories
   join: product_categories {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Products[CategoryID] = ProductCategories[CategoryID] ;;
   }
 }

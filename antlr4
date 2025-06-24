@@ -1,3 +1,0 @@
-#!/bin/bash
-source "$HOME/.sdkman/bin/sdkman-init.sh"
-java -jar /home/surya/code/copper/antlr-4.13.1-complete.jar "$@"

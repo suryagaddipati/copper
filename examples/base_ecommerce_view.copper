@@ -2,20 +2,17 @@
 # Foundation view with common joins for e-commerce analysis
 
 view: base_ecommerce {
-  extension: required
-  from: orders
+  from: orders ;;
   
   # Core customer join - used in all e-commerce analyses
   join: customers {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[CustomerID] = Customers[CustomerID] ;;
   }
   
   # Core product join - essential for product analysis
   join: products {
-    type: inner ;;
-    relationship: many_to_one ;;
+    relationship: inner ;;
     expression: Orders[ProductID] = Products[ProductID] ;;
   }
 }
@@ -26,15 +23,13 @@ view: retail_sales {
   
   # Add store information for brick-and-mortar analysis
   join: stores {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[StoreID] = Stores[StoreID] ;;
   }
   
   # Add store regions for geographic analysis
   join: store_regions {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Stores[RegionID] = StoreRegions[RegionID] ;;
   }
 }
@@ -45,22 +40,19 @@ view: online_sales {
   
   # Add shipping information for delivery analysis
   join: shipping {
-    type: left_outer ;;
-    relationship: one_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[OrderID] = Shipping[OrderID] ;;
   }
   
   # Add payment methods for transaction analysis
   join: payment_methods {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[PaymentMethodID] = PaymentMethods[PaymentMethodID] ;;
   }
   
   # Add marketing campaigns for attribution analysis
   join: marketing_campaigns {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[CampaignID] = MarketingCampaigns[CampaignID] ;;
   }
 }
@@ -71,22 +63,19 @@ view: product_performance {
   
   # Add detailed product information
   join: product_categories {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Products[CategoryID] = ProductCategories[CategoryID] ;;
   }
   
   # Add suppliers for supply chain analysis
   join: suppliers {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Products[SupplierID] = Suppliers[SupplierID] ;;
   }
   
   # Add inventory for stock analysis
   join: inventory {
-    type: left_outer ;;
-    relationship: one_to_one ;;
+    relationship: left_outer ;;
     expression: Products[ProductID] = Inventory[ProductID] ;;
   }
 }
@@ -97,22 +86,19 @@ view: customer_analytics {
   
   # Add customer segments for behavioral analysis
   join: customer_segments {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Customers[SegmentID] = CustomerSegments[SegmentID] ;;
   }
   
   # Add customer preferences
   join: customer_preferences {
-    type: left_outer ;;
-    relationship: one_to_many ;;
+    relationship: left_outer ;;
     expression: Customers[CustomerID] = CustomerPreferences[CustomerID] ;;
   }
   
   # Add loyalty program information
   join: loyalty_programs {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Customers[LoyaltyProgramID] = LoyaltyPrograms[LoyaltyProgramID] ;;
   }
 }
@@ -123,29 +109,25 @@ view: financial_analysis {
   
   # Add cost information
   join: product_costs {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Products[ProductID] = ProductCosts[ProductID] ;;
   }
   
   # Add discount information
   join: discounts {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[DiscountID] = Discounts[DiscountID] ;;
   }
   
   # Add tax information
   join: tax_rates {
-    type: left_outer ;;
-    relationship: many_to_one ;;
+    relationship: left_outer ;;
     expression: Orders[TaxRateID] = TaxRates[TaxRateID] ;;
   }
   
   # Add refunds and returns
   join: returns {
-    type: left_outer ;;
-    relationship: one_to_many ;;
+    relationship: left_outer ;;
     expression: Orders[OrderID] = Returns[OrderID] ;;
   }
 }

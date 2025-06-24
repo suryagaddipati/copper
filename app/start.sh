@@ -31,9 +31,9 @@ if ! command -v npm &> /dev/null; then
 fi
 
 # Install webapp deps if needed
-if [ ! -d "webapp/node_modules" ]; then
+if [ ! -d "web/node_modules" ]; then
     echo "📦 Installing webapp dependencies..."
-    cd webapp
+    cd web
     npm install
     cd ..
 fi
@@ -69,7 +69,7 @@ sleep 2
 
 # Start webapp in background
 echo "🌐 Starting webapp on port 3000..."
-cd webapp
+cd web
 npm run dev &
 WEBAPP_PID=$!
 cd ..

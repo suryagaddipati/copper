@@ -124,7 +124,7 @@ async def parse_copper(request: ParseRequest):
 async def get_examples():
     """Get all example Copper files"""
     examples = []
-    examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "examples")
+    examples_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "examples")
     
     if not os.path.exists(examples_dir):
         return examples
@@ -164,7 +164,7 @@ async def get_examples():
 @app.get("/examples/{example_name}")
 async def get_example(example_name: str):
     """Get a specific example file by name"""
-    examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "examples")
+    examples_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "examples")
     
     # Convert display name back to filename
     filename = example_name.lower().replace(' ', '_') + '.copper'

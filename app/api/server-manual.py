@@ -72,7 +72,7 @@ class CopperAPIHandler(BaseHTTPRequestHandler):
             
             try:
                 request_data = json.loads(post_data)
-                content = request_data.get('content', '')
+                content = request_data.get('code', request_data.get('content', ''))
                 
                 result = validate_copper_syntax(content)
                 
@@ -136,7 +136,7 @@ class CopperAPIHandler(BaseHTTPRequestHandler):
 
     def _get_examples(self):
         examples = []
-        examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "examples")
+        examples_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "examples")
         
         if not os.path.exists(examples_dir):
             return examples
@@ -172,7 +172,7 @@ class CopperAPIHandler(BaseHTTPRequestHandler):
         return examples
 
     def _get_example(self, example_name):
-        examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "examples")
+        examples_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "examples")
         
         # Convert display name back to filename
         filename = example_name.lower().replace(' ', '_') + '.copper'
