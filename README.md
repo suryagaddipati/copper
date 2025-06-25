@@ -72,16 +72,7 @@ where customer_tier = 'VIP'
   and total_spent > 10000
 ```
 
-## Roadmap
 
-*   [x] **ANTLR4 Grammar**
-*   [x] **Build System**
-*   [ ] **VS Code Extension**
-*   [ ] **CLI Tools**
-*   [ ] **dbt Integration**
-*   [ ] **Looker Migration**
-*   [ ] **Live Compilation**
-*   [ ] **Semantic Layer API**
 
 ## Tooling
 
