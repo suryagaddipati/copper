@@ -15,8 +15,8 @@ NC := \033[0m # No Color
 
 # Configuration
 GRAMMAR_DIR := grammar
-API_DIR := app/api
-WEB_DIR := app/web
+API_DIR := studio/api
+WEB_DIR := studio/web
 GENERATED_DIR := src/parser/generated
 GRAMMAR_FILE := $(GRAMMAR_DIR)/Copper.g4
 
