@@ -97,7 +97,7 @@ dev: build
 	@echo "$(BLUE)🚀 Starting Copper development environment...$(NC)"
 	@echo "$(YELLOW)🛑 Stopping any existing servers and clearing ports...$(NC)"
 	@pkill -f "npm run dev" 2>/dev/null || true
-	@pkill -f "server-manual.py" 2>/dev/null || true
+	@pkill -f "main.py" 2>/dev/null || true
 	@pkill -f "main.py" 2>/dev/null || true
 	@pkill -f "vite" 2>/dev/null || true
 	@pkill -f "uvicorn" 2>/dev/null || true
@@ -127,7 +127,7 @@ dev: build
 stop:
 	@echo "$(YELLOW)🛑 Stopping all servers and clearing ports...$(NC)"
 	@pkill -f "npm run dev" 2>/dev/null || true
-	@pkill -f "server-manual.py" 2>/dev/null || true
+	@pkill -f "main.py" 2>/dev/null || true
 	@pkill -f "main.py" 2>/dev/null || true
 	@pkill -f "vite" 2>/dev/null || true
 	@pkill -f "uvicorn" 2>/dev/null || true
@@ -176,7 +176,7 @@ web-dev:
 	@cd $(WEB_DIR) && npm run dev
 
 api-dev:
-	@cd $(API_DIR) && python3 server-manual.py
+	@cd $(API_DIR) && python3 main.py
 
 # Check requirements
 check:
