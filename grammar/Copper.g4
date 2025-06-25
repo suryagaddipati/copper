@@ -215,7 +215,7 @@ descriptionParameter
     ;
 
 hiddenParameter
-    : HIDDEN COLON booleanValue
+    : HIDDEN_PARAM COLON booleanValue
     ;
 
 tiersParameter
@@ -231,7 +231,7 @@ sqlLongitudeParameter
     ;
 
 unitsParameter
-    : UNITS COLON units
+    : UNITS COLON stringLiteral
     ;
 
 // ============================================================================

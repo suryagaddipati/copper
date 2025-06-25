@@ -49,6 +49,7 @@ class CopperErrorListener(ErrorListener):
     def __init__(self):
         super().__init__()
         self.errors = []
+        self.warnings = []
     
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         # Filter out token recognition errors for common DAX operators
@@ -56,6 +57,8 @@ class CopperErrorListener(ErrorListener):
             # These are common in DAX expressions and should be warnings, not errors
             if any(char in msg for char in ["'='", "'.'", "'+'", "'-'", "'*'", "'/'", "'('", "')'", "'<'", "'>'", "'!'", "'?'", "'&'", "'|'", "'%'", "'^'"]):
                 # Convert to warning instead of error for DAX operator tokens
+                warning_msg = f"Line {line}:{column} - Possible DAX syntax: {msg}"
+                self.warnings.append(warning_msg)
                 return
         
         error_msg = f"Line {line}:{column} - {msg}"
@@ -72,202 +75,150 @@ class CopperParseTreeListener(CopperListener):
         self.node_stack = []
         self.errors = []
         self.warnings = []
-    
+
+    def _add_error(self, message, line_number):
+        self.errors.append(f"Line {line_number}: {message}")
+
+    def _add_warning(self, message, line_number):
+        self.warnings.append(f"Line {line_number}: {message}")
+
+    def _enter_node(self, node_type, name, ctx):
+        new_node = ParsedNode(
+            type=node_type,
+            name=name,
+            properties={},
+            children=[],
+            line_number=ctx.start.line
+        )
+        if self.current_node:
+            self.current_node.children.append(new_node)
+        else:
+            self.nodes.append(new_node)
+        
+        self.node_stack.append(self.current_node)
+        self.current_node = new_node
+
+    def _exit_node(self):
+        if self.node_stack:
+            self.current_node = self.node_stack.pop()
+
     def enterModelStatement(self, ctx):
-        """Enter a model statement"""
         if ctx.identifier():
-            name = ctx.identifier().getText()
-            model_node = ParsedNode(
-                type=NodeType.MODEL,
-                name=name,
-                properties={},
-                children=[],
-                line_number=ctx.start.line
-            )
-            self.nodes.append(model_node)
-            self.node_stack.append(self.current_node)
-            self.current_node = model_node
+            self._enter_node(NodeType.MODEL, ctx.identifier().getText(), ctx)
     
     def exitModelStatement(self, ctx):
-        """Exit a model statement"""
-        self.current_node = self.node_stack.pop() if self.node_stack else None
+        self._exit_node()
     
     def enterViewStatement(self, ctx):
-        """Enter a view statement"""
         if ctx.identifier():
-            name = ctx.identifier().getText()
-            view_node = ParsedNode(
-                type=NodeType.VIEW,
-                name=name,
-                properties={},
-                children=[],
-                line_number=ctx.start.line
-            )
-            self.nodes.append(view_node)
-            self.node_stack.append(self.current_node)
-            self.current_node = view_node
+            self._enter_node(NodeType.VIEW, ctx.identifier().getText(), ctx)
     
     def exitViewStatement(self, ctx):
-        """Exit a view statement"""
-        self.current_node = self.node_stack.pop() if self.node_stack else None
+        self._exit_node()
     
     def enterDimensionStatement(self, ctx):
-        """Enter a dimension statement"""
-        if ctx.identifier() and self.current_node:
-            name = ctx.identifier().getText()
-            dimension_node = ParsedNode(
-                type=NodeType.DIMENSION,
-                name=name,
-                properties={},
-                children=[],
-                line_number=ctx.start.line
-            )
-            self.current_node.children.append(dimension_node)
-            self.node_stack.append(self.current_node)
-            self.current_node = dimension_node
+        if ctx.identifier():
+            self._enter_node(NodeType.DIMENSION, ctx.identifier().getText(), ctx)
     
     def exitDimensionStatement(self, ctx):
-        """Exit a dimension statement"""
-        if self.node_stack:
-            self.current_node = self.node_stack.pop()
+        self._exit_node()
     
     def enterMeasureStatement(self, ctx):
-        """Enter a measure statement"""
-        if ctx.identifier() and self.current_node:
-            name = ctx.identifier().getText()
-            measure_node = ParsedNode(
-                type=NodeType.MEASURE,
-                name=name,
-                properties={},
-                children=[],
-                line_number=ctx.start.line
-            )
-            self.current_node.children.append(measure_node)
-            self.node_stack.append(self.current_node)
-            self.current_node = measure_node
+        if ctx.identifier():
+            self._enter_node(NodeType.MEASURE, ctx.identifier().getText(), ctx)
     
     def exitMeasureStatement(self, ctx):
-        """Exit a measure statement"""
-        if self.node_stack:
-            self.current_node = self.node_stack.pop()
+        self._exit_node()
     
     def enterJoinStatement(self, ctx):
-        """Enter a join statement"""
-        if ctx.identifier() and self.current_node:
-            name = ctx.identifier().getText()
-            join_node = ParsedNode(
-                type=NodeType.JOIN,
-                name=name,
-                properties={},
-                children=[],
-                line_number=ctx.start.line
-            )
-            self.current_node.children.append(join_node)
-            self.node_stack.append(self.current_node)
-            self.current_node = join_node
+        if ctx.identifier():
+            self._enter_node(NodeType.JOIN, ctx.identifier().getText(), ctx)
     
     def exitJoinStatement(self, ctx):
-        """Exit a join statement"""
-        if self.node_stack:
-            self.current_node = self.node_stack.pop()
+        self._exit_node()
     
     def enterTypeParameter(self, ctx):
-        """Enter a type parameter"""
-        if self.current_node and ctx.dimensionType():
-            self.current_node.properties['type'] = ctx.dimensionType().getText()
-    
-    def enterExpressionParameter(self, ctx):
-        """Enter an expression parameter"""
         if self.current_node:
-            # Extract DAX expression content from token-based parsing
+            if ctx.dimensionType():
+                self.current_node.properties['type'] = ctx.dimensionType().getText()
+
+    def enterMeasureTypeParameter(self, ctx):
+        if self.current_node and ctx.measureType():
+            self.current_node.properties['type'] = ctx.measureType().getText()
+
+    def enterExpressionParameter(self, ctx):
+        if self.current_node:
             dax_text = ""
             if hasattr(ctx, 'daxExpression') and ctx.daxExpression():
-                # Get the content from daxContent, excluding the trailing ;;
                 dax_expr_ctx = ctx.daxExpression()
                 if hasattr(dax_expr_ctx, 'daxContent') and dax_expr_ctx.daxContent():
                     dax_text = dax_expr_ctx.daxContent().getText()
                 else:
-                    # Fallback: get all text and remove trailing ;;
                     full_text = dax_expr_ctx.getText()
                     dax_text = full_text.rstrip(';').strip()
             
             if dax_text:
-                # Store the raw DAX expression
                 self.current_node.properties['expression'] = dax_text
-                
-                # Validate using external DAX parser module
                 try:
                     from dax_parser import validate_dax_expression
                     validation_result = validate_dax_expression(dax_text)
-                    
-                    # Store validation results for debugging/analysis
                     self.current_node.properties['dax_validation'] = validation_result
-                    
                     if not validation_result['valid']:
                         for error in validation_result['errors']:
                             self._add_error(f"DAX validation error: {error}", ctx.start.line)
                 except ImportError:
-                    # DAX parser module not available, skip validation
                     pass
     
     def enterLabelParameter(self, ctx):
-        """Enter a label parameter"""
-        if self.current_node and ctx.stringValue():
-            label_text = ctx.stringValue().getText()
-            # Remove quotes if present
+        if self.current_node and ctx.stringLiteral():
+            label_text = ctx.stringLiteral().getText()
             if label_text.startswith('"') and label_text.endswith('"'):
                 label_text = label_text[1:-1]
             self.current_node.properties['label'] = label_text
     
     def enterDescriptionParameter(self, ctx):
-        """Enter a description parameter"""
-        if self.current_node and ctx.stringValue():
-            desc_text = ctx.stringValue().getText()
-            # Remove quotes if present
+        if self.current_node and ctx.stringLiteral():
+            desc_text = ctx.stringLiteral().getText()
             if desc_text.startswith('"') and desc_text.endswith('"'):
                 desc_text = desc_text[1:-1]
             self.current_node.properties['description'] = desc_text
     
     def enterPrimaryKeyParameter(self, ctx):
-        """Enter a primary_key parameter"""
         if self.current_node and ctx.booleanValue():
             value = ctx.booleanValue().getText().lower()
-            self.current_node.properties['primary_key'] = value == 'yes'
+            self.current_node.properties['primary_key'] = value in ['yes', 'true']
     
     def enterHiddenParameter(self, ctx):
-        """Enter a hidden parameter"""
         if self.current_node and ctx.booleanValue():
             value = ctx.booleanValue().getText().lower()
-            self.current_node.properties['hidden'] = value == 'yes'
+            self.current_node.properties['hidden'] = value in ['yes', 'true']
     
     def enterValueFormatParameter(self, ctx):
-        """Enter a value_format parameter"""
-        if self.current_node and ctx.formatValue():
-            self.current_node.properties['value_format'] = ctx.formatValue().getText()
-    
+        if self.current_node:
+            if ctx.stringLiteral():
+                self.current_node.properties['value_format'] = ctx.stringLiteral().getText().strip('"')
+            elif ctx.formatName():
+                self.current_node.properties['value_format'] = ctx.formatName().getText()
+
     def enterUnitsParameter(self, ctx):
-        """Enter a units parameter"""
-        if self.current_node and ctx.stringValue():
-            units_text = ctx.stringValue().getText()
-            # Remove quotes if present
-            if units_text.startswith('"') and units_text.endswith('"'):
-                units_text = units_text[1:-1]
-            self.current_node.properties['units'] = units_text
-    
-    def enterFromParameter(self, ctx):
-        """Enter a from parameter"""
+        if self.current_node and ctx.stringLiteral():
+            self.current_node.properties['units'] = ctx.stringLiteral().getText().strip('"')
+
+    def enterFromStatement(self, ctx):
         if self.current_node and ctx.identifier():
             self.current_node.properties['from'] = ctx.identifier().getText()
     
-    def enterExtendsParameter(self, ctx):
-        """Enter an extends parameter"""
-        if self.current_node and ctx.identifier():
-            self.current_node.properties['extends'] = ctx.identifier().getText()
-    
+    def enterExtendsStatement(self, ctx):
+        if self.current_node and ctx.identifierList():
+            self.current_node.properties['extends'] = [ident.getText() for ident in ctx.identifierList().identifier()]
+
+    def enterJoinTypeParameter(self, ctx):
+        if self.current_node and ctx.joinType():
+            self.current_node.properties['type'] = ctx.joinType().getText()
+
     def enterRelationshipParameter(self, ctx):
-        """Enter a relationship parameter"""
-        if self.current_node and ctx.relationshipValue():
-            self.current_node.properties['relationship'] = ctx.relationshipValue().getText()
+        if self.current_node and ctx.relationshipType():
+            self.current_node.properties['relationship'] = ctx.relationshipType().getText()
 
 
 class CopperANTLRParser:
@@ -317,6 +268,7 @@ class CopperANTLRParser:
             self.nodes = listener.nodes
             self.errors.extend(error_listener.errors)
             self.errors.extend(listener.errors)
+            self.warnings.extend(error_listener.warnings)
             self.warnings.extend(listener.warnings)
             
             # Validate parsed content

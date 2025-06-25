@@ -143,6 +143,76 @@ view: order_view {
         
         print("✅ DAX expressions test passed!")
     
+    def test_all_parameter_types(self):
+        """Test parsing all parameter types"""
+        copper_code = """model: test_model {
+  dimension: test_dimension {
+    type: string
+    label: "Test Dimension"
+    description: "This is a test dimension"
+    primary_key: yes
+    hidden: no
+    value_format: "$#,##0.00"
+    units: "USD"
+    expression: a + b;;
+  }
+  measure: test_measure {
+    type: number
+    label: "Test Measure"
+    description: "This is a test measure"
+    hidden: yes
+    value_format: "0.0%"
+    expression: a + b;;
+  }
+}
+
+view: test_view {
+  from: test_model
+  extends: [base_view]
+  join: another_view {
+    type: left_outer
+    relationship: one_to_many
+    expression: a = b;;
+  }
+}"""
+        
+        result = validate_copper_syntax(copper_code)
+        
+        self.assertTrue(result['valid'], f"Parser failed with errors: {result['errors']}")
+        self.assertEqual(len(result['errors']), 0)
+        
+        model = result['models'][0]
+        dimension = model.children[0]
+        measure = model.children[1]
+        
+        self.assertEqual(dimension.properties['type'], 'string')
+        self.assertEqual(dimension.properties['label'], 'Test Dimension')
+        self.assertEqual(dimension.properties['description'], 'This is a test dimension')
+        self.assertTrue(dimension.properties['primary_key'])
+        self.assertFalse(dimension.properties['hidden'])
+        self.assertEqual(dimension.properties['value_format'], '$#,##0.00')
+        self.assertEqual(dimension.properties['units'], 'USD')
+        self.assertEqual(dimension.properties['expression'], 'a+b')
+        
+        self.assertEqual(measure.properties['type'], 'number')
+        self.assertEqual(measure.properties['label'], 'Test Measure')
+        self.assertEqual(measure.properties['description'], 'This is a test measure')
+        self.assertTrue(measure.properties['hidden'])
+        self.assertEqual(measure.properties['value_format'], '0.0%')
+        self.assertEqual(measure.properties['expression'], 'a+b')
+        
+        view = result['views'][0]
+        join = view.children[0]
+        
+        self.assertEqual(view.properties['from'], 'test_model')
+        self.assertEqual(view.properties['extends'], ['base_view'])
+        
+        self.assertEqual(join.properties['type'], 'left_outer')
+        self.assertEqual(join.properties['relationship'], 'one_to_many')
+        self.assertEqual(join.properties['expression'], 'a=b')
+        
+        print("✅ All parameter types test passed!")
+
     def test_all_example_files(self):
         """Test parsing all example files"""
         import glob
