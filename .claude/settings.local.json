@@ -46,7 +46,9 @@
       "Bash(make:*)",
       "Bash(pip3 list:*)",
       "Bash(apt list:*)",
-      "Bash(apt search:*)"
+      "Bash(apt search:*)",
+      "Bash(PYTHONPATH=src python3 -m unittest tests.sql.test_sql_generator -v)",
+      "Bash(PYTHONPATH=src python3:*)"
     ],
     "deny": []
   }
