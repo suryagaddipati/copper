@@ -1,7 +1,7 @@
 # Copper Development Environment Makefile
 # A beautiful way to build and run the Copper parser and web application
 
-.PHONY: all build parser clean start dev stop install-web install-api test test-all test-verbose help
+.PHONY: all build parser clean start dev stop install-web install-api test test-all test-verbose help kill-ports
 
 # Default target
 all: build start
@@ -17,7 +17,7 @@ NC := \033[0m # No Color
 GRAMMAR_DIR := grammar
 API_DIR := app/api
 WEB_DIR := app/web
-GENERATED_DIR := $(API_DIR)/generated
+GENERATED_DIR := src/parser/generated
 GRAMMAR_FILE := $(GRAMMAR_DIR)/Copper.g4
 
 # Help target - shows available commands
@@ -32,6 +32,7 @@ help:
 	@echo "  $(YELLOW)make start$(NC)      - Start API and web servers"
 	@echo "  $(YELLOW)make dev$(NC)        - Start development environment"
 	@echo "  $(YELLOW)make stop$(NC)       - Stop all running servers"
+	@echo "  $(YELLOW)make kill-ports$(NC) - Force kill processes on development ports"
 	@echo "  $(YELLOW)make install$(NC)    - Install all dependencies"
 	@echo "  $(YELLOW)make clean$(NC)      - Clean generated files"
 	@echo "  $(YELLOW)make test$(NC)       - Quick parser smoke test"
@@ -57,8 +58,8 @@ $(GENERATED_DIR)/CopperLexer.py: $(GRAMMAR_FILE)
 		exit 1; \
 	fi
 	@mkdir -p $(GENERATED_DIR)
-	@cd $(API_DIR) && cp ../../$(GRAMMAR_FILE) . && \
-		antlr4 -Dlanguage=Python3 -o generated Copper.g4 && \
+	@cp $(GRAMMAR_FILE) . && \
+		antlr4 -Dlanguage=Python3 -o $(GENERATED_DIR) Copper.g4 && \
 		rm Copper.g4
 	@if [ -f "$(GENERATED_DIR)/CopperParser.py" ]; then \
 		echo "$(GREEN)✅ Parser generated successfully$(NC)"; \
@@ -94,15 +95,22 @@ start: dev
 
 dev: build
 	@echo "$(BLUE)🚀 Starting Copper development environment...$(NC)"
-	@echo "$(YELLOW)🛑 Stopping any existing servers...$(NC)"
+	@echo "$(YELLOW)🛑 Stopping any existing servers and clearing ports...$(NC)"
 	@pkill -f "npm run dev" 2>/dev/null || true
 	@pkill -f "server-manual.py" 2>/dev/null || true
+	@pkill -f "main.py" 2>/dev/null || true
 	@pkill -f "vite" 2>/dev/null || true
+	@pkill -f "uvicorn" 2>/dev/null || true
+	@pkill -f "fastapi" 2>/dev/null || true
+	@echo "$(YELLOW)🔌 Killing processes on ports 3000, 3001, 3002, 8000...$(NC)"
 	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:3002 | xargs kill -9 2>/dev/null || true
 	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
-	@sleep 2
-	@echo "$(BLUE)🔥 Starting API server on port 8000...$(NC)"
-	@cd $(API_DIR) && python3 server-manual.py &
+	@echo "$(YELLOW)⏳ Waiting for ports to clear...$(NC)"
+	@sleep 3
+	@echo "$(BLUE)🔥 Starting API server with UFC integration on port 8000...$(NC)"
+	@cd $(API_DIR) && python3 main.py &
 	@sleep 3
 	@echo "$(BLUE)🌐 Starting web development server on port 3000...$(NC)"
 	@cd $(WEB_DIR) && npm run dev &
@@ -117,29 +125,44 @@ dev: build
 
 # Stop all servers
 stop:
-	@echo "$(YELLOW)🛑 Stopping all servers...$(NC)"
+	@echo "$(YELLOW)🛑 Stopping all servers and clearing ports...$(NC)"
 	@pkill -f "npm run dev" 2>/dev/null || true
 	@pkill -f "server-manual.py" 2>/dev/null || true
+	@pkill -f "main.py" 2>/dev/null || true
 	@pkill -f "vite" 2>/dev/null || true
+	@pkill -f "uvicorn" 2>/dev/null || true
+	@pkill -f "fastapi" 2>/dev/null || true
+	@echo "$(YELLOW)🔌 Killing processes on ports 3000, 3001, 3002, 8000...$(NC)"
 	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:3002 | xargs kill -9 2>/dev/null || true
 	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
-	@echo "$(GREEN)✅ All servers stopped$(NC)"
+	@echo "$(GREEN)✅ All servers stopped and ports cleared$(NC)"
+
+# Kill processes on development ports only
+kill-ports:
+	@echo "$(YELLOW)🔌 Forcefully killing processes on development ports...$(NC)"
+	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:3002 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@echo "$(GREEN)✅ Development ports cleared$(NC)"
 
 # Test parser functionality (quick smoke test)
 test: parser
 	@echo "$(BLUE)🧪 Testing parser functionality...$(NC)"
-	@cd $(API_DIR) && python3 -c "from antlr_parser import validate_copper_syntax; result = validate_copper_syntax('view: test { from: orders }'); print('$(GREEN)✅ Parser test passed!$(NC)' if result['valid'] else '$(RED)❌ Parser test failed$(NC)'); print('Views:', result['statistics']['total_views']); print('Errors:', result['errors'] if result['errors'] else 'None')"
+	@python3 -c "from src.parser.antlr_parser import validate_copper_syntax; result = validate_copper_syntax('view: test { from: orders }'); print('$(GREEN)✅ Parser test passed!$(NC)' if result['valid'] else '$(RED)❌ Parser test failed$(NC)'); print('Views:', result['statistics']['total_views']); print('Errors:', result['errors'] if result['errors'] else 'None')"
 
 # Run comprehensive unit tests
 test-all: parser
 	@echo "$(BLUE)🧪 Running comprehensive unit tests...$(NC)"
-	@cd $(API_DIR) && python3 test_parser.py
+	@python3 -m unittest discover tests/parser/ -s tests/parser/ -p "test_*.py"
 	@echo "$(GREEN)✅ All tests completed!$(NC)"
 
 # Run unit tests with verbose output
 test-verbose: parser
 	@echo "$(BLUE)🧪 Running unit tests with verbose output...$(NC)"
-	@cd $(API_DIR) && python3 -m unittest test_parser.py -v
+	@python3 -m unittest discover tests/parser/ -v
 	@echo "$(GREEN)✅ Verbose tests completed!$(NC)"
 
 # Clean generated files

@@ -7,7 +7,10 @@ from typing import Dict, List, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from antlr_parser import validate_copper_syntax
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+from src.parser.antlr_parser import validate_copper_syntax
 
 app = FastAPI(
     title="Copper Parser API",

@@ -3,7 +3,7 @@
 Unit tests for DAX parser module
 """
 import unittest
-from dax_parser import parse_dax_expression, validate_dax_expression, DAXTokenType
+from src.parser.dax_parser import parse_dax_expression, validate_dax_expression, DAXTokenType
 
 
 class TestDAXParser(unittest.TestCase):
