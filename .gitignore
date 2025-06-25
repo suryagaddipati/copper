@@ -45,10 +45,14 @@ ENV/
 .env.production
 .env.development
 
+# ANTLR cache
+.antlr/
+
 # ANTLR generated files
 grammar/build/
 *.tokens
 *.interp
+generated/
 
 # Java build artifacts
 *.class
