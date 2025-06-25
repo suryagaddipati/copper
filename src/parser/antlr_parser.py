@@ -15,6 +15,7 @@ from antlr4.error.ErrorListener import ErrorListener
 from CopperLexer import CopperLexer
 from CopperParser import CopperParser
 from CopperListener import CopperListener
+from .dax_parser import validate_dax_expression
 
 
 class NodeType(Enum):
@@ -160,7 +161,6 @@ class CopperParseTreeListener(CopperListener):
             if dax_text:
                 self.current_node.properties['expression'] = dax_text
                 try:
-                    from dax_parser import validate_dax_expression
                     validation_result = validate_dax_expression(dax_text)
                     self.current_node.properties['dax_validation'] = validation_result
                     if not validation_result['valid']:

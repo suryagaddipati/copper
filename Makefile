@@ -156,13 +156,13 @@ test: parser
 # Run comprehensive unit tests
 test-all: parser
 	@echo "$(BLUE)🧪 Running comprehensive unit tests...$(NC)"
-	@python3 -m unittest discover tests/parser/ -s tests/parser/ -p "test_*.py"
+	@PYTHONPATH=src python3 -m unittest discover tests/parser/ -s tests/parser/ -p "test_*.py"
 	@echo "$(GREEN)✅ All tests completed!$(NC)"
 
 # Run unit tests with verbose output
 test-verbose: parser
 	@echo "$(BLUE)🧪 Running unit tests with verbose output...$(NC)"
-	@python3 -m unittest discover tests/parser/ -v
+	@PYTHONPATH=src python3 -m unittest discover tests/parser/ -v
 	@echo "$(GREEN)✅ Verbose tests completed!$(NC)"
 
 # Clean generated files

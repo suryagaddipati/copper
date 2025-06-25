@@ -4,6 +4,7 @@ Unit tests for Copper parser
 """
 import unittest
 import os
+
 from src.parser.antlr_parser import validate_copper_syntax
 
 
