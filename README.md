@@ -1,26 +1,30 @@
-# Copper: A LookML-inspired data modeling language using DAX
+# Copper: Semantic Layer for Modern Data Platforms
 
-**Copper** is a metadata format for describing data dimensions and measures, inspired by LookML but using DAX expressions instead of SQL. This provides better compatibility with modern data processing tools like Spark and Dataflow.
+**Copper** is a semantic layer that defines business logic and metrics using DAX expressions. It provides a unified interface for data modeling that works across modern data platforms and BI tools.
 
-**[Read the Specification](spec/SPECIFICATION.md)** | **[View Examples](examples/)** | **[Parser Documentation](grammar/README.md)**
+**[View Examples](examples/)** | **[Parser Documentation](grammar/README.md)** | **[Studio Interface](studio/)**
 
 ---
 
 ## What is Copper?
 
-Copper is a data modeling language that combines the familiar, easy-to-read syntax of LookML with the powerful analytical capabilities of DAX (Data Analysis Expressions). It is designed to work with modern, distributed data processing environments like Apache Spark and Google Dataflow, and it provides native support for tools like Power BI and Tableau.
+Copper is a semantic layer that bridges the gap between raw data and business insights. It uses familiar modeling concepts with DAX expressions to define reusable business logic as code.
 
-By using DAX, Copper allows you to define complex business logic and time-series analysis in a way that is both expressive and compatible with a wide range of data platforms.
+Key benefits:
+- **Universal compatibility** with any data platform or BI tool
+- **Business logic centralization** - define metrics once, use everywhere  
+- **DAX expressions** for complex calculations and time intelligence
+- **Platform agnostic** - not tied to any specific query engine
 
 ## Core Features
 
-*   **LookML-inspired Syntax:** A familiar, easy-to-learn syntax for defining data models.
-*   **DAX Expressions:** Use the full power of DAX for complex calculations and analysis.
-*   **Time Intelligence:** Built-in functions for time-based analysis, such as `SAMEPERIODLASTYEAR` and `TOTALYTD`.
-*   **Context Awareness:** Automatic relationship traversal between tables.
-*   **View Inheritance:** An extensible, modular design that allows you to reuse code and build on existing models.
-*   **Multi-language Parsers:** The ANTLR4 grammar can be used to generate parsers for over 8 programming languages.
-*   **dbt Integration:** Reference Copper views in your dbt models as compiled SQL.
+*   **Semantic Models:** Define dimensions, measures, and business logic once
+*   **DAX Expressions:** Full power of DAX for calculations and time intelligence  
+*   **View Composition:** Build complex data models through joins and relationships
+*   **Studio Interface:** Web-based development environment
+*   **Multi-platform Parser:** ANTLR4 grammar supports multiple programming languages
+*   **Platform Agnostic:** Works with any data platform or BI tool
+*   **Code-First:** Version control friendly metadata definitions
 
 ## Getting Started
 
@@ -61,26 +65,35 @@ view: customer_analytics {
 }
 ```
 
-### 3. Integrate with dbt
+### 3. Use Anywhere
 
-```sql
--- models/vip_customers.sql
-{{ config(materialized='table') }}
+Copper definitions can be consumed by:
+- BI tools (Power BI, Tableau, Looker)
+- Data platforms (Spark, Snowflake, BigQuery) 
+- Applications (via generated code)
+- Analytics frameworks (dbt, Malloy, etc.)
 
-select * from {{ copper.ref('customer_analytics') }}
-where customer_tier = 'VIP'
-  and total_spent > 10000
+
+
+## Studio Development Environment
+
+Copper includes a web-based development studio for building and testing semantic models:
+
+```bash
+# Start the development environment
+make dev
+
+# Access the studio at http://localhost:3000
+# API available at http://localhost:8000
 ```
 
+## Architecture
 
-
-## Tooling
-
-Copper includes a comprehensive ANTLR4 grammar that can be used to generate parsers for a variety of languages. See the [Grammar Documentation](grammar/README.md) for more information.
-
-## Contributing
-
-Copper is open source and welcomes contributions. Please see the [Contributing Guide](CONTRIBUTING.md) to get started.
+- **Parser:** ANTLR4-based grammar for Copper language parsing
+- **Semantic Layer:** Business logic and metric definitions
+- **Studio:** React-based development interface  
+- **API:** FastAPI backend for live parsing and validation
+- **Generators:** Output for data processing platforms (SQL, Spark, Dataflow)
 
 ## License
 
