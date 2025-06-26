@@ -4,6 +4,7 @@ import { CopperEditor } from './components/CopperEditor'
 import { ValidationResults } from './components/ValidationResults'
 import { ProjectManagerCompact } from './components/projects/ProjectManagerCompact'
 import { ProjectFileTree } from './components/projects/ProjectFileTree'
+import { ConnectionManager } from './components/connections/ConnectionManager'
 import { useParseCode } from './hooks/useParseCode'
 import { Project, CopperFile } from './hooks/useProjects'
 
@@ -64,6 +65,14 @@ function App() {
               </div>
               <div className="panel-content">
                 <ProjectManagerCompact onProjectSelect={handleProjectSelect} />
+              </div>
+            </div>
+            <div className="panel">
+              <div className="panel-header">
+                Connections
+              </div>
+              <div className="panel-content">
+                <ConnectionManager />
               </div>
             </div>
             <div className="panel panel-flex">

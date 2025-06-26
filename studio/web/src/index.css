@@ -187,6 +187,71 @@
   .btn-delete {
     @apply bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-700 hover:bg-red-600 hover:text-white font-bold leading-none;
   }
+
+  /* Connection Manager Styles */
+  .connection-manager {
+    @apply flex flex-col gap-3 text-sm;
+  }
+
+  .connection-actions {
+    @apply flex gap-2;
+  }
+
+  .connection-form {
+    @apply flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded;
+  }
+
+  .connection-form select {
+    @apply w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs;
+  }
+
+  .connections-list {
+    @apply max-h-48 overflow-y-auto;
+  }
+
+  .connection-items {
+    @apply flex flex-col gap-1;
+  }
+
+  .connection-item {
+    @apply flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-600;
+  }
+
+  .connection-info {
+    @apply flex-1 min-w-0;
+  }
+
+  .connection-header {
+    @apply flex items-center gap-2 mb-1;
+  }
+
+  .connection-icon {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+
+  .connection-name {
+    @apply font-medium text-gray-900 dark:text-white text-xs truncate;
+  }
+
+  .connection-status {
+    @apply text-xs px-1 py-0.5 rounded;
+  }
+
+  .connection-status.active {
+    @apply bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400;
+  }
+
+  .connection-status.inactive {
+    @apply bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-400;
+  }
+
+  .connection-meta {
+    @apply text-gray-600 dark:text-gray-400 text-xs capitalize;
+  }
+
+  .connection-actions-item {
+    @apply flex gap-1 flex-shrink-0;
+  }
 }
 
 /* Monaco Editor Theme Overrides */
