@@ -3,7 +3,7 @@ import { registerCopperLanguage } from './copper-language'
 import { CopperEditor } from './components/CopperEditor'
 import { ValidationResults } from './components/ValidationResults'
 import { DatabaseExplorer } from './components/database/DatabaseExplorer'
-import { ProjectManager } from './components/projects/ProjectManager'
+import { ProjectManagerCompact } from './components/projects/ProjectManagerCompact'
 import { ProjectFileTree } from './components/projects/ProjectFileTree'
 import { useParseCode } from './hooks/useParseCode'
 import { Project, CopperFile } from './hooks/useProjects'
@@ -12,7 +12,7 @@ import './styles/database.css'
 function App() {
   const [code, setCode] = useState('')
   const [isDarkTheme, setIsDarkTheme] = useState(false)
-  const [activeTab, setActiveTab] = useState<'projects' | 'editor' | 'database'>('projects')
+  const [activeTab, setActiveTab] = useState<'studio' | 'database'>('studio')
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [selectedFile, setSelectedFile] = useState<CopperFile | null>(null)
   const { parseResult, isLoading, parseCode } = useParseCode(code)
@@ -29,7 +29,6 @@ function App() {
   const handleProjectSelect = (project: Project) => {
     setSelectedProject(project)
     setSelectedFile(null)
-    setActiveTab('editor')
   }
 
   const handleFileSelect = (file: CopperFile) => {
@@ -58,16 +57,10 @@ function App() {
           
           <nav className="main-nav">
             <button 
-              className={`nav-tab ${activeTab === 'projects' ? 'active' : ''}`}
-              onClick={() => setActiveTab('projects')}
+              className={`nav-tab ${activeTab === 'studio' ? 'active' : ''}`}
+              onClick={() => setActiveTab('studio')}
             >
-              Projects
-            </button>
-            <button 
-              className={`nav-tab ${activeTab === 'editor' ? 'active' : ''}`}
-              onClick={() => setActiveTab('editor')}
-            >
-              Copper Editor
+              Studio
             </button>
             <button 
               className={`nav-tab ${activeTab === 'database' ? 'active' : ''}`}
@@ -80,12 +73,27 @@ function App() {
       </header>
 
       <main className="main-content container">
-        {activeTab === 'projects' && (
-          <ProjectManager onProjectSelect={handleProjectSelect} />
-        )}
-        
-        {activeTab === 'editor' && (
-          <>
+        {activeTab === 'studio' && (
+          <div className="studio-layout">
+            <div className="left-sidebar">
+              <div className="panel">
+                <div className="panel-header">Projects</div>
+                <div className="panel-content">
+                  <ProjectManagerCompact onProjectSelect={handleProjectSelect} />
+                </div>
+              </div>
+              <div className="panel">
+                <div className="panel-header">Project Files</div>
+                <div className="panel-content" style={{ padding: 0 }}>
+                  <ProjectFileTree
+                    project={selectedProject}
+                    onFileSelect={handleFileSelect}
+                    selectedFile={selectedFile}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="editor-panel">
               <CopperEditor
                 code={code}
@@ -98,24 +106,7 @@ function App() {
                 parseResult={parseResult}
               />
             </div>
-
-            <div className="sidebar">
-              <div className="panel">
-                <div className="panel-header">Project Files</div>
-                <div className="panel-content" style={{ padding: 0 }}>
-                  <ProjectFileTree
-                    project={selectedProject}
-                    onFileSelect={handleFileSelect}
-                    selectedFile={selectedFile}
-                  />
-                </div>
-              </div>
-              <ValidationResults
-                parseResult={parseResult}
-                isLoading={isLoading}
-              />
-            </div>
-          </>
+          </div>
         )}
 
         {activeTab === 'database' && (

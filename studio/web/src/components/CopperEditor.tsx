@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useEffect } from 'react'
 import Editor from '@monaco-editor/react'
-import { FileText, Loader2, Sun, Moon } from 'lucide-react'
+import { FileText, Loader2, Sun, Moon, Check, X } from 'lucide-react'
 import { registerCopperLanguage, copperLanguageDefinition } from '../copper-language'
 import * as monaco from 'monaco-editor'
 
@@ -133,31 +133,58 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
         Code Editor
       </div>
       <div className="toolbar">
-        <button 
-          className="btn primary" 
-          onClick={onParse}
-          disabled={isLoading}
-        >
-          {isLoading ? <Loader2 size={14} className="animate-spin" /> : 'Parse'}
-        </button>
-        <button 
-          className="btn" 
-          onClick={onClear}
-        >
-          Clear
-        </button>
-        <button 
-          className="btn" 
-          onClick={onToggleTheme}
-          title={isDarkTheme ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-        >
-          {isDarkTheme ? <Sun size={14} /> : <Moon size={14} />}
-          {isDarkTheme ? ' Light' : ' Dark'}
-        </button>
+        <div className="toolbar-left">
+          <button 
+            className="btn primary" 
+            onClick={onParse}
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader2 size={14} className="animate-spin" /> : 'Parse'}
+          </button>
+          <button 
+            className="btn" 
+            onClick={onClear}
+          >
+            Clear
+          </button>
+          <button 
+            className="btn" 
+            onClick={onToggleTheme}
+            title={isDarkTheme ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          >
+            {isDarkTheme ? <Sun size={14} /> : <Moon size={14} />}
+            {isDarkTheme ? ' Light' : ' Dark'}
+          </button>
+        </div>
+
+        <div className="toolbar-right">
+          {isLoading ? (
+            <div className="validation-status parsing">
+              <Loader2 size={14} className="animate-spin" />
+              <span>Parsing...</span>
+            </div>
+          ) : parseResult ? (
+            <div className="validation-status-bar">
+              <div className={`validation-status ${parseResult.valid ? 'valid' : 'invalid'}`}>
+                {parseResult.valid ? (
+                  <>
+                    <Check size={14} />
+                    <span>Valid</span>
+                  </>
+                ) : (
+                  <>
+                    <X size={14} />
+                    <span>{parseResult.errors.length} Error{parseResult.errors.length !== 1 ? 's' : ''}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
       <div className="editor-container">
         <Editor
-          height="500px"
+          height="600px"
           defaultLanguage="plaintext"
           theme={isDarkTheme ? "copper-dark" : "copper-light"}
           value={code}
