@@ -30,6 +30,26 @@ class ConnectionManager:
     def __init__(self):
         self.connections: Dict[str, DatabaseConnection] = {}
         self._active_connections: Dict[str, Any] = {}
+        self._storage = None
+        self._load_connections()
+    
+    def _load_connections(self):
+        """Load saved connections from storage"""
+        try:
+            from .connection_storage import ConnectionStorage
+            self._storage = ConnectionStorage()
+            self.connections = self._storage.load_connections()
+        except Exception as e:
+            print(f"Failed to load connections: {e}")
+            self.connections = {}
+    
+    def _save_connections(self):
+        """Save current connections to storage"""
+        if self._storage:
+            try:
+                self._storage.save_connections(self.connections)
+            except Exception as e:
+                print(f"Failed to save connections: {e}")
     
     def create_connection(
         self,
@@ -57,6 +77,7 @@ class ConnectionManager:
         )
         
         self.connections[connection_id] = connection
+        self._save_connections()
         return connection
     
     def get_connection(self, connection_id: str) -> Optional[DatabaseConnection]:
@@ -70,6 +91,7 @@ class ConnectionManager:
             if connection_id in self._active_connections:
                 self.disconnect(connection_id)
             del self.connections[connection_id]
+            self._save_connections()
             return True
         return False
     
