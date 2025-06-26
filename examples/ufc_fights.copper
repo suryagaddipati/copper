@@ -1,0 +1,84 @@
+model: fights {
+  dimension: fight_id {
+    type: number
+    primary_key: yes
+    hidden: yes
+  }
+  
+  dimension: event_id {
+    type: number
+    hidden: yes
+  }
+  
+  dimension: fighter1_id {
+    type: number
+    label: "Fighter 1 ID"
+    hidden: yes
+  }
+  
+  dimension: fighter2_id {
+    type: number
+    label: "Fighter 2 ID" 
+    hidden: yes
+  }
+  
+  dimension: winner_id {
+    type: number
+    label: "Winner ID"
+    hidden: yes
+  }
+  
+  dimension: method {
+    type: string
+    label: "Fight Method"
+    description: "How the fight ended (Decision, KO, TKO, Submission)"
+  }
+  
+  dimension: round {
+    type: number
+    label: "Round"
+    description: "Round in which fight ended"
+  }
+  
+  dimension: time {
+    type: string
+    label: "Fight Time"
+    description: "Time at which fight ended"
+  }
+  
+  measure: total_fights {
+    type: count
+    label: "Total Fights"
+    description: "Total number of fights"
+  }
+  
+  measure: average_round {
+    type: average
+    label: "Average Round"
+    description: "Average round fights end in"
+    expression: AVERAGE(fights[round]) ;;
+    value_format: "0.0"
+  }
+  
+  measure: ko_tko_rate {
+    type: number
+    label: "KO/TKO Rate"
+    description: "Percentage of fights ending in KO or TKO"
+    value_format: "0.0%"
+    expression: DIVIDE(
+      SUMX(fights, IF(fights[method] = "KO" || fights[method] = "TKO", 1, 0)),
+      COUNT(fights[fight_id])
+    ) ;;
+  }
+  
+  measure: submission_rate {
+    type: number
+    label: "Submission Rate"
+    description: "Percentage of fights ending in submission"
+    value_format: "0.0%"
+    expression: DIVIDE(
+      SUMX(fights, IF(fights[method] = "Submission", 1, 0)),
+      COUNT(fights[fight_id])
+    ) ;;
+  }
+}

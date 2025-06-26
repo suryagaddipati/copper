@@ -1,9 +1,9 @@
 """
-FastAPI backend for Copper language live parsing
+FastAPI backend for Copper Studio
 """
 import os
 import glob
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -11,12 +11,18 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from src.parser.antlr_parser import validate_copper_syntax
+from database import ConnectionManager, QueryExecutor, SchemaInspector
+from database.connection_manager import DatabaseType
 
 app = FastAPI(
-    title="Copper Parser API",
-    description="Live parsing API for the Copper metadata language",
+    title="Copper Studio API",
+    description="API for Copper Studio - semantic layer development environment",
     version="1.0.0"
 )
+
+connection_manager = ConnectionManager()
+query_executor = QueryExecutor(connection_manager)
+schema_inspector = SchemaInspector(connection_manager)
 
 # Enable CORS for web frontend
 app.add_middleware(
@@ -45,6 +51,53 @@ class ExampleFile(BaseModel):
     name: str
     content: str
     description: str
+
+
+class ConnectionRequest(BaseModel):
+    name: str
+    type: str
+    host: Optional[str] = None
+    port: Optional[int] = None
+    database: Optional[str] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
+    file_path: Optional[str] = None
+
+
+class ConnectionResponse(BaseModel):
+    id: str
+    name: str
+    type: str
+    is_active: bool
+
+
+class QueryRequest(BaseModel):
+    query: str
+    limit: Optional[int] = 1000
+
+
+class QueryResponse(BaseModel):
+    data: List[Dict[str, Any]]
+    columns: List[str]
+    row_count: int
+
+
+class TableInfo(BaseModel):
+    name: str
+    row_count: Optional[int] = None
+
+
+class ColumnInfo(BaseModel):
+    name: str
+    type: str
+    nullable: bool
+    primary_key: bool = False
+
+
+class TableSchema(BaseModel):
+    name: str
+    columns: List[ColumnInfo]
+    row_count: Optional[int] = None
 
 
 @app.get("/")
@@ -196,6 +249,137 @@ async def get_example(example_name: str):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading example: {str(e)}")
+
+
+@app.post("/connections", response_model=ConnectionResponse)
+async def create_connection(request: ConnectionRequest):
+    try:
+        db_type = DatabaseType(request.type.lower())
+        connection = connection_manager.create_connection(
+            name=request.name,
+            db_type=db_type,
+            host=request.host,
+            port=request.port,
+            database=request.database,
+            username=request.username,
+            password=request.password,
+            file_path=request.file_path
+        )
+        
+        return ConnectionResponse(
+            id=connection.id,
+            name=connection.name,
+            type=connection.type.value,
+            is_active=connection.is_active
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to create connection: {str(e)}")
+
+
+@app.get("/connections", response_model=List[ConnectionResponse])
+async def list_connections():
+    connections = connection_manager.list_connections()
+    return [
+        ConnectionResponse(
+            id=conn.id,
+            name=conn.name,
+            type=conn.type.value,
+            is_active=conn.is_active
+        )
+        for conn in connections
+    ]
+
+
+@app.post("/connections/{connection_id}/connect")
+async def connect_to_database(connection_id: str):
+    if not connection_manager.get_connection(connection_id):
+        raise HTTPException(status_code=404, detail="Connection not found")
+    
+    if connection_manager.connect(connection_id):
+        return {"status": "connected"}
+    else:
+        raise HTTPException(status_code=400, detail="Failed to connect to database")
+
+
+@app.post("/connections/{connection_id}/disconnect")
+async def disconnect_from_database(connection_id: str):
+    if not connection_manager.get_connection(connection_id):
+        raise HTTPException(status_code=404, detail="Connection not found")
+    
+    if connection_manager.disconnect(connection_id):
+        return {"status": "disconnected"}
+    else:
+        raise HTTPException(status_code=400, detail="Failed to disconnect from database")
+
+
+@app.get("/connections/{connection_id}/tables", response_model=List[TableInfo])
+async def get_tables(connection_id: str):
+    try:
+        tables = schema_inspector.get_tables(connection_id)
+        table_infos = []
+        
+        for table in tables:
+            try:
+                info = schema_inspector.get_table_info(connection_id, table)
+                table_infos.append(TableInfo(name=info.name, row_count=info.row_count))
+            except Exception:
+                table_infos.append(TableInfo(name=table, row_count=None))
+        
+        return table_infos
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to get tables: {str(e)}")
+
+
+@app.get("/connections/{connection_id}/tables/{table_name}/schema", response_model=TableSchema)
+async def get_table_schema(connection_id: str, table_name: str):
+    try:
+        table_info = schema_inspector.get_table_info(connection_id, table_name)
+        
+        columns = [
+            ColumnInfo(
+                name=col.name,
+                type=col.type,
+                nullable=col.nullable,
+                primary_key=col.primary_key
+            )
+            for col in table_info.columns
+        ]
+        
+        return TableSchema(
+            name=table_info.name,
+            columns=columns,
+            row_count=table_info.row_count
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to get table schema: {str(e)}")
+
+
+@app.post("/connections/{connection_id}/query", response_model=QueryResponse)
+async def execute_query(connection_id: str, request: QueryRequest):
+    try:
+        result = query_executor.execute_query(connection_id, request.query, request.limit)
+        
+        return QueryResponse(
+            data=result.data,
+            columns=result.columns,
+            row_count=result.row_count
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Query execution failed: {str(e)}")
+
+
+@app.get("/connections/{connection_id}/tables/{table_name}/data", response_model=QueryResponse)
+async def get_table_data(connection_id: str, table_name: str, limit: int = 100):
+    try:
+        result = query_executor.get_table_data(connection_id, table_name, limit)
+        
+        return QueryResponse(
+            data=result.data,
+            columns=result.columns,
+            row_count=result.row_count
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to get table data: {str(e)}")
 
 
 if __name__ == "__main__":

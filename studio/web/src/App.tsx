@@ -3,12 +3,15 @@ import { registerCopperLanguage } from './copper-language'
 import { CopperEditor } from './components/CopperEditor'
 import { ExamplesSidebar } from './components/ExamplesSidebar'
 import { ValidationResults } from './components/ValidationResults'
+import { DatabaseExplorer } from './components/database/DatabaseExplorer'
 import { useParseCode } from './hooks/useParseCode'
 import { useExamples } from './hooks/useExamples'
+import './styles/database.css'
 
 function App() {
   const [code, setCode] = useState('')
   const [isDarkTheme, setIsDarkTheme] = useState(false)
+  const [activeTab, setActiveTab] = useState<'editor' | 'database'>('editor')
   const { parseResult, isLoading, parseCode } = useParseCode(code)
   const { examples, loadingExamples } = useExamples()
 
@@ -48,36 +51,57 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="container">
-          <h1>Copper Language Parser</h1>
-          <p>Live parsing and validation for the Copper metadata language</p>
+          <h1>Copper Studio</h1>
+          <p>Semantic layer development environment</p>
+          
+          <nav className="main-nav">
+            <button 
+              className={`nav-tab ${activeTab === 'editor' ? 'active' : ''}`}
+              onClick={() => setActiveTab('editor')}
+            >
+              Copper Editor
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'database' ? 'active' : ''}`}
+              onClick={() => setActiveTab('database')}
+            >
+              Database Explorer
+            </button>
+          </nav>
         </div>
       </header>
 
       <main className="main-content container">
-        <div className="editor-panel">
-          <CopperEditor
-            code={code}
-            onChange={handleCodeChange}
-            onParse={parseCode}
-            onClear={handleClearCode}
-            isLoading={isLoading}
-            isDarkTheme={isDarkTheme}
-            onToggleTheme={handleToggleTheme}
-            parseResult={parseResult}
-          />
-        </div>
+        {activeTab === 'editor' ? (
+          <>
+            <div className="editor-panel">
+              <CopperEditor
+                code={code}
+                onChange={handleCodeChange}
+                onParse={parseCode}
+                onClear={handleClearCode}
+                isLoading={isLoading}
+                isDarkTheme={isDarkTheme}
+                onToggleTheme={handleToggleTheme}
+                parseResult={parseResult}
+              />
+            </div>
 
-        <div className="sidebar">
-          <ExamplesSidebar
-            examples={examples}
-            loadingExamples={loadingExamples}
-            onLoadExample={handleLoadExample}
-          />
-          <ValidationResults
-            parseResult={parseResult}
-            isLoading={isLoading}
-          />
-        </div>
+            <div className="sidebar">
+              <ExamplesSidebar
+                examples={examples}
+                loadingExamples={loadingExamples}
+                onLoadExample={handleLoadExample}
+              />
+              <ValidationResults
+                parseResult={parseResult}
+                isLoading={isLoading}
+              />
+            </div>
+          </>
+        ) : (
+          <DatabaseExplorer />
+        )}
       </main>
     </div>
   )
