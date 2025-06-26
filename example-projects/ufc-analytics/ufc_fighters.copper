@@ -42,10 +42,10 @@ model: fighters {
   }
   
   measure: total_fights {
-    type: number
+    type: sum
     label: "Total Fights"
     description: "Total professional fights"
-    expression: fighters[wins] + fighters[losses] + fighters[draws] ;;
+    expression: fighters[wins] ;;
   }
   
   measure: win_percentage {
@@ -53,7 +53,6 @@ model: fighters {
     label: "Win Percentage"
     description: "Percentage of fights won"
     value_format: "0.0%"
-    expression: DIVIDE(fighters[wins], fighters[wins] + fighters[losses] + fighters[draws]) ;;
   }
   
   measure: fighter_count {

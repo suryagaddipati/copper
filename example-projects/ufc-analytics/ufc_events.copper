@@ -39,6 +39,6 @@ model: events {
     type: count_distinct
     label: "Events by Year"
     description: "Number of events per year"
-    expression: YEAR(events[date]) ;;
+    expression: events[date] ;;
   }
 }
