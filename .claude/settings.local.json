@@ -52,7 +52,8 @@
       "mcp__playwright__browser_type",
       "mcp__playwright__browser_press_key",
       "Bash(npx tailwindcss init:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(kill:*)"
     ],
     "deny": []
   }

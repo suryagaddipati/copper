@@ -50,7 +50,7 @@ export const ProjectManagerCompact: React.FC<ProjectManagerCompactProps> = ({ on
       <div className="project-actions">
         <button 
           onClick={() => setShowForm(!showForm)}
-          className="btn primary"
+          className="btn btn-primary"
           disabled={loadingProject}
         >
           {showForm ? 'Cancel' : 'Load Project'}
@@ -72,19 +72,19 @@ export const ProjectManagerCompact: React.FC<ProjectManagerCompactProps> = ({ on
           <button 
             onClick={handleLoadProject}
             disabled={loadingProject || !projectPath.trim()}
-            className="btn primary small"
+            className="btn btn-primary btn-small"
           >
             {loadingProject ? 'Loading...' : 'Load'}
           </button>
-          {error && <div className="error-message small">{error}</div>}
+          {error && <div className="error-message">{error}</div>}
         </div>
       )}
 
       <div className="projects-list-compact">
         {loading ? (
-          <div className="loading small">Loading...</div>
+          <div className="loading">Loading...</div>
         ) : projects.length === 0 ? (
-          <div className="empty-state small">No projects loaded</div>
+          <div className="empty-state">No projects loaded</div>
         ) : (
           <div className="project-items-compact">
             {projects.map(project => (
@@ -98,14 +98,14 @@ export const ProjectManagerCompact: React.FC<ProjectManagerCompactProps> = ({ on
                 <div className="project-actions-compact">
                   <button 
                     onClick={() => onProjectSelect?.(project)}
-                    className="btn small"
+                    className="btn btn-secondary btn-small"
                     title="Open project"
                   >
                     Open
                   </button>
                   <button 
                     onClick={() => handleDeleteProject(project.id, project.name)}
-                    className="btn small delete"
+                    className="btn btn-small btn-delete"
                     title="Remove from workspace"
                   >
                     ×
