@@ -50,7 +50,9 @@
       "Bash(PYTHONPATH=src python3 -m unittest tests.sql.test_sql_generator -v)",
       "Bash(PYTHONPATH=src python3:*)",
       "mcp__playwright__browser_type",
-      "mcp__playwright__browser_press_key"
+      "mcp__playwright__browser_press_key",
+      "Bash(npx tailwindcss init:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": []
   }

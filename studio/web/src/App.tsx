@@ -49,21 +49,21 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="container">
-          <h1>Copper Studio</h1>
-          <p>Semantic layer development environment</p>
+    <div className="app-container">
+      <header className="app-header">
+        <div className="app-header-content">
+          <h1 className="app-title">Copper Studio</h1>
+          <p className="app-subtitle">Semantic layer development environment</p>
           
           <nav className="main-nav">
             <button 
-              className={`nav-tab ${activeTab === 'studio' ? 'active' : ''}`}
+              className={`nav-tab ${activeTab === 'studio' ? 'nav-tab-active' : 'nav-tab-inactive'}`}
               onClick={() => setActiveTab('studio')}
             >
               Studio
             </button>
             <button 
-              className={`nav-tab ${activeTab === 'database' ? 'active' : ''}`}
+              className={`nav-tab ${activeTab === 'database' ? 'nav-tab-active' : 'nav-tab-inactive'}`}
               onClick={() => setActiveTab('database')}
             >
               Database Explorer
@@ -72,19 +72,23 @@ function App() {
         </div>
       </header>
 
-      <main className="main-content container">
+      <main className="main-content">
         {activeTab === 'studio' && (
           <div className="studio-layout">
-            <div className="left-sidebar">
+            <div className="studio-sidebar">
               <div className="panel">
-                <div className="panel-header">Projects</div>
+                <div className="panel-header">
+                  Projects
+                </div>
                 <div className="panel-content">
                   <ProjectManagerCompact onProjectSelect={handleProjectSelect} />
                 </div>
               </div>
-              <div className="panel">
-                <div className="panel-header">Project Files</div>
-                <div className="panel-content" style={{ padding: 0 }}>
+              <div className="panel panel-flex">
+                <div className="panel-header">
+                  Project Files
+                </div>
+                <div className="panel-content-no-padding">
                   <ProjectFileTree
                     project={selectedProject}
                     onFileSelect={handleFileSelect}
@@ -94,7 +98,7 @@ function App() {
               </div>
             </div>
 
-            <div className="editor-panel">
+            <div className="studio-editor">
               <CopperEditor
                 code={code}
                 onChange={handleCodeChange}

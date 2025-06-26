@@ -127,64 +127,64 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
   }, [onChange])
 
   return (
-    <div className="panel">
-      <div className="panel-header">
-        <FileText size={16} style={{ display: 'inline', marginRight: '0.5rem' }} />
+    <div className="editor-panel">
+      <div className="panel-header panel-header-with-icon">
+        <FileText size={16} className="icon-spacing" />
         Code Editor
       </div>
-      <div className="toolbar">
-        <div className="toolbar-left">
+      <div className="editor-toolbar">
+        <div className="editor-toolbar-left">
           <button 
-            className="btn primary" 
+            className="btn btn-primary btn-with-icon" 
             onClick={onParse}
             disabled={isLoading}
           >
             {isLoading ? <Loader2 size={14} className="animate-spin" /> : 'Parse'}
           </button>
           <button 
-            className="btn" 
+            className="btn btn-secondary" 
             onClick={onClear}
           >
             Clear
           </button>
           <button 
-            className="btn" 
+            className="btn btn-secondary btn-with-icon" 
             onClick={onToggleTheme}
             title={isDarkTheme ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
           >
             {isDarkTheme ? <Sun size={14} /> : <Moon size={14} />}
-            {isDarkTheme ? ' Light' : ' Dark'}
+            {isDarkTheme ? 'Light' : 'Dark'}
           </button>
         </div>
 
-        <div className="toolbar-right">
+        <div className="editor-toolbar-right">
           {isLoading ? (
-            <div className="validation-status parsing">
+            <div className="validation-status validation-status-parsing">
               <Loader2 size={14} className="animate-spin" />
               <span>Parsing...</span>
             </div>
           ) : parseResult ? (
-            <div className="validation-status-bar">
-              <div className={`validation-status ${parseResult.valid ? 'valid' : 'invalid'}`}>
-                {parseResult.valid ? (
-                  <>
-                    <Check size={14} />
-                    <span>Valid</span>
-                  </>
-                ) : (
-                  <>
-                    <X size={14} />
-                    <span>{parseResult.errors.length} Error{parseResult.errors.length !== 1 ? 's' : ''}</span>
-                  </>
-                )}
-              </div>
+            <div className={`validation-status ${
+              parseResult.valid ? 'validation-status-valid' : 'validation-status-invalid'
+            }`}>
+              {parseResult.valid ? (
+                <>
+                  <Check size={14} />
+                  <span>Valid</span>
+                </>
+              ) : (
+                <>
+                  <X size={14} />
+                  <span>{parseResult.errors.length} Error{parseResult.errors.length !== 1 ? 's' : ''}</span>
+                </>
+              )}
             </div>
           ) : null}
         </div>
       </div>
       <div className="editor-container">
         <Editor
-          height="600px"
+          height="100%"
           defaultLanguage="plaintext"
           theme={isDarkTheme ? "copper-dark" : "copper-light"}
           value={code}
