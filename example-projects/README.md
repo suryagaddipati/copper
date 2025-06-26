@@ -1,43 +1,53 @@
-# Copper Language Examples
+# Copper Example Projects
 
-This directory contains example `.copper` files demonstrating the Copper language syntax for metadata-driven data modeling.
+This directory contains organized example projects demonstrating the Copper language syntax for metadata-driven data modeling.
 
-## Working Examples
+## Project Structure
 
-The following examples demonstrate syntax that currently works with the parser:
+Each subdirectory represents a complete project with related Copper files:
 
-### Simple Views
+### 📚 `basic-tutorial/`
+**Learning Copper basics**
+- `minimal.copper` - Minimal model definition
+- `simple.copper` - Simple model with DAX expressions
 
-- **`simple_sales_view.copper`** - Basic view with `from` clause
-- **`ecommerce_base_view.copper`** - Simple e-commerce base view  
-- **`product_catalog_view.copper`** - Product catalog view
-- **`customer_analysis_view.copper`** - Customer analysis view
+Perfect for getting started with Copper syntax and understanding basic model definitions.
 
-### Example Usage
+### 🛒 `ecommerce-demo/`
+**Complete e-commerce semantic layer**
+- `customers.copper` - Customer demographics model
+- `complete_example.copper` - Product model with analytics view
+- `orders_view.copper` - Order view definitions
+- `with_expressions.copper` - Advanced DAX expression examples
 
-```copper
-# Basic view syntax that works
-view: simple_sales {
-  from: orders
-}
-```
+Shows how to build a realistic semantic layer for an e-commerce business with multiple related models and views.
 
-## Comprehensive Examples (Syntax Reference)
+### 🥊 `ufc-analytics/`
+**Real-world analytics with sample data**
+- `ufc_fighters.copper` - Fighter demographics and performance
+- `ufc_fights.copper` - Fight outcomes and methods
+- `ufc_events.copper` - Event venues and dates
+- `ufc_analytics.copper` - Analytics views with complex joins
+- `create_ufc_data.py` - Sample data generator
+- `ufc_sample.db` - DuckDB database with sample data
 
-The following files demonstrate the intended full Copper syntax based on the specification, though they may not parse correctly with the current parser implementation:
+Demonstrates a complete analytics use case with complex joins, measures, and actual sample data for testing.
 
-### Models
+## Using with Copper Studio
 
-- **`customers.copper`** - Customer data model with dimensions and measures
-- **`ecommerce_orders.copper`** - E-commerce orders model with comprehensive analytics
-- **`products.copper`** - Product catalog model with inventory metrics
-- **`inventory_management.copper`** - Inventory tracking and forecasting model
+### Load as Projects
+1. Start Copper Studio: `make dev`
+2. Go to http://localhost:3000
+3. Click "Projects" tab
+4. Load project path: `/path/to/copper/example-projects/basic-tutorial`
+5. Open the project and explore the files
 
-### Views
-
-- **`sales_analysis_view.copper`** - Complex view with multiple joins
-- **`base_ecommerce_view.copper`** - Base view with inheritance pattern
-- **`customer_analytics_view.copper`** - Customer behavior analysis view
+### Work with Sample Data
+For the UFC analytics project:
+1. Load the `ufc-analytics` project
+2. Use Database Explorer to connect to `ufc_sample.db`
+3. Generate SQL from the Copper views
+4. Execute queries against the sample data
 
 ### Model Example Structure
 

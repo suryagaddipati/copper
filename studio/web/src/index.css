@@ -519,6 +519,206 @@ body {
   border-color: var(--accent-primary);
 }
 
+/* Project Management styles */
+.project-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  height: 100%;
+}
+
+.project-loader {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.project-loader h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.form-group input:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.projects-list h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.project-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.project-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.project-item:hover {
+  background: var(--hover-bg);
+  border-color: var(--accent-primary);
+}
+
+.project-info h4 {
+  margin: 0 0 0.25rem 0;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.project-path {
+  margin: 0 0 0.25rem 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+.project-meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.project-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.project-actions .btn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.btn.delete {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-color: var(--error-border);
+}
+
+.btn.delete:hover {
+  background: var(--error-text);
+  color: white;
+}
+
+/* Project File Tree styles */
+.project-file-tree {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.project-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+.project-header h4 {
+  margin: 0 0 0.25rem 0;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.file-count {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.file-tree {
+  padding: 0.5rem;
+}
+
+.folder-section {
+  margin-bottom: 1rem;
+}
+
+.folder-name {
+  padding: 0.25rem 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color-light);
+  margin-bottom: 0.5rem;
+}
+
+.files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-item:hover {
+  background: var(--hover-bg);
+}
+
+.file-item.selected {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.file-icon {
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.file-name {
+  font-size: 0.875rem;
+  flex: 1;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* Print styles */
 @media print {
   .sidebar {

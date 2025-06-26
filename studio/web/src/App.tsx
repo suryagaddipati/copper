@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react'
 import { registerCopperLanguage } from './copper-language'
 import { CopperEditor } from './components/CopperEditor'
-import { ExamplesSidebar } from './components/ExamplesSidebar'
 import { ValidationResults } from './components/ValidationResults'
 import { DatabaseExplorer } from './components/database/DatabaseExplorer'
+import { ProjectManager } from './components/projects/ProjectManager'
+import { ProjectFileTree } from './components/projects/ProjectFileTree'
 import { useParseCode } from './hooks/useParseCode'
-import { useExamples } from './hooks/useExamples'
+import { Project, CopperFile } from './hooks/useProjects'
 import './styles/database.css'
 
 function App() {
   const [code, setCode] = useState('')
   const [isDarkTheme, setIsDarkTheme] = useState(false)
-  const [activeTab, setActiveTab] = useState<'editor' | 'database'>('editor')
+  const [activeTab, setActiveTab] = useState<'projects' | 'editor' | 'database'>('projects')
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [selectedFile, setSelectedFile] = useState<CopperFile | null>(null)
   const { parseResult, isLoading, parseCode } = useParseCode(code)
-  const { examples, loadingExamples } = useExamples()
 
   // Register language early and update document theme
   useEffect(() => {
@@ -24,16 +26,16 @@ function App() {
     document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light')
   }, [isDarkTheme])
 
-  const handleLoadExample = (example: { name: string; content: string; description: string }) => {
-    setCode(example.content)
+  const handleProjectSelect = (project: Project) => {
+    setSelectedProject(project)
+    setSelectedFile(null)
+    setActiveTab('editor')
   }
 
-  // Auto-load first example when examples are loaded
-  useEffect(() => {
-    if (examples.length > 0 && code === '') {
-      setCode(examples[0].content)
-    }
-  }, [examples, code])
+  const handleFileSelect = (file: CopperFile) => {
+    setSelectedFile(file)
+    setCode(file.content)
+  }
 
   const handleClearCode = () => {
     setCode('')
@@ -56,6 +58,12 @@ function App() {
           
           <nav className="main-nav">
             <button 
+              className={`nav-tab ${activeTab === 'projects' ? 'active' : ''}`}
+              onClick={() => setActiveTab('projects')}
+            >
+              Projects
+            </button>
+            <button 
               className={`nav-tab ${activeTab === 'editor' ? 'active' : ''}`}
               onClick={() => setActiveTab('editor')}
             >
@@ -72,7 +80,11 @@ function App() {
       </header>
 
       <main className="main-content container">
-        {activeTab === 'editor' ? (
+        {activeTab === 'projects' && (
+          <ProjectManager onProjectSelect={handleProjectSelect} />
+        )}
+        
+        {activeTab === 'editor' && (
           <>
             <div className="editor-panel">
               <CopperEditor
@@ -88,18 +100,25 @@ function App() {
             </div>
 
             <div className="sidebar">
-              <ExamplesSidebar
-                examples={examples}
-                loadingExamples={loadingExamples}
-                onLoadExample={handleLoadExample}
-              />
+              <div className="panel">
+                <div className="panel-header">Project Files</div>
+                <div className="panel-content" style={{ padding: 0 }}>
+                  <ProjectFileTree
+                    project={selectedProject}
+                    onFileSelect={handleFileSelect}
+                    selectedFile={selectedFile}
+                  />
+                </div>
+              </div>
               <ValidationResults
                 parseResult={parseResult}
                 isLoading={isLoading}
               />
             </div>
           </>
-        ) : (
+        )}
+
+        {activeTab === 'database' && (
           <DatabaseExplorer />
         )}
       </main>

@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from src.parser.antlr_parser import validate_copper_syntax
 from database import ConnectionManager, QueryExecutor, SchemaInspector
 from database.connection_manager import DatabaseType
+from projects import ProjectManager
 
 app = FastAPI(
     title="Copper Studio API",
@@ -23,6 +24,7 @@ app = FastAPI(
 connection_manager = ConnectionManager()
 query_executor = QueryExecutor(connection_manager)
 schema_inspector = SchemaInspector(connection_manager)
+project_manager = ProjectManager()
 
 # Enable CORS for web frontend
 app.add_middleware(
@@ -98,6 +100,26 @@ class TableSchema(BaseModel):
     name: str
     columns: List[ColumnInfo]
     row_count: Optional[int] = None
+
+
+class ProjectRequest(BaseModel):
+    path: str
+    name: Optional[str] = None
+
+
+class CopperFileResponse(BaseModel):
+    name: str
+    path: str
+    content: str
+    relative_path: str
+
+
+class ProjectResponse(BaseModel):
+    id: str
+    name: str
+    path: str
+    file_count: int
+    created_at: str
 
 
 @app.get("/")
@@ -380,6 +402,81 @@ async def get_table_data(connection_id: str, table_name: str, limit: int = 100):
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get table data: {str(e)}")
+
+
+@app.post("/projects", response_model=ProjectResponse)
+async def load_project(request: ProjectRequest):
+    """Load a project from a disk directory"""
+    try:
+        project = project_manager.load_project_from_path(request.path, request.name)
+        return ProjectResponse(
+            id=project.id,
+            name=project.name,
+            path=project.path,
+            file_count=len(project.files),
+            created_at=project.created_at.isoformat()
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to load project: {str(e)}")
+
+
+@app.get("/projects", response_model=List[ProjectResponse])
+async def list_projects():
+    """List all loaded projects"""
+    projects = project_manager.list_projects()
+    return [
+        ProjectResponse(
+            id=project.id,
+            name=project.name,
+            path=project.path,
+            file_count=len(project.files),
+            created_at=project.created_at.isoformat()
+        )
+        for project in projects
+    ]
+
+
+@app.get("/projects/{project_id}/files", response_model=List[CopperFileResponse])
+async def get_project_files(project_id: str):
+    """Get all Copper files in a project"""
+    project = project_manager.get_project(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    return [
+        CopperFileResponse(
+            name=file.name,
+            path=file.path,
+            content=file.content,
+            relative_path=file.relative_path
+        )
+        for file in project.files
+    ]
+
+
+@app.delete("/projects/{project_id}")
+async def delete_project(project_id: str):
+    """Remove a project from the workspace"""
+    if project_manager.delete_project(project_id):
+        return {"status": "deleted"}
+    else:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+
+@app.post("/projects/{project_id}/refresh")
+async def refresh_project(project_id: str):
+    """Refresh project files from disk"""
+    project = project_manager.refresh_project(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    return ProjectResponse(
+        id=project.id,
+        name=project.name,
+        path=project.path,
+        file_count=len(project.files),
+        created_at=project.created_at.isoformat()
+    )
 
 
 if __name__ == "__main__":

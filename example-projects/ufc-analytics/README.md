@@ -1,6 +1,17 @@
-# Sample Datasets
+# UFC Analytics Project
 
-This directory contains sample datasets for testing Copper Studio database connections.
+This project provides a complete UFC (Ultimate Fighting Championship) analytics semantic layer with sample data.
+
+## Files:
+- `ufc_fighters.copper` - Fighter model with demographics and performance metrics
+- `ufc_fights.copper` - Fight model with method, rounds, and outcome data
+- `ufc_events.copper` - Event model with venue and date information
+- `ufc_analytics.copper` - Analytics views joining fighters, fights, and events
+- `create_ufc_data.py` - Script to generate sample UFC database
+- `ufc_sample.db` - Sample DuckDB database with UFC data
+
+## Purpose:
+Demonstrates a real-world analytics use case with complex joins and measures. Includes actual sample data for testing queries and visualizations.
 
 ## UFC Sample Dataset
 
