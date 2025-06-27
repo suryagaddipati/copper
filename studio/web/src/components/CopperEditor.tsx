@@ -42,6 +42,7 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
 }) => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof monaco | null>(null)
+  const decorationsRef = useRef<string[]>([])  // Track decoration IDs
 
   // Update editor markers when parse results change
   useEffect(() => {
@@ -57,6 +58,7 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
     if (!model) return
 
     const markers: monaco.editor.IMarkerData[] = []
+
 
     // Helper function to parse error line and column
     const parseErrorLocation = (errorMsg: string) => {
@@ -84,7 +86,7 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
       
       const lineContent = model.getLineContent(lineNumber)
       const startColumn = Math.max(1, columnNumber)
-      const endColumn = Math.min(lineContent.length + 1, startColumn + 10) // Underline ~10 chars or to end of line
+      const endColumn = Math.min(lineContent.length + 1, startColumn + 10)
       
       markers.push({
         severity: monacoRef.current!.MarkerSeverity.Error,
@@ -92,7 +94,7 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
         startColumn: startColumn,
         endLineNumber: lineNumber,
         endColumn: endColumn,
-        message: error.replace(/^Line \d+:\d*\s*-?\s*/, ''), // Clean up message
+        message: error.replace(/^Line \d+:\d*\s*-?\s*/, ''),
         source: 'copper-parser'
       })
     })
@@ -122,30 +124,62 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
       })
     })
 
+    // Set Monaco Editor markers
     monacoRef.current.editor.setModelMarkers(model, 'copper-parser', markers)
+    
+    // Also add decorations for more visible error indicators
+    const decorations: monaco.editor.IModelDeltaDecoration[] = []
+    
+    parseResult.errors.forEach((error) => {
+      const { line: lineNumber, column: columnNumber } = parseErrorLocation(error)
+      
+      if (lineNumber <= 0 || lineNumber > model.getLineCount()) return
+      
+      const lineContent = model.getLineContent(lineNumber)
+      const startColumn = Math.max(1, columnNumber)
+      const endColumn = Math.min(lineContent.length + 1, startColumn + 10)
+      
+      
+      decorations.push({
+        range: new monacoRef.current.Range(lineNumber, startColumn, lineNumber, endColumn),
+        options: {
+          className: 'copper-error-decoration',
+          inlineClassName: 'copper-error-inline',
+          hoverMessage: { value: error },
+          overviewRuler: {
+            color: 'red',
+            position: monacoRef.current.editor.OverviewRulerLane.Right
+          },
+          minimap: {
+            color: 'red',
+            position: monacoRef.current.editor.MinimapPosition.Inline
+          }
+        }
+      })
+    })
+    
+    // Apply decorations (clear old ones and add new ones)
+    decorationsRef.current = editorRef.current.deltaDecorations(decorationsRef.current, decorations)
+    
+    
   }
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => {
-    console.log('Editor mounted')
     editorRef.current = editor
     monacoRef.current = monacoInstance
     
     const currentModel = editor.getModel()
-    console.log('Current model language:', currentModel?.getLanguageId())
     
     monacoInstance.languages.setMonarchTokensProvider('plaintext', copperLanguageDefinition)
-    console.log('Applied Copper tokenizer to plaintext')
     
     const currentTheme = isDarkTheme ? "copper-dark" : "copper-light"
     monacoInstance.editor.setTheme(currentTheme)
-    console.log('Applied theme:', currentTheme)
     
     if (currentModel) {
       setTimeout(() => {
         const currentContent = currentModel.getValue()
         currentModel.setValue('')
         currentModel.setValue(currentContent)
-        console.log('Forced re-tokenization for proper syntax highlighting')
       }, 100)
     }
     
@@ -247,7 +281,12 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
             guides: {
               bracketPairs: true,
               indentation: true
-            }
+            },
+            // Enable error squiggles and hover
+            'semanticHighlighting.enabled': true,
+            glyphMargin: true,
+            lineDecorationsWidth: 10,
+            lineNumbersMinChars: 3
           }}
         />
       </div>

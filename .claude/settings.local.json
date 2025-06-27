@@ -54,7 +54,9 @@
       "Bash(npx tailwindcss init:*)",
       "Bash(npm uninstall:*)",
       "Bash(kill:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_close"
     ],
     "deny": []
   }

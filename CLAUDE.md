@@ -70,13 +70,32 @@ view: sales_analysis {
 - **View inheritance**: Views can extend other views using `extends: [view_name]`
 - **Value formatting**: Supports both named formats (`usd`, `percent_2`) and custom format strings
 
-## Development Tasks
+## Development Workflow
 
-When working on Copper:
-1. Use `grammar/Copper.g4` and `grammar/DAX.g4` for parser development
-2. Check `example-projects/` for syntax patterns and best practices
-3. Maintain backward compatibility with LookML concepts where possible
-4. Run `make test-all` after parser changes to verify all functionality
+### Grammar Changes
+When modifying `grammar/Copper.g4` or `grammar/DAX.g4`:
+1. Run `make parser` to regenerate Python parser files
+2. Run `make test-all` to verify all parser tests pass
+3. Test with example files: `make test` for quick smoke test
+4. Update example files in `example-projects/` if syntax changes
+
+### Parser Code Changes
+When modifying `src/parser/antlr_parser.py`:
+1. Run `make test-all` to verify parser functionality
+2. Test SQL generation: `python3 -m unittest tests.sql.test_sql_generator -v`
+3. Verify web integration still works: `make dev` and test in browser
+
+### Frontend Changes
+When modifying `studio/web/` components:
+1. Run `npm run lint` and `npm run type-check` in `studio/web/`
+2. Test parser integration with `make dev`
+3. Check Monaco Editor functionality if modifying editor components
+
+### API Changes
+When modifying `studio/api/` code:
+1. Test API endpoints with `curl` or through web interface
+2. Verify database connections if changing database code
+3. Run parser tests to ensure API integration works
 
 ## Build Commands
 
@@ -196,17 +215,17 @@ This project uses two complementary parsing approaches:
 ## Architecture
 
 ### Live Parsing System
-- **FastAPI Backend**: `app/api/main.py` provides REST endpoints for real-time parsing
-- **React Frontend**: `app/web/src/App.tsx` with Monaco Editor and custom Copper syntax highlighting
-- **Monaco Integration**: `app/web/src/copper-language.ts` provides advanced syntax highlighting for Copper
+- **FastAPI Backend**: `studio/api/main.py` provides REST endpoints for real-time parsing
+- **React Frontend**: `studio/web/src/App.tsx` with Monaco Editor and custom Copper syntax highlighting
+- **Monaco Integration**: `studio/web/src/copper-language.ts` provides advanced syntax highlighting for Copper
 - **Real-time Validation**: Live parsing results with error reporting and statistics
 
 ### Multi-Language Parser System
 - **ANTLR4 Grammar**: `grammar/Copper.g4` defines the complete Copper syntax
 - **DAX Grammar**: `grammar/DAX.g4` handles DAX expressions as blackbox strings using lexer modes
 - **Build System**: Makefile-based parser generation for Python (extensible to other languages)
-- **Python Integration**: `app/api/antlr_parser.py` wraps generated Python parser for API use
-- **Generated Files**: Parser files are created in `app/api/generated/` directory
+- **Python Integration**: `src/parser/antlr_parser.py` wraps generated Python parser for API use
+- **Generated Files**: Parser files are created in `src/parser/generated/` directory
 
 ### Frontend Architecture
 - **Vite + React**: Modern development setup with hot module replacement
@@ -224,11 +243,24 @@ This project uses two complementary parsing approaches:
 - **Multi-Package Support**: Language-specific package structure (e.g., `com.copper.parser` for Java)
 - **CLI Wrappers**: Generated main classes for testing parsers against Copper files
 
+### Database Integration Architecture
+- **Connection Manager**: `studio/api/database/connection_manager.py` handles multi-database connections
+- **Query Executor**: `studio/api/database/query_executor.py` executes SQL queries with error handling
+- **Schema Inspector**: `studio/api/database/schema_inspector.py` provides database schema introspection
+- **Connection Storage**: `studio/api/database/connection_storage.py` persists database connections
+- **Supported Databases**: SQLite, PostgreSQL, MySQL, DuckDB with unified interface
+
+### Project Management System
+- **Project Manager**: `studio/api/projects/project_manager.py` handles project lifecycle
+- **Project Storage**: `studio/api/projects/project_storage.py` manages project file persistence
+- **File Tree**: `studio/web/src/components/projects/ProjectFileTree.tsx` provides file browser
+- **Project Data**: `studio/api/data/projects.json` stores project metadata and configurations
+
 ## Testing
 
 ### Frontend Testing
 ```bash
-cd app/web
+cd studio/web
 npm run lint        # ESLint TypeScript/React checking
 npm run type-check  # TypeScript type checking without compilation
 npm run build       # Test production build
@@ -246,26 +278,41 @@ make test-all
 make test-verbose
 
 # Manual testing of parser
-cd app/api
-python3 -c "from antlr_parser import validate_copper_syntax; print(validate_copper_syntax('view: test { from: orders }'))"
+python3 -c "from src.parser.antlr_parser import validate_copper_syntax; print(validate_copper_syntax('view: test { from: orders }'))"
 
 # Test with example files
-cd app/api
 python3 -c "
-from antlr_parser import validate_copper_syntax
-with open('../../examples/customers.copper', 'r') as f:
+from src.parser.antlr_parser import validate_copper_syntax
+with open('example-projects/ecommerce-demo/customers.copper', 'r') as f:
     result = validate_copper_syntax(f.read())
     print(f'Valid: {result[\"valid\"]}, Models: {result[\"statistics\"][\"total_models\"]}, Views: {result[\"statistics\"][\"total_views\"]}')
 "
 
-# Run individual test file directly
-cd app/api
-python3 test_parser.py
+# Run SQL generation tests
+python3 -m unittest tests.sql.test_sql_generator -v
+
+# Run DAX parser tests specifically
+python3 -m unittest tests.parser.test_dax_parser -v
 ```
+
+### SQL Generation Testing
+```bash
+# Test SQL generation from Copper models
+python3 -m unittest tests.sql.test_sql_generator -v
+
+# Manual SQL generation testing
+python3 -c "
+from src.sql.sql_generator import generate_sql
+from src.parser.antlr_parser import validate_copper_syntax
+code = 'model: test { dimension: id { type: string; expression: Table[ID] } }'
+parsed = validate_copper_syntax(code)
+if parsed['valid']:
+    sql = generate_sql(parsed['ast'])
+    print('Generated SQL:', sql)
+"
 
 ### API Testing
 ```bash
-cd app/api
 # Test live parsing endpoints
 curl -X POST "http://localhost:8000/parse" \
   -H "Content-Type: application/json" \
@@ -279,10 +326,10 @@ make test
 
 ### Key Configuration Files
 - `.claude/settings.local.json` - Claude Code permissions configuration
-- `app/web/vite.config.ts` - Vite dev server configuration (port 3000)
-- `app/web/tsconfig.json` - TypeScript strict mode with React JSX
-- `app/web/package.json` - Dependencies: React, Monaco Editor, Vite, ESLint
-- `app/api/requirements.txt` - Python dependencies: FastAPI, uvicorn, pydantic
+- `studio/web/vite.config.ts` - Vite dev server configuration (port 3000)
+- `studio/web/tsconfig.json` - TypeScript strict mode with React JSX
+- `studio/web/package.json` - Dependencies: React, Monaco Editor, Vite, ESLint
+- `studio/api/requirements.txt` - Python dependencies: FastAPI, uvicorn, pydantic
 - `Makefile` - Development environment automation and build system
 - `grammar/Copper.g4` - Complete ANTLR4 grammar for Copper language
 - `grammar/DAX.g4` - DAX expression grammar for lexer modes
@@ -304,7 +351,7 @@ pip install -r requirements.txt  # Install ANTLR4 tools
 
 **"Module not found" errors in API**
 ```bash
-cd app/api
+cd studio/api
 source venv/bin/activate  # Activate Python virtual environment
 pip install -r requirements.txt
 ```
@@ -317,7 +364,7 @@ lsof -ti:8000 | xargs kill -9
 ```
 
 **Monaco Editor syntax highlighting not working**
-- Check `app/web/src/copper-language.ts` for language definition
+- Check `studio/web/src/copper-language.ts` for language definition
 - Verify Monaco Editor is properly imported in `App.tsx`
 - Check browser console for JavaScript errors
 
