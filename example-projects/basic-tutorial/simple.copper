@@ -1,6 +1,3 @@
-model: orders {
-  dimension: order_id {
-    type: string
-    expression: Orders[OrderID] ;;
-  }
+dimension: order_id {
+  expression: ${orders.OrderID} ;;
 }

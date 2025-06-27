@@ -1,18 +1,15 @@
-model: products {
-  dimension: product_id {
-    type: string
-  }
-  dimension: product_name {
-    type: string
-  }
-  dimension: price {
-    type: number
-  }
-  dimension: category {
-    type: string
-  }
+dimension: product_id {
+  expression: ${products.product_id} ;;
 }
 
-view: product_analytics {
-  from: products
+dimension: product_name {
+  expression: ${products.product_name} ;;
+}
+
+dimension: price {
+  expression: ${products.price} ;;
+}
+
+dimension: category {
+  expression: ${products.category} ;;
 }

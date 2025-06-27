@@ -53,7 +53,8 @@
       "mcp__playwright__browser_press_key",
       "Bash(npx tailwindcss init:*)",
       "Bash(npm uninstall:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(npm run lint)"
     ],
     "deny": []
   }

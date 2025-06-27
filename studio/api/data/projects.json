@@ -6,6 +6,13 @@
       "path": "/home/surya/code/copper/example-projects/ufc-analytics",
       "created_at": "2025-06-25T20:47:35.750931",
       "file_count": 4
+    },
+    {
+      "id": "e203a5a5-c73c-44c8-8107-bac74a0e1778",
+      "name": "ecommerce-demo",
+      "path": "/home/surya/code/copper/example-projects/ecommerce-demo",
+      "created_at": "2025-06-26T15:05:13.372029",
+      "file_count": 4
     }
   ]
 }

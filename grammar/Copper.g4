@@ -1,209 +1,91 @@
-/*
- * ANTLR4 Grammar for Copper Language
- * 
- * A metadata format for describing data dimensions and measures,
- * inspired by LookML but using DAX expressions instead of SQL.
- * 
- * Converted from EBNF specification to ANTLR4 format.
- */
-
 grammar Copper;
 
-// ============================================================================
-// PARSER RULES (start with lowercase)
-// ============================================================================
+// ===========================================================================
+// PARSER RULES
+// ===========================================================================
 
-// Entry point
 program
-    : statement* EOF
+    : (statement | NEWLINE)* EOF
     ;
 
 statement
     : modelStatement
     | viewStatement
-    | comment
-    | NEWLINE
+    | measureStatement
+    | dimensionStatement
     ;
-
-comment
-    : COMMENT
-    ;
-
-// ============================================================================
-// MODEL STATEMENTS
-// ============================================================================
 
 modelStatement
-    : MODEL COLON identifier LBRACE modelBody* RBRACE
+    : MODEL COLON identifier LBRACE (modelElement | NEWLINE)* RBRACE
     ;
 
-modelBody
+viewStatement
+    : VIEW COLON identifier LBRACE (viewElement | NEWLINE)* RBRACE
+    ;
+
+modelElement
     : dimensionStatement
     | measureStatement
-    | comment
-    | NEWLINE
+    | joinStatement
     ;
 
-dimensionStatement
-    : DIMENSION COLON identifier LBRACE dimensionParameter* RBRACE
+viewElement
+    : fromStatement
+    | extendsStatement
+    | joinStatement
+    | dimensionStatement
+    | measureStatement
     ;
 
 measureStatement
-    : MEASURE COLON identifier LBRACE measureParameter* RBRACE
+    : MEASURE COLON identifier LBRACE (measureParameter | NEWLINE)* RBRACE
     ;
 
-// ============================================================================
-// VIEW STATEMENTS
-// ============================================================================
-
-viewStatement
-    : VIEW COLON identifier LBRACE viewBody* RBRACE
-    ;
-
-viewBody
-    : fromStatement
-    | joinStatement
-    | extendsStatement
-    | extensionStatement
-    | comment
-    | NEWLINE
-    ;
-
-fromStatement
-    : FROM COLON identifier
+dimensionStatement
+    : DIMENSION COLON identifier LBRACE (dimensionParameter | NEWLINE)* RBRACE
     ;
 
 joinStatement
-    : JOIN COLON identifier LBRACE joinParameter* RBRACE
+    : JOIN COLON identifier LBRACE (joinParameter | NEWLINE)* RBRACE
     ;
-
-extendsStatement
-    : EXTENDS COLON LBRACKET identifierList RBRACKET
-    ;
-
-extensionStatement
-    : EXTENSION COLON (REQUIRED | OPTIONAL)
-    ;
-
-// ============================================================================
-// DIMENSION PARAMETERS
-// ============================================================================
 
 dimensionParameter
     : typeParameter
     | expressionParameter
+    | labelParameter
+    | descriptionParameter
     | primaryKeyParameter
+    | hiddenParameter
     | valueFormatParameter
+    | unitsParameter
+    ;
+
+measureParameter
+    : measureTypeParameter
+    | expressionParameter
     | labelParameter
     | descriptionParameter
     | hiddenParameter
-    | tiersParameter
-    | sqlLatitudeParameter
-    | sqlLongitudeParameter
+    | valueFormatParameter
     | unitsParameter
-    | comment
-    | NEWLINE
+    ;
+
+joinParameter
+    : joinTypeParameter
+    | relationshipParameter
+    | expressionParameter
     ;
 
 typeParameter
     : TYPE COLON dimensionType
     ;
 
-dimensionType
-    : STRING_TYPE
-    | NUMBER_TYPE
-    | DATE_TYPE
-    | DATE_TIME_TYPE
-    | YESNO_TYPE
-    | TIER_TYPE
-    | BIN_TYPE
-    | LOCATION_TYPE
-    | ZIPCODE_TYPE
-    | DISTANCE_TYPE
-    | DURATION_TYPE
-    | TIME_TYPE
-    | UNQUOTED_TYPE
-    ;
-
-// ============================================================================
-// MEASURE PARAMETERS
-// ============================================================================
-
-measureParameter
-    : measureTypeParameter
-    | expressionParameter
-    | valueFormatParameter
-    | labelParameter
-    | descriptionParameter
-    | hiddenParameter
-    | comment
-    | NEWLINE
-    ;
-
 measureTypeParameter
     : TYPE COLON measureType
     ;
 
-measureType
-    : COUNT_TYPE
-    | SUM_TYPE
-    | AVERAGE_TYPE
-    | MIN_TYPE
-    | MAX_TYPE
-    | COUNT_DISTINCT_TYPE
-    | MEDIAN_TYPE
-    | PERCENTILE_TYPE
-    | NUMBER_TYPE  // 'number' can be both dimension and measure type
-    ;
-
-// ============================================================================
-// JOIN PARAMETERS
-// ============================================================================
-
-joinParameter
-    : joinTypeParameter
-    | relationshipParameter
-    | expressionParameter
-    | comment
-    | NEWLINE
-    ;
-
-joinTypeParameter
-    : TYPE COLON joinType
-    ;
-
-joinType
-    : LEFT_OUTER
-    | INNER
-    | FULL_OUTER
-    | CROSS
-    ;
-
-relationshipParameter
-    : RELATIONSHIP COLON relationshipType
-    ;
-
-relationshipType
-    : ONE_TO_ONE
-    | MANY_TO_ONE
-    | ONE_TO_MANY
-    | MANY_TO_MANY
-    ;
-
-// ============================================================================
-// COMMON PARAMETERS
-// ============================================================================
-
 expressionParameter
     : EXPRESSION COLON daxExpression
-    ;
-
-primaryKeyParameter
-    : PRIMARY_KEY COLON booleanValue
-    ;
-
-valueFormatParameter
-    : VALUE_FORMAT COLON (stringLiteral | formatName)
     ;
 
 labelParameter
@@ -214,168 +96,196 @@ descriptionParameter
     : DESCRIPTION COLON stringLiteral
     ;
 
+primaryKeyParameter
+    : PRIMARY_KEY COLON booleanValue
+    ;
+
 hiddenParameter
-    : HIDDEN_PARAM COLON booleanValue
+    : HIDDEN_ COLON booleanValue
     ;
 
-tiersParameter
-    : TIERS COLON LBRACKET (stringList | numberList) RBRACKET
-    ;
-
-sqlLatitudeParameter
-    : SQL_LATITUDE COLON daxExpression SEMICOLON_SEMICOLON
-    ;
-
-sqlLongitudeParameter
-    : SQL_LONGITUDE COLON daxExpression SEMICOLON_SEMICOLON
+valueFormatParameter
+    : VALUE_FORMAT COLON (stringLiteral | formatName)
     ;
 
 unitsParameter
     : UNITS COLON stringLiteral
     ;
 
-// ============================================================================
-// DAX EXPRESSIONS (Delegated to external DAX parser module)
-// ============================================================================
+joinTypeParameter
+    : TYPE COLON joinType
+    ;
+
+relationshipParameter
+    : RELATIONSHIP COLON relationshipType
+    ;
+
+fromStatement
+    : FROM COLON identifier
+    ;
+
+extendsStatement
+    : EXTENDS COLON identifierList
+    ;
+
+identifierList
+    : identifier (COMMA identifier)*
+    ;
+
+dimensionType
+    : STRING | NUMBER | DATE | TIME | TIMESTAMP | BOOLEAN
+    ;
+
+measureType
+    : SUM | COUNT | AVERAGE | MIN | MAX | COUNT_DISTINCT | NUMBER
+    ;
+
+joinType
+    : LEFT_OUTER | INNER | FULL_OUTER | CROSS
+    ;
+
+relationshipType
+    : ONE_TO_ONE | ONE_TO_MANY | MANY_TO_ONE | MANY_TO_MANY
+    ;
+
+formatName
+    : USD | PERCENT | PERCENT_2 | DECIMAL_2
+    ;
+
+booleanValue
+    : YES | NO | TRUE | FALSE
+    ;
 
 daxExpression
-    : daxContent SEMICOLON_SEMICOLON
+    : daxContent DOUBLE_SEMICOLON
     ;
 
 daxContent
-    : daxToken+
-    ;
-
-daxToken
-    : IDENTIFIER
-    | NUMBER_LITERAL
-    | STRING_LITERAL
-    | LBRACKET | RBRACKET
-    | LPAREN | RPAREN
-    | DOT | COMMA
-    | PLUS | MINUS | MULTIPLY | DIVIDE
-    | EQUALS | LESS_THAN | GREATER_THAN
-    | contextualKeyword
-    ;
-
-// ============================================================================
-// LITERALS AND BASIC TYPES
-// ============================================================================
-
-identifier
-    : IDENTIFIER
-    | contextualKeyword  // Handle keywords used as identifiers
-    ;
-
-contextualKeyword
-    : STRING_TYPE | NUMBER_TYPE | DATE_TYPE | DATE_TIME_TYPE | YESNO_TYPE
-    | TIER_TYPE | BIN_TYPE | LOCATION_TYPE | ZIPCODE_TYPE | DISTANCE_TYPE
-    | DURATION_TYPE | TIME_TYPE | UNQUOTED_TYPE
-    | COUNT_TYPE | SUM_TYPE | AVERAGE_TYPE | MIN_TYPE | MAX_TYPE
-    | COUNT_DISTINCT_TYPE | MEDIAN_TYPE | PERCENTILE_TYPE
-    | LEFT_OUTER | INNER | FULL_OUTER | CROSS
-    | ONE_TO_ONE | MANY_TO_ONE | ONE_TO_MANY | MANY_TO_MANY
-    | USD | EUR | GBP | PERCENT_1 | PERCENT_2 | DECIMAL_0 | DECIMAL_1 | DECIMAL_2 | ID
-    | MILES | KILOMETERS | METERS | FEET
+    : ~(DOUBLE_SEMICOLON | NEWLINE)*
     ;
 
 stringLiteral
     : STRING_LITERAL
     ;
 
-numberLiteral
-    : NUMBER_LITERAL
+// Expression grammar with precedence from lowest to highest
+expression
+    : logicalOrExpression
     ;
 
-booleanValue
-    : booleanLiteral
+logicalOrExpression
+    : logicalAndExpression (OR logicalAndExpression)*
+    ;
+
+logicalAndExpression
+    : comparisonExpression (AND comparisonExpression)*
+    ;
+
+comparisonExpression
+    : additiveExpression ( (EQUALS | NOT_EQUALS | GTE | LTE | GREATER_THAN | LESS_THAN) additiveExpression )?
+    ;
+
+additiveExpression
+    : multiplicativeExpression ( (PLUS | MINUS) multiplicativeExpression )*
+    ;
+
+multiplicativeExpression
+    : primary ( (MULTIPLY | DIVIDE) primary )*
+    ;
+
+primary
+    : LPAREN expression RPAREN
+    | literal
+    | fieldReference
+    | functionCall
+    ;
+
+functionCall
+    : AGGREGATE LPAREN namedArgument (COMMA namedArgument)* RPAREN (overClause)? # aggregateFunc
+    | identifier LPAREN (expression (COMMA expression)*)? RPAREN                # simpleFunc
+    ;
+
+overClause
+    : OVER LBRACE namedArgument (COMMA namedArgument)* RBRACE
+    ;
+
+namedArgument
+    : identifier COLON value_
+    ;
+
+value_
+    : expression
+    | list_
+    ;
+
+list_
+    : LBRACKET (expression (COMMA expression)*)? RBRACKET
+    ;
+
+fieldReference
+    : DOLLAR_LBRACE identifier (DOT identifier)? RBRACE
+    ;
+
+literal
+    : NUMBER_LITERAL
+    | STRING_LITERAL
+    | booleanLiteral
     ;
 
 booleanLiteral
-    : TRUE | FALSE | YES | NO
+    : TRUE | FALSE
     ;
 
-formatName
-    : USD | EUR | GBP 
-    | PERCENT_1 | PERCENT_2
-    | DECIMAL_0 | DECIMAL_1 | DECIMAL_2
-    | ID
+identifier
+    : IDENTIFIER
+    | STRING | NUMBER | DATE | TIME | TIMESTAMP | BOOLEAN
+    | SUM | COUNT | AVERAGE | MIN | MAX | COUNT_DISTINCT
+    | LEFT_OUTER | INNER | FULL_OUTER | CROSS
+    | ONE_TO_ONE | ONE_TO_MANY | MANY_TO_ONE | MANY_TO_MANY
+    | USD | PERCENT | PERCENT_2 | DECIMAL_2
+    | YES | NO | TRUE | FALSE
     ;
 
-units
-    : MILES | KILOMETERS | METERS | FEET
-    ;
 
-// ============================================================================
-// LISTS
-// ============================================================================
+// ===========================================================================
+// LEXER RULES
+// ===========================================================================
 
-identifierList
-    : identifier (COMMA identifier)*
-    ;
-
-stringList
-    : stringLiteral (COMMA stringLiteral)*
-    ;
-
-numberList
-    : numberLiteral (COMMA numberLiteral)*
-    ;
-
-// ============================================================================
-// LEXER RULES (start with uppercase)
-// ============================================================================
-
-// Keywords - Structural
+// Keywords
 MODEL           : 'model';
 VIEW            : 'view';
-DIMENSION       : 'dimension';
 MEASURE         : 'measure';
-FROM            : 'from';
+DIMENSION       : 'dimension';
 JOIN            : 'join';
-EXTENDS         : 'extends';
-EXTENSION       : 'extension';
 TYPE            : 'type';
 EXPRESSION      : 'expression';
-PRIMARY_KEY     : 'primary_key';
-VALUE_FORMAT    : 'value_format';
 LABEL           : 'label';
 DESCRIPTION     : 'description';
-HIDDEN_PARAM    : 'hidden';
-TIERS           : 'tiers';
-SQL_LATITUDE    : 'sql_latitude';
-SQL_LONGITUDE   : 'sql_longitude';
+PRIMARY_KEY     : 'primary_key';
+HIDDEN_         : 'hidden';
+VALUE_FORMAT    : 'value_format';
 UNITS           : 'units';
 RELATIONSHIP    : 'relationship';
-
-// Extension Types
-REQUIRED        : 'required';
-OPTIONAL        : 'optional';
+FROM            : 'from';
+EXTENDS         : 'extends';
+AGGREGATE       : 'Aggregate';
+OVER            : 'OVER';
 
 // Dimension Types
-STRING_TYPE     : 'string';
-NUMBER_TYPE     : 'number';
-DATE_TYPE       : 'date';
-DATE_TIME_TYPE  : 'date_time';
-YESNO_TYPE      : 'yesno';
-TIER_TYPE       : 'tier';
-BIN_TYPE        : 'bin';
-LOCATION_TYPE   : 'location';
-ZIPCODE_TYPE    : 'zipcode';
-DISTANCE_TYPE   : 'distance';
-DURATION_TYPE   : 'duration';
-TIME_TYPE       : 'time';
-UNQUOTED_TYPE   : 'unquoted';
+STRING          : 'string';
+NUMBER          : 'number';
+DATE            : 'date';
+TIME            : 'time';
+TIMESTAMP       : 'timestamp';
+BOOLEAN         : 'boolean';
 
 // Measure Types
-COUNT_TYPE      : 'count';
-SUM_TYPE        : 'sum';
-AVERAGE_TYPE    : 'average';
-MIN_TYPE        : 'min';
-MAX_TYPE        : 'max';
-COUNT_DISTINCT_TYPE : 'count_distinct';
-MEDIAN_TYPE     : 'median';
-PERCENTILE_TYPE : 'percentile';
+SUM             : 'sum';
+COUNT           : 'count';
+AVERAGE         : 'average';
+MIN             : 'min';
+MAX             : 'max';
+COUNT_DISTINCT  : 'count_distinct';
 
 // Join Types
 LEFT_OUTER      : 'left_outer';
@@ -385,67 +295,55 @@ CROSS           : 'cross';
 
 // Relationship Types
 ONE_TO_ONE      : 'one_to_one';
-MANY_TO_ONE     : 'many_to_one';
 ONE_TO_MANY     : 'one_to_many';
+MANY_TO_ONE     : 'many_to_one';
 MANY_TO_MANY    : 'many_to_many';
 
 // Format Names
 USD             : 'usd';
-EUR             : 'eur';
-GBP             : 'gbp';
-PERCENT_1       : 'percent_1';
+PERCENT         : 'percent';
 PERCENT_2       : 'percent_2';
-DECIMAL_0       : 'decimal_0';
-DECIMAL_1       : 'decimal_1';
 DECIMAL_2       : 'decimal_2';
-ID              : 'id';
 
-// Units
-MILES           : 'miles';
-KILOMETERS      : 'kilometers';
-METERS          : 'meters';
-FEET            : 'feet';
-
-// Boolean Literals
-TRUE            : 'true';
-FALSE           : 'false';
+// Boolean Values
 YES             : 'yes';
 NO              : 'no';
+TRUE            : 'true';
+FALSE           : 'false';
+AND             : 'and';
+OR              : 'or';
 
 // Delimiters
-COLON           : ':';
-SEMICOLON       : ';';
-SEMICOLON_SEMICOLON : ';;';
+LPAREN          : '(';
+RPAREN          : ')';
 LBRACE          : '{';
 RBRACE          : '}';
 LBRACKET        : '[';
 RBRACKET        : ']';
+DOLLAR_LBRACE   : '${';
+COLON           : ':';
 COMMA           : ',';
-LPAREN          : '(';
-RPAREN          : ')';
 DOT             : '.';
+DOUBLE_SEMICOLON: ';;';
+
+// Operators
 PLUS            : '+';
 MINUS           : '-';
 MULTIPLY        : '*';
 DIVIDE          : '/';
-EQUALS          : '=';
-LESS_THAN       : '<';
+EQUALS          : '==';
+NOT_EQUALS      : '!=';
+GTE             : '>=';
+LTE             : '<=';
 GREATER_THAN    : '>';
+LESS_THAN       : '<';
 
-// Literals
-IDENTIFIER      : LETTER (LETTER | DIGIT | '_')*;
+// Base tokens
+IDENTIFIER      : [a-zA-Z_] [a-zA-Z0-9_]*;
+STRING_LITERAL  : '"' ( ~["\\] | '\\' . )*? '"'; // Corrected for proper escaping
+NUMBER_LITERAL  : '-'? [0-9]+ ('.' [0-9]+)?;
 
-STRING_LITERAL  : '"' (~["\\\r\n] | '\\' ('"' | '\\' | '/' | 'b' | 'f' | 'n' | 'r' | 't'))* '"';
-
-NUMBER_LITERAL  : '-'? DIGIT+ ('.' DIGIT+)?;
-
-// Comments
-COMMENT         : '#' ~[\r\n]* -> channel(HIDDEN);
-
-// Whitespace
-NEWLINE         : ('\r'? '\n')+;
+// Whitespace and Comments
+COMMENT         : '#' ~[\r\n]* -> skip;
+NEWLINE         : [\r\n]+;
 WS              : [ \t]+ -> skip;
-
-// Character classes
-fragment LETTER : [a-zA-Z];
-fragment DIGIT  : [0-9];

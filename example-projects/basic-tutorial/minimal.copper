@@ -1,5 +1,3 @@
-model: orders {
-  dimension: order_id {
-    type: string
-  }
+dimension: order_id {
+  expression: ${orders.order_id} ;;
 }

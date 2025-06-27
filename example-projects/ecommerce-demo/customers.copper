@@ -1,14 +1,15 @@
-model: customers {
-  dimension: customer_id {
-    type: string
-  }
-  dimension: customer_name {
-    type: string
-  }
-  dimension: age {
-    type: number
-  }
-  dimension: is_active {
-    type: yesno
-  }
+dimension: customer_id {
+  expression: ${customers.customer_id} ;;
+}
+
+dimension: customer_name {
+  expression: ${customers.customer_name} ;;
+}
+
+dimension: age {
+  expression: ${customers.age} ;;
+}
+
+dimension: is_active {
+  expression: ${customers.is_active} ;;
 }

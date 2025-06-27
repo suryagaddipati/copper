@@ -9,23 +9,27 @@ Copper is a metadata format for describing data dimensions and measures, inspire
 ## Repository Structure
 
 ```
-/spec/          - Language specification documents
-/grammar/       - Parser grammar definition (ANTLR4)
-/examples/      - Sample .copper files demonstrating syntax
-/app/api/       - FastAPI backend for live parsing
-/app/web/       - React TypeScript frontend with Monaco Editor
-/docs/          - Documentation (future)
+/grammar/           - ANTLR4 grammar definitions for Copper and DAX
+/src/               - Core parser and SQL generation source code
+  /parser/          - ANTLR-based parsing logic and generated files  
+  /sql/             - SQL generation from Copper models
+/studio/            - Web-based development environment
+  /api/             - FastAPI backend with database connections
+  /web/             - React TypeScript frontend with Monaco Editor
+/tests/             - Comprehensive test suite for parser and SQL generation
+/example-projects/  - Sample projects demonstrating Copper features
 ```
 
 ## Key Files
 
-- `spec/SPECIFICATION.md` - Complete Copper language specification
 - `grammar/Copper.g4` - ANTLR4 grammar definition for Copper syntax
-- `grammar/DAX.g4` - Complete DAX expression grammar
-- `examples/*.copper` - Example models and views demonstrating various features
-- `app/web/src/App.tsx` - Main React frontend component with Monaco Editor
-- `app/api/main.py` - FastAPI backend with live parsing endpoints
-- `app/start.sh` - Simple startup script for the full development environment
+- `grammar/DAX.g4` - Complete DAX expression grammar with lexer modes
+- `src/parser/antlr_parser.py` - Main parser interface with validation functions
+- `src/sql/sql_generator.py` - SQL generation from Copper models and views
+- `studio/web/src/App.tsx` - Main React frontend with Monaco Editor
+- `studio/api/main.py` - FastAPI backend with live parsing and database connections
+- `example-projects/` - Sample Copper projects (basic-tutorial, ecommerce-demo, ufc-analytics)
+- `Makefile` - Development environment automation and build system
 
 ## Copper Language Basics
 
@@ -69,10 +73,10 @@ view: sales_analysis {
 ## Development Tasks
 
 When working on Copper:
-1. Reference `spec/SPECIFICATION.md` for complete syntax details
-2. Use `grammar/Copper.g4` and `grammar/DAX.g4` for parser development
-3. Check `examples/` for syntax patterns and best practices
-4. Maintain backward compatibility with LookML concepts where possible
+1. Use `grammar/Copper.g4` and `grammar/DAX.g4` for parser development
+2. Check `example-projects/` for syntax patterns and best practices
+3. Maintain backward compatibility with LookML concepts where possible
+4. Run `make test-all` after parser changes to verify all functionality
 
 ## Build Commands
 
@@ -98,7 +102,7 @@ make test    # Test parser functionality
 
 ### Webapp Development
 ```bash
-cd app/web
+cd studio/web
 
 # Install dependencies
 npm install
@@ -121,16 +125,13 @@ npm run type-check
 
 ### API Development
 ```bash
-cd app/api
+cd studio/api
 
 # Install Python dependencies
 pip install -r requirements.txt
 
 # Start development server with auto-reload
 python3 main.py
-
-# Or start manual server (used by start.sh)
-python3 server-manual.py
 
 # Or use uvicorn directly
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
@@ -142,10 +143,10 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 make parser
 
 # Manual parser generation using ANTLR4 directly
-cd app/api
+cd src/parser
 antlr4 -Dlanguage=Python3 -o generated ../../grammar/Copper.g4
 
-# The generated parser files will be in app/api/generated/:
+# The generated parser files will be in src/parser/generated/:
 # - CopperLexer.py
 # - CopperParser.py  
 # - CopperListener.py
@@ -156,7 +157,7 @@ antlr4 -Dlanguage=Python3 -o generated ../../grammar/Copper.g4
 ### Python Environment
 ```bash
 # API development requires Python virtual environment
-cd app/api
+cd studio/api
 python3 -m venv venv
 source venv/bin/activate     # Linux/Mac
 # venv\Scripts\activate      # Windows
@@ -166,7 +167,7 @@ pip install -r requirements.txt
 ### Node.js Environment
 ```bash
 # Webapp development requires Node.js
-cd app/web
+cd studio/web
 npm install
 ```
 
@@ -181,7 +182,7 @@ pip install -r requirements.txt  # Install ANTLR4 tools
 
 This project uses two complementary parsing approaches:
 
-1. **Live Demo Parser** (`app/api/antlr_parser.py`):
+1. **Live Demo Parser** (`src/parser/antlr_parser.py`):
    - ANTLR-based Python parser for real-time web demo
    - Fast parsing for immediate feedback in Monaco Editor
    - Used by FastAPI backend for live validation
@@ -190,7 +191,7 @@ This project uses two complementary parsing approaches:
    - Complete ANTLR4 grammar definitions for Copper language
    - DAX expression handling with lexer modes
    - Currently generates Python parser, extensible to other languages
-   - Parser files generated in `app/api/generated/` directory
+   - Parser files generated in `src/parser/generated/` directory
 
 ## Architecture
 

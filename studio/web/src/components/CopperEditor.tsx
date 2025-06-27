@@ -58,34 +58,66 @@ export const CopperEditor: React.FC<CopperEditorProps> = ({
 
     const markers: monaco.editor.IMarkerData[] = []
 
+    // Helper function to parse error line and column
+    const parseErrorLocation = (errorMsg: string) => {
+      // Try to match "Line X:Y" pattern first (with column)
+      let match = errorMsg.match(/Line (\d+):(\d+)/)
+      if (match) {
+        return { line: parseInt(match[1]), column: parseInt(match[2]) }
+      }
+      
+      // Fall back to "Line X:" pattern (no column)
+      match = errorMsg.match(/Line (\d+):/)
+      if (match) {
+        return { line: parseInt(match[1]), column: 1 }
+      }
+      
+      return { line: 1, column: 1 }
+    }
+
     // Add error markers
     parseResult.errors.forEach((error) => {
-      const lineMatch = error.match(/Line (\d+):/)
-      const lineNumber = lineMatch ? parseInt(lineMatch[1]) : 1
-
+      const { line: lineNumber, column: columnNumber } = parseErrorLocation(error)
+      
+      // Ensure line number is valid
+      if (lineNumber <= 0 || lineNumber > model.getLineCount()) return
+      
+      const lineContent = model.getLineContent(lineNumber)
+      const startColumn = Math.max(1, columnNumber)
+      const endColumn = Math.min(lineContent.length + 1, startColumn + 10) // Underline ~10 chars or to end of line
+      
       markers.push({
         severity: monacoRef.current!.MarkerSeverity.Error,
         startLineNumber: lineNumber,
-        startColumn: 1,
+        startColumn: startColumn,
         endLineNumber: lineNumber,
-        endColumn: model.getLineContent(lineNumber).length + 1,
-        message: error,
+        endColumn: endColumn,
+        message: error.replace(/^Line \d+:\d*\s*-?\s*/, ''), // Clean up message
         source: 'copper-parser'
       })
     })
 
-    // Add warning markers
+    // Add warning markers (typically DAX token recognition warnings)
     parseResult.warnings.forEach((warning) => {
-      const lineMatch = warning.match(/Line (\d+):/)
-      const lineNumber = lineMatch ? parseInt(lineMatch[1]) : 1
-
+      const { line: lineNumber, column: columnNumber } = parseErrorLocation(warning)
+      
+      // Ensure line number is valid
+      if (lineNumber <= 0 || lineNumber > model.getLineCount()) return
+      
+      const lineContent = model.getLineContent(lineNumber)
+      const startColumn = Math.max(1, columnNumber)
+      const endColumn = Math.min(lineContent.length + 1, startColumn + 5) // Shorter underline for warnings
+      
+      // Filter out token recognition errors to reduce noise
+      if (warning.includes('token recognition error')) return
+      
       markers.push({
         severity: monacoRef.current!.MarkerSeverity.Warning,
         startLineNumber: lineNumber,
-        startColumn: 1,
+        startColumn: startColumn,
         endLineNumber: lineNumber,
-        endColumn: model.getLineContent(lineNumber).length + 1,
-        message: warning,
+        endColumn: endColumn,
+        message: warning.replace(/^Line \d+:\d*\s*-?\s*/, ''), // Clean up message
         source: 'copper-parser'
       })
     })

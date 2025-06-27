@@ -103,6 +103,7 @@ class CopperParseTreeListener(CopperListener):
         if self.node_stack:
             self.current_node = self.node_stack.pop()
 
+    # Model handlers
     def enterModelStatement(self, ctx):
         if ctx.identifier():
             self._enter_node(NodeType.MODEL, ctx.identifier().getText(), ctx)
@@ -110,6 +111,7 @@ class CopperParseTreeListener(CopperListener):
     def exitModelStatement(self, ctx):
         self._exit_node()
     
+    # View handlers
     def enterViewStatement(self, ctx):
         if ctx.identifier():
             self._enter_node(NodeType.VIEW, ctx.identifier().getText(), ctx)
@@ -117,6 +119,7 @@ class CopperParseTreeListener(CopperListener):
     def exitViewStatement(self, ctx):
         self._exit_node()
     
+    # Dimension handlers
     def enterDimensionStatement(self, ctx):
         if ctx.identifier():
             self._enter_node(NodeType.DIMENSION, ctx.identifier().getText(), ctx)
@@ -124,6 +127,7 @@ class CopperParseTreeListener(CopperListener):
     def exitDimensionStatement(self, ctx):
         self._exit_node()
     
+    # Measure handlers
     def enterMeasureStatement(self, ctx):
         if ctx.identifier():
             self._enter_node(NodeType.MEASURE, ctx.identifier().getText(), ctx)
@@ -131,6 +135,7 @@ class CopperParseTreeListener(CopperListener):
     def exitMeasureStatement(self, ctx):
         self._exit_node()
     
+    # Join handlers
     def enterJoinStatement(self, ctx):
         if ctx.identifier():
             self._enter_node(NodeType.JOIN, ctx.identifier().getText(), ctx)
@@ -138,40 +143,25 @@ class CopperParseTreeListener(CopperListener):
     def exitJoinStatement(self, ctx):
         self._exit_node()
     
+    # Parameter handlers
     def enterTypeParameter(self, ctx):
-        if self.current_node:
-            if ctx.dimensionType():
-                self.current_node.properties['type'] = ctx.dimensionType().getText()
-
+        if self.current_node and ctx.dimensionType():
+            self.current_node.properties['type'] = ctx.dimensionType().getText()
+    
     def enterMeasureTypeParameter(self, ctx):
         if self.current_node and ctx.measureType():
             self.current_node.properties['type'] = ctx.measureType().getText()
-
+    
     def enterExpressionParameter(self, ctx):
-        if self.current_node:
-            dax_text = ""
-            if hasattr(ctx, 'daxExpression') and ctx.daxExpression():
-                dax_expr_ctx = ctx.daxExpression()
-                if hasattr(dax_expr_ctx, 'daxContent') and dax_expr_ctx.daxContent():
-                    dax_text = dax_expr_ctx.daxContent().getText()
-                else:
-                    full_text = dax_expr_ctx.getText()
-                    dax_text = full_text.rstrip(';').strip()
-            
-            if dax_text:
-                self.current_node.properties['expression'] = dax_text
-                try:
-                    validation_result = validate_dax_expression(dax_text)
-                    self.current_node.properties['dax_validation'] = validation_result
-                    if not validation_result['valid']:
-                        for error in validation_result['errors']:
-                            self._add_error(f"DAX validation error: {error}", ctx.start.line)
-                except ImportError:
-                    pass
+        if self.current_node and ctx.daxExpression():
+            # Extract DAX content without the ;; 
+            dax_content = ctx.daxExpression().daxContent().getText()
+            self.current_node.properties['expression'] = dax_content
     
     def enterLabelParameter(self, ctx):
         if self.current_node and ctx.stringLiteral():
             label_text = ctx.stringLiteral().getText()
+            # Remove quotes from string literal
             if label_text.startswith('"') and label_text.endswith('"'):
                 label_text = label_text[1:-1]
             self.current_node.properties['label'] = label_text
@@ -179,46 +169,34 @@ class CopperParseTreeListener(CopperListener):
     def enterDescriptionParameter(self, ctx):
         if self.current_node and ctx.stringLiteral():
             desc_text = ctx.stringLiteral().getText()
+            # Remove quotes from string literal
             if desc_text.startswith('"') and desc_text.endswith('"'):
                 desc_text = desc_text[1:-1]
             self.current_node.properties['description'] = desc_text
     
     def enterPrimaryKeyParameter(self, ctx):
         if self.current_node and ctx.booleanValue():
-            value = ctx.booleanValue().getText().lower()
-            self.current_node.properties['primary_key'] = value in ['yes', 'true']
+            bool_val = ctx.booleanValue().getText().lower() in ['yes', 'true']
+            self.current_node.properties['primary_key'] = bool_val
     
     def enterHiddenParameter(self, ctx):
         if self.current_node and ctx.booleanValue():
-            value = ctx.booleanValue().getText().lower()
-            self.current_node.properties['hidden'] = value in ['yes', 'true']
+            bool_val = ctx.booleanValue().getText().lower() in ['yes', 'true'] 
+            self.current_node.properties['hidden'] = bool_val
     
     def enterValueFormatParameter(self, ctx):
         if self.current_node:
             if ctx.stringLiteral():
-                self.current_node.properties['value_format'] = ctx.stringLiteral().getText().strip('"')
+                format_text = ctx.stringLiteral().getText()
+                if format_text.startswith('"') and format_text.endswith('"'):
+                    format_text = format_text[1:-1]
+                self.current_node.properties['value_format'] = format_text
             elif ctx.formatName():
                 self.current_node.properties['value_format'] = ctx.formatName().getText()
-
-    def enterUnitsParameter(self, ctx):
-        if self.current_node and ctx.stringLiteral():
-            self.current_node.properties['units'] = ctx.stringLiteral().getText().strip('"')
-
+    
     def enterFromStatement(self, ctx):
         if self.current_node and ctx.identifier():
             self.current_node.properties['from'] = ctx.identifier().getText()
-    
-    def enterExtendsStatement(self, ctx):
-        if self.current_node and ctx.identifierList():
-            self.current_node.properties['extends'] = [ident.getText() for ident in ctx.identifierList().identifier()]
-
-    def enterJoinTypeParameter(self, ctx):
-        if self.current_node and ctx.joinType():
-            self.current_node.properties['type'] = ctx.joinType().getText()
-
-    def enterRelationshipParameter(self, ctx):
-        if self.current_node and ctx.relationshipType():
-            self.current_node.properties['relationship'] = ctx.relationshipType().getText()
 
 
 class CopperANTLRParser:
@@ -290,11 +268,11 @@ class CopperANTLRParser:
             if node.type == NodeType.MODEL and not node.children:
                 self.warnings.append(f"Line {node.line_number}: Model '{node.name}' has no dimensions or measures")
             
-            # Validate required properties for dimensions and measures
+            # Basic validation for dimensions and measures
             for child in node.children:
                 if child.type in [NodeType.DIMENSION, NodeType.MEASURE]:
-                    if 'type' not in child.properties:
-                        self.errors.append(f"Line {child.line_number}: {child.type.value} '{child.name}' missing required 'type' property")
+                    if 'expression' not in child.properties:
+                        self.warnings.append(f"Line {child.line_number}: {child.type.value} '{child.name}' has no expression defined")
 
 
 def validate_copper_syntax(content: str) -> Dict[str, Any]:
@@ -312,9 +290,9 @@ def validate_copper_syntax(content: str) -> Dict[str, Any]:
         "statistics": {
             "total_models": len([n for n in result.nodes if n.type == NodeType.MODEL]),
             "total_views": len([n for n in result.nodes if n.type == NodeType.VIEW]),
-            "total_dimensions": sum(len([c for c in n.children if c.type == NodeType.DIMENSION]) for n in result.nodes),
-            "total_measures": sum(len([c for c in n.children if c.type == NodeType.MEASURE]) for n in result.nodes),
-            "total_joins": sum(len([c for c in n.children if c.type == NodeType.JOIN]) for n in result.nodes)
+            "total_dimensions": len([n for n in result.nodes if n.type == NodeType.DIMENSION]) + sum(len([c for c in n.children if c.type == NodeType.DIMENSION]) for n in result.nodes),
+            "total_measures": len([n for n in result.nodes if n.type == NodeType.MEASURE]) + sum(len([c for c in n.children if c.type == NodeType.MEASURE]) for n in result.nodes),
+            "total_joins": len([n for n in result.nodes if n.type == NodeType.JOIN]) + sum(len([c for c in n.children if c.type == NodeType.JOIN]) for n in result.nodes)
         }
     }
     

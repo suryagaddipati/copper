@@ -151,7 +151,7 @@ kill-ports:
 # Test parser functionality (quick smoke test)
 test: parser
 	@echo "$(BLUE)🧪 Testing parser functionality...$(NC)"
-	@python3 -c "from src.parser.antlr_parser import validate_copper_syntax; result = validate_copper_syntax('view: test { from: orders }'); print('$(GREEN)✅ Parser test passed!$(NC)' if result['valid'] else '$(RED)❌ Parser test failed$(NC)'); print('Views:', result['statistics']['total_views']); print('Errors:', result['errors'] if result['errors'] else 'None')"
+	@python3 -c "from src.parser.antlr_parser import validate_copper_syntax; result = validate_copper_syntax('dimension: test_id { expression: \$${table.id} }'); print('$(GREEN)✅ Parser test passed!$(NC)' if result['valid'] else '$(RED)❌ Parser test failed$(NC)'); print('Dimensions:', result['statistics']['total_dimensions']); print('Errors:', result['errors'] if result['errors'] else 'None')"
 
 # Run comprehensive unit tests
 test-all: parser
