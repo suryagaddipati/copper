@@ -20,6 +20,13 @@ WEB_DIR := studio/web
 GENERATED_DIR := src/parser/generated
 GRAMMAR_FILE := $(GRAMMAR_DIR)/Copper.g4
 
+# Port configuration with defaults (can be overridden)
+API_PORT ?= 8000
+WEB_PORT ?= 3000
+WEB_PORT_EXTRA1 ?= 3001
+WEB_PORT_EXTRA2 ?= 3002
+PORTS := $(WEB_PORT) $(WEB_PORT_EXTRA1) $(WEB_PORT_EXTRA2) $(API_PORT)
+
 # Help target - shows available commands
 help:
 	@echo "$(BLUE)🚀 Copper Development Environment$(NC)"
@@ -43,6 +50,11 @@ help:
 	@echo "$(GREEN)Quick start:$(NC)"
 	@echo "  $(BLUE)make$(NC)            - Build and start everything"
 	@echo "  $(BLUE)make dev$(NC)        - Start development servers"
+	@echo ""
+	@echo "$(GREEN)Port configuration:$(NC)"
+	@echo "  Default ports: API=$(API_PORT), Web=$(WEB_PORT)"
+	@echo "  Custom ports:  $(YELLOW)API_PORT=8080 WEB_PORT=3001 make dev$(NC)"
+	@echo "  Override any:  $(YELLOW)make dev API_PORT=9000$(NC)"
 
 # Build everything
 build: parser install
@@ -102,24 +114,21 @@ dev: build
 	@pkill -f "vite" 2>/dev/null || true
 	@pkill -f "uvicorn" 2>/dev/null || true
 	@pkill -f "fastapi" 2>/dev/null || true
-	@echo "$(YELLOW)🔌 Killing processes on ports 3000, 3001, 3002, 8000...$(NC)"
-	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:3001 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:3002 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@echo "$(YELLOW)🔌 Killing processes on ports $(PORTS)...$(NC)"
+	$(foreach port,$(PORTS),@lsof -ti:$(port) | xargs kill -9 2>/dev/null || true;)
 	@echo "$(YELLOW)⏳ Waiting for ports to clear...$(NC)"
 	@sleep 3
-	@echo "$(BLUE)🔥 Starting API server with UFC integration on port 8000...$(NC)"
-	@cd $(API_DIR) && python3 main.py &
+	@echo "$(BLUE)🔥 Starting API server with UFC integration on port $(API_PORT)...$(NC)"
+	@cd $(API_DIR) && API_PORT=$(API_PORT) python3 main.py &
 	@sleep 3
-	@echo "$(BLUE)🌐 Starting web development server on port 3000...$(NC)"
-	@cd $(WEB_DIR) && npm run dev &
+	@echo "$(BLUE)🌐 Starting web development server on port $(WEB_PORT)...$(NC)"
+	@cd $(WEB_DIR) && PORT=$(WEB_PORT) npm run dev &
 	@sleep 2
 	@echo ""
 	@echo "$(GREEN)🎉 Development environment ready!$(NC)"
 	@echo "========================================"
-	@echo "$(BLUE)📱 Web App: http://localhost:3000$(NC)"
-	@echo "$(BLUE)🔌 API:     http://localhost:8000$(NC)"
+	@echo "$(BLUE)📱 Web App: http://localhost:$(WEB_PORT)$(NC)"
+	@echo "$(BLUE)🔌 API:     http://localhost:$(API_PORT)$(NC)"
 	@echo ""
 	@echo "$(YELLOW)Press Ctrl+C to stop, or run 'make stop'$(NC)"
 
@@ -132,20 +141,14 @@ stop:
 	@pkill -f "vite" 2>/dev/null || true
 	@pkill -f "uvicorn" 2>/dev/null || true
 	@pkill -f "fastapi" 2>/dev/null || true
-	@echo "$(YELLOW)🔌 Killing processes on ports 3000, 3001, 3002, 8000...$(NC)"
-	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:3001 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:3002 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@echo "$(YELLOW)🔌 Killing processes on ports $(PORTS)...$(NC)"
+	$(foreach port,$(PORTS),@lsof -ti:$(port) | xargs kill -9 2>/dev/null || true;)
 	@echo "$(GREEN)✅ All servers stopped and ports cleared$(NC)"
 
 # Kill processes on development ports only
 kill-ports:
 	@echo "$(YELLOW)🔌 Forcefully killing processes on development ports...$(NC)"
-	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:3001 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:3002 | xargs kill -9 2>/dev/null || true
-	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	$(foreach port,$(PORTS),@lsof -ti:$(port) | xargs kill -9 2>/dev/null || true;)
 	@echo "$(GREEN)✅ Development ports cleared$(NC)"
 
 # Test parser functionality (quick smoke test)
