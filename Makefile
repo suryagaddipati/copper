@@ -108,17 +108,14 @@ start: dev
 dev: build
 	@echo "$(BLUE)🚀 Starting Copper development environment...$(NC)"
 	@echo "$(YELLOW)🛑 Stopping any existing servers and clearing ports...$(NC)"
-	@pkill -f "npm run dev" 2>/dev/null || true
-	@pkill -f "main.py" 2>/dev/null || true
-	@pkill -f "main.py" 2>/dev/null || true
-	@pkill -f "vite" 2>/dev/null || true
-	@pkill -f "uvicorn" 2>/dev/null || true
-	@pkill -f "fastapi" 2>/dev/null || true
 	@echo "$(YELLOW)🔌 Killing processes on ports $(PORTS)...$(NC)"
-	$(foreach port,$(PORTS),@lsof -ti:$(port) | xargs kill -9 2>/dev/null || true;)
+	@lsof -ti:$(WEB_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(WEB_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(WEB_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(API_PORT) | xargs kill -9 2>/dev/null || true
 	@echo "$(YELLOW)⏳ Waiting for ports to clear...$(NC)"
 	@sleep 3
-	@echo "$(BLUE)🔥 Starting API server with UFC integration on port $(API_PORT)...$(NC)"
+	@echo "$(BLUE)🔥 Starting API server on port $(API_PORT)...$(NC)"
 	@cd $(API_DIR) && API_PORT=$(API_PORT) python3 main.py &
 	@sleep 3
 	@echo "$(BLUE)🌐 Starting web development server on port $(WEB_PORT)...$(NC)"
@@ -135,20 +132,20 @@ dev: build
 # Stop all servers
 stop:
 	@echo "$(YELLOW)🛑 Stopping all servers and clearing ports...$(NC)"
-	@pkill -f "npm run dev" 2>/dev/null || true
-	@pkill -f "main.py" 2>/dev/null || true
-	@pkill -f "main.py" 2>/dev/null || true
-	@pkill -f "vite" 2>/dev/null || true
-	@pkill -f "uvicorn" 2>/dev/null || true
-	@pkill -f "fastapi" 2>/dev/null || true
 	@echo "$(YELLOW)🔌 Killing processes on ports $(PORTS)...$(NC)"
-	$(foreach port,$(PORTS),@lsof -ti:$(port) | xargs kill -9 2>/dev/null || true;)
+	@lsof -ti:$(WEB_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(WEB_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(WEB_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(API_PORT) | xargs kill -9 2>/dev/null || true
 	@echo "$(GREEN)✅ All servers stopped and ports cleared$(NC)"
 
 # Kill processes on development ports only
 kill-ports:
 	@echo "$(YELLOW)🔌 Forcefully killing processes on development ports...$(NC)"
-	$(foreach port,$(PORTS),@lsof -ti:$(port) | xargs kill -9 2>/dev/null || true;)
+	@lsof -ti:$(WEB_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(WEB_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(WEB_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(API_PORT) | xargs kill -9 2>/dev/null || true
 	@echo "$(GREEN)✅ Development ports cleared$(NC)"
 
 # Test parser functionality (quick smoke test)
