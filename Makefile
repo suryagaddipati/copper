@@ -15,17 +15,15 @@ NC := \033[0m # No Color
 
 # Configuration
 GRAMMAR_DIR := grammar
-API_DIR := studio/api
-WEB_DIR := studio/web
-GENERATED_DIR := src/parser/generated
+STUDIO_DIR := studio
+GENERATED_DIR := studio/src/lib/parser/generated
 GRAMMAR_FILE := $(GRAMMAR_DIR)/Copper.g4
 
 # Port configuration with defaults (can be overridden)
-API_PORT ?= 8000
-WEB_PORT ?= 3000
-WEB_PORT_EXTRA1 ?= 3001
-WEB_PORT_EXTRA2 ?= 3002
-PORTS := $(WEB_PORT) $(WEB_PORT_EXTRA1) $(WEB_PORT_EXTRA2) $(API_PORT)
+STUDIO_PORT ?= 3000
+STUDIO_PORT_EXTRA1 ?= 3001
+STUDIO_PORT_EXTRA2 ?= 3002
+PORTS := $(STUDIO_PORT) $(STUDIO_PORT_EXTRA1) $(STUDIO_PORT_EXTRA2)
 
 # Help target - shows available commands
 help:
@@ -33,156 +31,122 @@ help:
 	@echo "=================================="
 	@echo ""
 	@echo "$(GREEN)Available targets:$(NC)"
-	@echo "  $(YELLOW)make all$(NC)        - Build parser and start development environment"
+	@echo "  $(YELLOW)make all$(NC)        - Build and start unified Next.js application"
 	@echo "  $(YELLOW)make build$(NC)      - Build everything (parser + dependencies)"
 	@echo "  $(YELLOW)make parser$(NC)     - Generate ANTLR parser from grammar"
-	@echo "  $(YELLOW)make start$(NC)      - Start API and web servers"
-	@echo "  $(YELLOW)make dev$(NC)        - Start development environment"
+	@echo "  $(YELLOW)make start$(NC)      - Start unified development server"
+	@echo "  $(YELLOW)make dev$(NC)        - Start unified development server"
 	@echo "  $(YELLOW)make stop$(NC)       - Stop all running servers"
 	@echo "  $(YELLOW)make kill-ports$(NC) - Force kill processes on development ports"
 	@echo "  $(YELLOW)make install$(NC)    - Install all dependencies"
 	@echo "  $(YELLOW)make clean$(NC)      - Clean generated files"
 	@echo "  $(YELLOW)make test$(NC)       - Quick parser smoke test"
-	@echo "  $(YELLOW)make test-all$(NC)   - Run comprehensive unit tests"
-	@echo "  $(YELLOW)make test-verbose$(NC) - Run unit tests with verbose output"
 	@echo "  $(YELLOW)make help$(NC)       - Show this help message"
 	@echo ""
 	@echo "$(GREEN)Quick start:$(NC)"
 	@echo "  $(BLUE)make$(NC)            - Build and start everything"
-	@echo "  $(BLUE)make dev$(NC)        - Start development servers"
+	@echo "  $(BLUE)make dev$(NC)        - Start unified Next.js application"
 	@echo ""
 	@echo "$(GREEN)Port configuration:$(NC)"
-	@echo "  Default ports: API=$(API_PORT), Web=$(WEB_PORT)"
-	@echo "  Custom ports:  $(YELLOW)API_PORT=8080 WEB_PORT=3001 make dev$(NC)"
-	@echo "  Override any:  $(YELLOW)make dev API_PORT=9000$(NC)"
+	@echo "  Default port: $(STUDIO_PORT) (Next.js will use next available if taken)"
+	@echo "  Custom port:  $(YELLOW)STUDIO_PORT=3001 make dev$(NC)"
 
 # Build everything
 build: parser install
 	@echo "$(GREEN)✅ Build complete!$(NC)"
 
 # Generate ANTLR parser from grammar
-parser: $(GENERATED_DIR)/CopperLexer.py
+parser: $(GENERATED_DIR)/CopperLexer.js
 
-$(GENERATED_DIR)/CopperLexer.py: $(GRAMMAR_FILE)
-	@echo "$(BLUE)🔨 Generating ANTLR parser...$(NC)"
+$(GENERATED_DIR)/CopperLexer.js: $(GRAMMAR_FILE)
+	@echo "$(BLUE)🔨 Generating ANTLR JavaScript parser...$(NC)"
 	@if [ ! -f "$(GRAMMAR_FILE)" ]; then \
 		echo "$(RED)❌ Grammar file not found: $(GRAMMAR_FILE)$(NC)"; \
 		exit 1; \
 	fi
 	@mkdir -p $(GENERATED_DIR)
-	@cp $(GRAMMAR_FILE) . && \
-		antlr4 -Dlanguage=Python3 -o $(GENERATED_DIR) Copper.g4 && \
-		rm Copper.g4
-	@if [ -f "$(GENERATED_DIR)/CopperParser.py" ]; then \
-		echo "$(GREEN)✅ Parser generated successfully$(NC)"; \
-		echo "   Files: CopperLexer.py, CopperParser.py, CopperListener.py"; \
+	@antlr4 -Dlanguage=JavaScript -o $(GENERATED_DIR) $(GRAMMAR_FILE)
+	@if [ -f "$(GENERATED_DIR)/CopperParser.js" ]; then \
+		echo "$(GREEN)✅ JavaScript parser generated successfully$(NC)"; \
+		echo "   Files: CopperLexer.js, CopperParser.js, CopperListener.js"; \
 	else \
 		echo "$(RED)❌ Parser generation failed$(NC)"; \
 		exit 1; \
 	fi
 
 # Install dependencies
-install: install-web install-api
-
-install-web:
-	@echo "$(BLUE)📦 Installing web dependencies...$(NC)"
-	@if [ ! -d "$(WEB_DIR)/node_modules" ]; then \
-		cd $(WEB_DIR) && npm install; \
-		echo "$(GREEN)✅ Web dependencies installed$(NC)"; \
+install:
+	@echo "$(BLUE)📦 Installing Next.js dependencies...$(NC)"
+	@if [ ! -d "$(STUDIO_DIR)/node_modules" ]; then \
+		cd $(STUDIO_DIR) && npm install; \
+		echo "$(GREEN)✅ Next.js dependencies installed$(NC)"; \
 	else \
-		echo "$(YELLOW)⏭️  Web dependencies already installed$(NC)"; \
+		echo "$(YELLOW)⏭️  Next.js dependencies already installed$(NC)"; \
 	fi
-
-install-api:
-	@echo "$(BLUE)📦 Checking API dependencies...$(NC)"
-	@if [ ! -f "$(API_DIR)/requirements.txt" ]; then \
-		echo "$(RED)❌ API requirements.txt not found$(NC)"; \
-		exit 1; \
-	fi
-	@echo "$(YELLOW)💡 API dependencies listed in $(API_DIR)/requirements.txt$(NC)"
-	@echo "   Install with: pip install -r $(API_DIR)/requirements.txt"
 
 # Start development environment
 start: dev
 
 dev: build
-	@echo "$(BLUE)🚀 Starting Copper development environment...$(NC)"
+	@echo "$(BLUE)🚀 Starting Copper Studio (unified Next.js application)...$(NC)"
 	@echo "$(YELLOW)🛑 Stopping any existing servers and clearing ports...$(NC)"
 	@echo "$(YELLOW)🔌 Killing processes on ports $(PORTS)...$(NC)"
-	@lsof -ti:$(WEB_PORT) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(WEB_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(WEB_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(API_PORT) | xargs kill -9 2>/dev/null || true
-	@echo "$(YELLOW)⏳ Waiting for ports to clear...$(NC)"
+	@lsof -ti:$(STUDIO_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
+	@echo "$(YELLOW)🔌 Killing Next.js processes...$(NC)"
+	@ps aux | grep -E "node.*next.*dev|next-server" | grep -v grep | awk '{print $$2}' | xargs kill -9 2>/dev/null || true
+	@echo "$(YELLOW)⏳ Waiting for processes to clear...$(NC)"
 	@sleep 3
-	@echo "$(BLUE)🔥 Starting API server on port $(API_PORT)...$(NC)"
-	@cd $(API_DIR) && API_PORT=$(API_PORT) python3 main.py &
+	@echo "$(BLUE)🚀 Starting unified Next.js development server...$(NC)"
+	@cd $(STUDIO_DIR) && PORT=$(STUDIO_PORT) npm run dev &
 	@sleep 3
-	@echo "$(BLUE)🌐 Starting web development server on port $(WEB_PORT)...$(NC)"
-	@cd $(WEB_DIR) && PORT=$(WEB_PORT) npm run dev &
-	@sleep 2
 	@echo ""
-	@echo "$(GREEN)🎉 Development environment ready!$(NC)"
+	@echo "$(GREEN)🎉 Copper Studio ready!$(NC)"
 	@echo "========================================"
-	@echo "$(BLUE)📱 Web App: http://localhost:$(WEB_PORT)$(NC)"
-	@echo "$(BLUE)🔌 API:     http://localhost:$(API_PORT)$(NC)"
+	@echo "$(BLUE)🌐 Application: http://localhost:$(STUDIO_PORT)$(NC)"
+	@echo "$(BLUE)🔌 API Routes:  http://localhost:$(STUDIO_PORT)/api$(NC)"
 	@echo ""
 	@echo "$(YELLOW)Press Ctrl+C to stop, or run 'make stop'$(NC)"
 
 # Stop all servers
 stop:
 	@echo "$(YELLOW)🛑 Stopping all servers and clearing ports...$(NC)"
+	@echo "$(YELLOW)🔌 Killing Next.js processes...$(NC)"
+	@pkill -f "node.*next.*dev" 2>/dev/null || true
+	@pkill -f "next-server" 2>/dev/null || true
 	@echo "$(YELLOW)🔌 Killing processes on ports $(PORTS)...$(NC)"
-	@lsof -ti:$(WEB_PORT) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(WEB_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(WEB_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(API_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
 	@echo "$(GREEN)✅ All servers stopped and ports cleared$(NC)"
 
 # Kill processes on development ports only
 kill-ports:
 	@echo "$(YELLOW)🔌 Forcefully killing processes on development ports...$(NC)"
-	@lsof -ti:$(WEB_PORT) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(WEB_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(WEB_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
-	@lsof -ti:$(API_PORT) | xargs kill -9 2>/dev/null || true
+	@pkill -f "node.*next.*dev" 2>/dev/null || true
+	@pkill -f "next-server" 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT_EXTRA1) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(STUDIO_PORT_EXTRA2) | xargs kill -9 2>/dev/null || true
 	@echo "$(GREEN)✅ Development ports cleared$(NC)"
 
 # Test parser functionality (quick smoke test)
-test: parser
-	@echo "$(BLUE)🧪 Testing parser functionality...$(NC)"
-	@python3 -c "from src.parser.antlr_parser import validate_copper_syntax; result = validate_copper_syntax('dimension: test_id { expression: \$${table.id} }'); print('$(GREEN)✅ Parser test passed!$(NC)' if result['valid'] else '$(RED)❌ Parser test failed$(NC)'); print('Dimensions:', result['statistics']['total_dimensions']); print('Errors:', result['errors'] if result['errors'] else 'None')"
-
-# Run comprehensive unit tests
-test-all: parser
-	@echo "$(BLUE)🧪 Running comprehensive unit tests...$(NC)"
-	@PYTHONPATH=src python3 -m unittest discover tests/parser/ -s tests/parser/ -p "test_*.py"
-	@echo "$(GREEN)✅ All tests completed!$(NC)"
-
-# Run unit tests with verbose output
-test-verbose: parser
-	@echo "$(BLUE)🧪 Running unit tests with verbose output...$(NC)"
-	@PYTHONPATH=src python3 -m unittest discover tests/parser/ -v
-	@echo "$(GREEN)✅ Verbose tests completed!$(NC)"
+test:
+	@echo "$(BLUE)🧪 Testing Next.js application...$(NC)"
+	@cd $(STUDIO_DIR) && npm run build && echo "$(GREEN)✅ Build test passed!$(NC)" || echo "$(RED)❌ Build test failed$(NC)"
 
 # Clean generated files
 clean:
 	@echo "$(YELLOW)🧹 Cleaning generated files...$(NC)"
 	@rm -rf $(GENERATED_DIR)
+	@cd $(STUDIO_DIR) && rm -rf .next node_modules/.cache 2>/dev/null || true
 	@echo "$(GREEN)✅ Generated files cleaned$(NC)"
-
-# Development shortcuts
-web-dev:
-	@cd $(WEB_DIR) && npm run dev
-
-api-dev:
-	@cd $(API_DIR) && python3 main.py
 
 # Check requirements
 check:
 	@echo "$(BLUE)🔍 Checking requirements...$(NC)"
 	@command -v antlr4 >/dev/null 2>&1 || { echo "$(RED)❌ antlr4 command not found$(NC)"; exit 1; }
-	@command -v python3 >/dev/null 2>&1 || { echo "$(RED)❌ python3 not found$(NC)"; exit 1; }
 	@command -v node >/dev/null 2>&1 || { echo "$(RED)❌ node not found$(NC)"; exit 1; }
 	@command -v npm >/dev/null 2>&1 || { echo "$(RED)❌ npm not found$(NC)"; exit 1; }
 	@echo "$(GREEN)✅ All requirements satisfied$(NC)"

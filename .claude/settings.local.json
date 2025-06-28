@@ -56,7 +56,12 @@
       "Bash(kill:*)",
       "Bash(npm run lint)",
       "mcp__playwright__browser_wait_for",
-      "mcp__playwright__browser_close"
+      "mcp__playwright__browser_close",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm install:*)",
+      "Bash(sed:*)",
+      "Bash(npm run build:*)",
+      "mcp__playwright__browser_network_requests"
     ],
     "deny": []
   }
