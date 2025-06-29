@@ -4,7 +4,8 @@ setup(
     name="copper",
     version="0.1.0",
     description="Universal Semantic Layer - Define Once. Run Anywhere.",
-    packages=find_packages(),
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     python_requires=">=3.8",
     install_requires=[
         "antlr4-python3-runtime>=4.9.0",
@@ -24,7 +25,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "copper=copper.cli:main",
+            "copper=cli:main",
         ],
     },
 )

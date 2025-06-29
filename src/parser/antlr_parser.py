@@ -1,7 +1,7 @@
 from typing import Optional
 import antlr4
 from antlr4.error.ErrorListener import ErrorListener
-from .ast_nodes import *
+from ast_nodes import *
 
 
 class CopperErrorListener(ErrorListener):
@@ -26,9 +26,9 @@ class CopperParser:
         """Parse a Copper expression string into an AST."""
         try:
             # Import generated ANTLR classes
-            from .generated.CopperLexer import CopperLexer
-            from .generated.CopperParser import CopperParser as GeneratedParser
-            from .generated.CopperBaseVisitor import CopperBaseVisitor
+            from generated.CopperLexer import CopperLexer
+            from generated.CopperParser import CopperParser as GeneratedParser
+            from generated.CopperBaseVisitor import CopperBaseVisitor
             
             # Create lexer and parser
             input_stream = antlr4.InputStream(expression)

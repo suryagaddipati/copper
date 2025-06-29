@@ -15,8 +15,8 @@ import pandas as pd
 # Add copper to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import copper
-from copper.semantic.loader import SemanticModelLoader
+import src as copper
+from src.semantic.loader import SemanticModelLoader
 
 
 def create_sample_data():

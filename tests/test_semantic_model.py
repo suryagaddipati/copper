@@ -1,6 +1,6 @@
 import pytest
-from copper.semantic.schema import SemanticModel, Dimension, Measure, Relationship
-from copper.semantic.loader import SemanticModelLoader
+from src.semantic.schema import SemanticModel, Dimension, Measure, Relationship
+from src.semantic.loader import SemanticModelLoader
 
 
 def test_dimension_creation():

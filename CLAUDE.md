@@ -98,31 +98,33 @@ python -m pytest tests/
 ./start.sh  # or ./start-manual.sh
 ```
 
-### Project Structure (Historical)
+### Current Project Structure
 ```
 copper/
+├── src/                       # Main Python package (source code)
+│   ├── parser/                # ANTLR-based expression parser
+│   │   ├── antlr_parser.py    # Python parser implementation
+│   │   └── ast_nodes.py       # AST node definitions
+│   ├── semantic/              # YAML schema and semantic model
+│   │   ├── schema.py          # Pydantic model definitions
+│   │   └── loader.py          # YAML model loader
+│   ├── query/                 # Query builder and planning
+│   │   └── builder.py         # Fluent query API
+│   └── executors/             # Execution engines
+│       └── pandas_executor.py # Pandas backend implementation
 ├── grammar/
-│   ├── Copper.g4              # ANTLR grammar definition
-│   └── generated/             # Generated parser files
-├── src/
-│   └── parser/
-│       └── antlr_parser.py    # Python parser implementation
-├── studio/
-│   ├── api/                   # FastAPI backend
-│   │   ├── main.py
-│   │   ├── database/          # Connection and storage management
-│   │   └── projects/          # Project management APIs
-│   └── web/                   # Next.js frontend (later moved to studio/)
-│       ├── src/
-│       │   ├── components/    # React components
-│       │   ├── hooks/         # Custom React hooks
-│       │   └── copper-language.ts  # Monaco language definition
-│       └── package.json
-├── tests/
-│   └── parser/                # Parser unit tests
-├── example-projects/
-│   ├── basic-tutorial/        # Simple examples
-│   └── ecommerce-demo/        # Complex real-world examples
+│   └── Copper.g4              # ANTLR grammar definition
+├── tests/                     # Comprehensive test suite
+│   ├── test_semantic_model.py
+│   ├── test_query_builder.py
+│   └── test_pandas_executor.py
+├── examples/                  # Example models and demos
+│   ├── basic_demo.py          # Working demo script
+│   ├── ecommerce.copper       # Ecommerce semantic model
+│   └── saas_metrics.copper    # SaaS business metrics model
+├── setup.py                   # Python package configuration
+├── requirements.txt           # Python dependencies
+├── pytest.ini                # Test configuration
 └── Makefile                   # Build automation
 ```
 
@@ -142,7 +144,9 @@ dimensions:
 ```
 
 ```python
-query = layer.dimensions(["region"]).measures(["revenue"])
+import src as copper
+model = copper.load("model.yaml")
+query = copper.Query(model).dimensions(["region"]).measures(["revenue"])
 df = query.to_pandas()
 ```
 

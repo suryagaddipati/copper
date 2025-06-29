@@ -1,8 +1,8 @@
 import pytest
 import pandas as pd
 import numpy as np
-from copper.semantic.loader import SemanticModelLoader
-from copper.query.builder import Query
+from src.semantic.loader import SemanticModelLoader
+from src.query.builder import Query
 
 
 @pytest.fixture

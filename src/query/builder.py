@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional, Any
-from ..semantic.schema import SemanticModel
-from ..parser.antlr_parser import CopperParser
-from ..parser.ast_nodes import ASTNode
+from semantic.schema import SemanticModel
+from parser.antlr_parser import CopperParser
+from parser.ast_nodes import ASTNode
 
 
 class Query:
@@ -64,21 +64,21 @@ class Query:
     
     def to_pandas(self, data_source: Optional[Dict[str, Any]] = None):
         """Execute the query using Pandas backend."""
-        from ..executors.pandas_executor import PandasExecutor
+        from executors.pandas_executor import PandasExecutor
         
         executor = PandasExecutor(self.semantic_model)
         return executor.execute(self, data_source)
     
     def to_sql(self, dialect: str = "standard") -> str:
         """Generate SQL for the query."""
-        from ..executors.sql_generator import SQLGenerator
+        from executors.sql_generator import SQLGenerator
         
         generator = SQLGenerator(self.semantic_model, dialect)
         return generator.generate(self)
     
     def to_spark(self, spark_session=None):
         """Execute the query using Spark backend."""
-        from ..executors.spark_executor import SparkExecutor
+        from executors.spark_executor import SparkExecutor
         
         executor = SparkExecutor(self.semantic_model, spark_session)
         return executor.execute(self)
@@ -124,7 +124,7 @@ class Query:
     
     def _extract_tables_from_ast(self, ast: ASTNode) -> List[str]:
         """Extract table names from AST."""
-        from ..parser.ast_nodes import ColumnReference
+        from parser.ast_nodes import ColumnReference
         
         tables = []
         

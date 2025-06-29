@@ -9,7 +9,7 @@ Copper = Define Once. Run Anywhere. ☄️
 
 __version__ = "0.1.0"
 
-from .semantic.loader import load
-from .query.builder import Query
+from semantic.loader import load
+from query.builder import Query
 
 __all__ = ["load", "Query"]
