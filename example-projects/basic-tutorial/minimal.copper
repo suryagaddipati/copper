@@ -1,3 +1,0 @@
-dimension: order_id {
-  expression: ${orders.order_id} ;;
-}

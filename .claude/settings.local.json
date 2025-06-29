@@ -61,7 +61,13 @@
       "Bash(npm install:*)",
       "Bash(sed:*)",
       "Bash(npm run build:*)",
-      "mcp__playwright__browser_network_requests"
+      "mcp__playwright__browser_network_requests",
+      "Bash(npm test)",
+      "Bash(npm --version)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm test:*)",
+      "Bash(sed:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }
