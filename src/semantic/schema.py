@@ -59,19 +59,25 @@ class Relationship(BaseModel):
         allow_population_by_field_name = True
 
 
-class Table(BaseModel):
-    """Represents a table in the semantic model."""
+class DataSource(BaseModel):
+    """Represents a data source in the semantic model."""
     
+    type: str = "table"  # table, view, api, stream, etc.
     sql: Optional[str] = None
     database: Optional[str] = None
     schema: Optional[str] = None
     table: Optional[str] = None
+    endpoint: Optional[str] = None  # for API sources
+    topic: Optional[str] = None     # for streaming sources
+    refresh_schedule: Optional[str] = None
     description: Optional[str] = None
+    columns: Optional[List[Dict[str, str]]] = None
     
-    @validator('sql', 'table')
-    def sql_or_table_required(cls, v, values):
-        if not v and not values.get('sql') and not values.get('table'):
-            raise ValueError('Either sql or table must be provided')
+    @validator('sql', 'table', 'endpoint')
+    def source_identifier_required(cls, v, values):
+        # At least one source identifier must be provided
+        if not any([v, values.get('sql'), values.get('table'), values.get('endpoint')]):
+            raise ValueError('At least one of sql, table, or endpoint must be provided')
         return v
 
 
@@ -80,10 +86,12 @@ class SemanticModel(BaseModel):
     
     name: str
     description: Optional[str] = None
-    tables: Dict[str, Table] = {}
+    datasources: Dict[str, DataSource] = {}
+    tables: Dict[str, DataSource] = {}  # Backward compatibility alias
     dimensions: Dict[str, Dimension] = {}
     measures: Dict[str, Measure] = {}
     relationships: List[Relationship] = []
+    includes: Optional[List[str]] = None  # For file includes
     
     def get_dimension(self, name: str) -> Optional[Dimension]:
         """Get a dimension by name."""
@@ -93,13 +101,22 @@ class SemanticModel(BaseModel):
         """Get a measure by name."""
         return self.measures.get(name)
     
-    def get_table(self, name: str) -> Optional[Table]:
-        """Get a table by name."""
-        return self.tables.get(name)
+    def get_datasource(self, name: str) -> Optional[DataSource]:
+        """Get a data source by name."""
+        # Check datasources first, then fall back to tables for backward compatibility
+        return self.datasources.get(name) or self.tables.get(name)
     
-    def get_relationships_for_table(self, table_name: str) -> List[Relationship]:
-        """Get all relationships involving a specific table."""
+    def get_table(self, name: str) -> Optional[DataSource]:
+        """Get a table by name (backward compatibility)."""
+        return self.get_datasource(name)
+    
+    def get_relationships_for_datasource(self, source_name: str) -> List[Relationship]:
+        """Get all relationships involving a specific data source."""
         return [
             rel for rel in self.relationships 
-            if rel.from_table == table_name or rel.to_table == table_name
+            if rel.from_table == source_name or rel.to_table == source_name
         ]
+    
+    def get_relationships_for_table(self, table_name: str) -> List[Relationship]:
+        """Get all relationships involving a specific table (backward compatibility)."""
+        return self.get_relationships_for_datasource(table_name)

@@ -53,12 +53,14 @@ def create_sample_model():
         'name': 'ecommerce',
         'description': 'Sample ecommerce semantic model',
         
-        'tables': {
+        'datasources': {
             'Orders': {
+                'type': 'table',
                 'table': 'orders',
                 'description': 'Customer orders'
             },
             'Customers': {
+                'type': 'table',
                 'table': 'customers', 
                 'description': 'Customer information'
             }

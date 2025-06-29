@@ -10,7 +10,7 @@ Copper is a portable semantic layer that compiles metric definitions and queries
 import src as copper
 
 # Load semantic model from YAML
-model = copper.load("examples/ecommerce.copper")
+model = copper.load("examples/ecommerce/model.yaml")
 
 # Build and execute query
 query = copper.Query(model) \
@@ -54,55 +54,100 @@ copper/
 ├── grammar/                   # ANTLR grammar definition
 ├── tests/                     # Comprehensive test suite
 ├── examples/                  # Sample models and demos
+│   ├── ecommerce/             # E-commerce analytics example
+│   │   ├── datasources.yaml   # Data source definitions
+│   │   └── model.yaml         # Semantic model
+│   ├── saas/                  # SaaS metrics example
+│   │   ├── datasources.yaml   # Data source definitions  
+│   │   └── model.yaml         # Semantic model
+│   ├── basic_demo.py          # Simple demo script
+│   └── load_example.py        # File loading demonstration
 └── Makefile                   # Build automation
 ```
 
 ## 📊 Example Models
 
 ### E-commerce Analytics
+
+**Data Sources** (`examples/ecommerce/datasources.yaml`):
 ```yaml
-# examples/ecommerce.copper
+datasources:
+  orders:
+    type: table
+    table: orders
+    database: analytics
+    schema: ecommerce
+    description: Customer order transactions
+    
+  customers:
+    type: table
+    table: customers
+    database: analytics
+    schema: ecommerce
+    description: Customer master data
+```
+
+**Semantic Model** (`examples/ecommerce/model.yaml`):
+```yaml
 name: ecommerce_analytics
+
+includes:
+  - datasources.yaml
 
 relationships:
   - orders.customer_id → customers.id
-  - order_items.order_id → orders.id
 
 dimensions:
   customer_region:
     sql: customers.region
     type: string
     
-  customer_tier:
-    sql: customers.tier
-    type: string
-
 measures:
   total_revenue:
     expression: SUM(orders.total_amount)
     type: currency
-    
-  order_count:
-    expression: COUNT(orders.id)
-    type: number
 ```
 
 ### SaaS Business Metrics
+
+**Data Sources** (`examples/saas/datasources.yaml`):
 ```yaml
-# examples/saas_metrics.copper
+datasources:
+  subscriptions:
+    type: table
+    table: subscriptions
+    description: Customer subscription records
+    
+  users:
+    type: table  
+    table: users
+    description: User account information
+    
+  # Example of other data source types
+  customer_events:
+    type: view
+    sql: |
+      SELECT customer_id, event_type, event_timestamp
+      FROM raw.customer_events
+    
+  monthly_metrics:
+    type: api
+    endpoint: "https://api.company.com/metrics/monthly"
+    refresh_schedule: daily
+```
+
+**Semantic Model** (`examples/saas/model.yaml`):
+```yaml
 name: saas_business_metrics
+
+includes:
+  - datasources.yaml
 
 measures:
   monthly_recurring_revenue:
     expression: SUM(subscriptions.monthly_value WHERE subscriptions.status = "active")
     type: currency
     label: Monthly Recurring Revenue (MRR)
-    
-  churn_rate:
-    expression: COUNT(subscriptions.id WHERE subscriptions.status = "cancelled") / COUNT(subscriptions.id WHERE subscriptions.status = "active") * 100
-    type: number
-    format: "%.2f%%"
-    label: Monthly Churn Rate
 ```
 
 ## 🛠️ Development

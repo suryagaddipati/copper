@@ -1,7 +1,7 @@
 import yaml
 from pathlib import Path
 from typing import Union, Dict, Any
-from .schema import SemanticModel, Dimension, Measure, Table, Relationship
+from .schema import SemanticModel, Dimension, Measure, DataSource, Relationship
 
 
 class SemanticModelLoader:
@@ -23,11 +23,20 @@ class SemanticModelLoader:
     def load_from_dict(data: Dict[str, Any]) -> SemanticModel:
         """Load a semantic model from a dictionary."""
         
-        # Parse tables
+        # Parse datasources (and tables for backward compatibility)
+        datasources = {}
         tables = {}
+        
+        if 'datasources' in data:
+            for source_name, source_def in data['datasources'].items():
+                datasources[source_name] = DataSource(**source_def)
+                
         if 'tables' in data:
             for table_name, table_def in data['tables'].items():
-                tables[table_name] = Table(**table_def)
+                # Ensure table_def has a type field for DataSource compatibility
+                if 'type' not in table_def:
+                    table_def['type'] = 'table'
+                tables[table_name] = DataSource(**table_def)
         
         # Parse dimensions
         dimensions = {}
@@ -55,10 +64,12 @@ class SemanticModelLoader:
         return SemanticModel(
             name=data.get('name', 'unnamed'),
             description=data.get('description'),
+            datasources=datasources,
             tables=tables,
             dimensions=dimensions,
             measures=measures,
-            relationships=relationships
+            relationships=relationships,
+            includes=data.get('includes')
         )
     
     @staticmethod
