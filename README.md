@@ -10,15 +10,15 @@ Copper is a portable semantic layer that compiles metric definitions and queries
 import src as copper
 
 # Load semantic model from YAML
-model = copper.load("examples/ecommerce/model.yaml")
+model = copper.load("examples/ufc/model.yaml")
 
 # Build and execute query
 query = copper.Query(model) \
-    .dimensions(["region"]) \
-    .measures(["revenue", "order_count"]) \
-    .filters(["order_status = 'completed'"])
+    .dimensions(["weight_class"]) \
+    .measures(["total_fights", "finish_rate"]) \
+    .filters(["finish_method = 'KO/TKO'"])
 
-# Execute on Pandas (built-in mock data)
+# Execute on Pandas with real UFC data
 df = query.to_pandas()
 print(df)
 ```
@@ -60,12 +60,66 @@ copper/
 │   ├── saas/                  # SaaS metrics example
 │   │   ├── datasources.yaml   # Data source definitions  
 │   │   └── model.yaml         # Semantic model
+│   ├── ufc/                   # UFC/MMA analytics with real data
+│   │   ├── data/              # Real UFC fight datasets
+│   │   ├── datasources.yaml   # UFC data source definitions
+│   │   ├── model.yaml         # MMA analytics semantic model
+│   │   └── data_loader.py     # UFC data loading utilities
 │   ├── basic_demo.py          # Simple demo script
+│   ├── ufc_demo.py            # UFC analytics demonstration
 │   └── load_example.py        # File loading demonstration
 └── Makefile                   # Build automation
 ```
 
 ## 📊 Example Models
+
+### UFC/MMA Analytics (Real Data)
+
+**Data Sources** (`examples/ufc/datasources.yaml`):
+```yaml
+datasources:
+  fighters:
+    type: table
+    table: ufc_fighter_details
+    description: Fighter profiles and physical attributes
+    
+  fight_results:
+    type: table
+    table: ufc_fight_results
+    description: Fight outcomes and basic match information
+    
+  events:
+    type: table
+    table: ufc_events
+    description: UFC event information including venues
+```
+
+**Semantic Model** (`examples/ufc/model.yaml`):
+```yaml
+name: ufc_analytics
+
+includes:
+  - datasources.yaml
+
+dimensions:
+  weight_class:
+    sql: fight_results.weight_class
+    type: string
+    
+  nationality:
+    sql: fighters.nationality
+    type: string
+
+measures:
+  total_fights:
+    expression: COUNT(fight_results.fight_id)
+    type: number
+    
+  finish_rate:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.method != "Decision") / COUNT(fight_results.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+```
 
 ### E-commerce Analytics
 
@@ -208,6 +262,27 @@ make typecheck
 
 ## 🧪 Examples
 
+### UFC Fighter Analysis
+```python
+import src as copper
+from examples.ufc.data_loader import UFCDataLoader
+
+# Load real UFC data
+loader = UFCDataLoader()
+ufc_data = loader.load_all_data()
+
+# Load semantic model
+model = copper.load("examples/ufc/model.yaml")
+
+# Analyze finish rates by weight class
+query = copper.Query(model) \
+    .dimensions(['weight_class']) \
+    .measures(['total_fights', 'finish_rate'])
+
+result = query.to_pandas(ufc_data)
+print(result)
+```
+
 ### Basic Aggregation
 ```python
 import src as copper
@@ -215,6 +290,9 @@ import src as copper
 # Create semantic model
 model_def = {
     'name': 'sales',
+    'datasources': {
+        'orders': {'type': 'table', 'table': 'orders'}
+    },
     'dimensions': {
         'region': {'sql': 'customers.region', 'type': 'string'}
     },

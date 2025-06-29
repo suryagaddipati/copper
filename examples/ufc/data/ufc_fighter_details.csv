@@ -1,0 +1,16 @@
+fighter_id,fighter_name,nickname,height_cm,weight_lbs,reach_cm,stance,date_of_birth,nationality,weight_class
+1,Jon Jones,Bones,193,240,215,Orthodox,1987-07-19,USA,Heavyweight
+2,Islam Makhachev,,180,155,178,Orthodox,1991-09-27,Russia,Lightweight
+3,Alexander Volkanovski,The Great,168,145,180,Orthodox,1988-09-29,Australia,Featherweight
+4,Leon Edwards,Rocky,183,170,188,Orthodox,1991-08-25,England,Welterweight
+5,Sean Strickland,,185,185,193,Orthodox,1991-02-27,USA,Middleweight
+6,Alex Pereira,Poatan,193,205,201,Orthodox,1987-07-07,Brazil,Light Heavyweight
+7,Sean O'Malley,Suga,180,135,183,Orthodox,1994-10-24,USA,Bantamweight
+8,Alexandre Pantoja,,168,125,170,Orthodox,1990-04-16,Brazil,Flyweight
+9,Raquel Pennington,Rocky,170,135,175,Orthodox,1988-09-05,USA,Women's Bantamweight
+10,Zhang Weili,Magnum,164,115,160,Orthodox,1989-08-13,China,Women's Strawweight
+11,Conor McGregor,The Notorious,175,155,188,Orthodox,1988-07-14,Ireland,Lightweight
+12,Khabib Nurmagomedov,The Eagle,178,155,178,Orthodox,1988-09-20,Russia,Lightweight
+13,Jorge Masvidal,Gamebred,180,170,188,Orthodox,1984-11-12,USA,Welterweight
+14,Nate Diaz,,183,170,193,Orthodox,1985-04-16,USA,Welterweight
+15,Daniel Cormier,DC,180,265,185,Orthodox,1979-03-20,USA,Heavyweight
