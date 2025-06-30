@@ -1,9 +1,35 @@
 name: ufc_analytics
 description: UFC/MMA analytics semantic model for fight sports analysis
 
-# Import data source definitions
-includes:
-  - datasources.yaml
+# Data source definitions
+datasources:
+  events:
+    type: table
+    table: ufc_events
+    database: ufc_analytics
+    schema: core
+    description: UFC event information including dates, venues, and locations
+
+  fighters:
+    type: table
+    table: ufc_fighter_details
+    database: ufc_analytics
+    schema: core
+    description: Comprehensive fighter profiles and physical attributes
+
+  fight_results:
+    type: table
+    table: ufc_fight_results
+    database: ufc_analytics
+    schema: core
+    description: Fight outcomes and basic match information
+
+  fight_details:
+    type: table
+    table: ufc_fight_details
+    database: ufc_analytics
+    schema: core
+    description: Detailed fight statistics and performance metrics
 
 # Relationships between data sources
 relationships:
@@ -18,50 +44,50 @@ relationships:
 dimensions:
   # Fighter dimensions
   fighter_name:
-    sql: fighters.fighter_name
+    expression: fighters.fighter_name
     type: string
     label: Fighter Name
     description: Full name of the fighter
 
   fighter_nickname:
-    sql: fighters.nickname
+    expression: fighters.nickname
     type: string
     label: Fighter Nickname
     description: Fighter's nickname or alias
 
   nationality:
-    sql: fighters.nationality
+    expression: fighters.nationality
     type: string
     label: Nationality
     description: Fighter's country of origin
 
   weight_class:
-    sql: fight_results.weight_class
+    expression: fight_results.weight_class
     type: string
     label: Weight Class
     description: Fighting weight division
 
   stance:
-    sql: fighters.stance
+    expression: fighters.stance
     type: string
     label: Fighting Stance
     description: Orthodox, Southpaw, or Switch stance
 
   # Event dimensions
   event_name:
-    sql: events.event_name
+    expression: events.event_name
     type: string
     label: Event Name
     description: Official UFC event name
 
   event_location:
-    sql: events.location
+    expression: events.location
     type: string
     label: Event Location
     description: City and country where event took place
 
   venue:
-    sql: events.venue
+    expression: events.venue
     type: string
     label: Venue
     description: Arena or venue name
@@ -81,13 +107,13 @@ dimensions:
 
   # Fight outcome dimensions
   finish_method:
-    sql: fight_results.method
+    expression: fight_results.method
     type: string
     label: Finish Method
     description: How the fight ended (Decision, KO/TKO, Submission)
 
   fight_round:
-    sql: fight_results.round
+    expression: fight_results.round
     type: number
     label: Round
     description: Round in which fight ended

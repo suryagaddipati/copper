@@ -40,7 +40,13 @@ print(df)
 ### ✅ Query Builder
 - **Fluent API**: Chain `.dimensions()`, `.measures()`, `.filters()`
 - **Validation**: Real-time expression and model validation
-- **Multiple backends**: Pandas (implemented), Spark/SQL (planned)
+- **Multiple backends**: Pandas execution and SQL generation
+
+### ✅ SQL Generation
+- **Universal SQL**: Generate SQL from Copper expressions
+- **Database portability**: Run on PostgreSQL, BigQuery, Snowflake, etc.
+- **Clean output**: Readable, optimized SQL with proper formatting
+- **Join automation**: Automatic JOIN generation from relationships
 
 ## 🏗️ Project Structure
 
@@ -103,11 +109,11 @@ includes:
 
 dimensions:
   weight_class:
-    sql: fight_results.weight_class
+    expression: fight_results.weight_class
     type: string
     
   nationality:
-    sql: fighters.nationality
+    expression: fighters.nationality
     type: string
 
 measures:
@@ -153,7 +159,7 @@ relationships:
 
 dimensions:
   customer_region:
-    sql: customers.region
+    expression: customers.region
     type: string
     
 measures:
@@ -252,7 +258,7 @@ make typecheck
 
 ### 2. Data Engineering
 - Semantic layer for data pipelines
-- Cross-engine portability (Pandas → Spark)
+- Cross-engine portability (Pandas → SQL → any database)
 - Expression validation and optimization
 
 ### 3. Analytics Engineering
@@ -279,8 +285,13 @@ query = copper.Query(model) \
     .dimensions(['weight_class']) \
     .measures(['total_fights', 'finish_rate'])
 
+# Execute with Pandas
 result = query.to_pandas(ufc_data)
 print(result)
+
+# Or generate SQL
+sql = query.to_sql()
+print(sql)
 ```
 
 ### Basic Aggregation
@@ -294,7 +305,7 @@ model_def = {
         'orders': {'type': 'table', 'table': 'orders'}
     },
     'dimensions': {
-        'region': {'sql': 'customers.region', 'type': 'string'}
+        'region': {'expression': 'customers.region', 'type': 'string'}
     },
     'measures': {
         'revenue': {'expression': 'SUM(orders.total_amount)', 'type': 'currency'}
@@ -303,7 +314,46 @@ model_def = {
 
 model = copper.SemanticModelLoader.load_from_dict(model_def)
 query = copper.Query(model).dimensions(['region']).measures(['revenue'])
+
+# Execute with Pandas
 result = query.to_pandas(data_source)
+
+# Generate SQL for any database
+sql = query.to_sql()
+print(sql)
+# Output:
+# SELECT
+#   customers.region AS region,
+#   SUM(orders.total_amount) AS revenue
+# FROM
+#   orders
+#   LEFT JOIN customers
+#     ON orders.customer_id = customers.id
+# GROUP BY
+#   customers.region
+```
+
+### SQL Generation Examples
+```python
+import src as copper
+
+# Load UFC model
+model = copper.load("examples/ufc/model.yaml")
+
+# Complex query with filters
+query = copper.Query(model) \
+    .dimensions(['weight_class', 'nationality']) \
+    .measures(['total_fights', 'finish_rate']) \
+    .filters(['event_year >= 2020', 'finish_method != "Decision"'])
+
+# Generate SQL for PostgreSQL
+sql = query.to_sql(dialect="postgresql")
+print(sql)
+
+# Use the SQL with any database connection
+import psycopg2
+conn = psycopg2.connect("postgresql://user:pass@host/db")
+result = pd.read_sql(sql, conn)
 ```
 
 ### Advanced Expressions
@@ -335,11 +385,13 @@ measures:
 - [x] Query builder API
 
 ### Phase 2: Multi-Engine Support 🚧
-- [ ] Spark execution engine
-- [ ] SQL generation (BigQuery, PostgreSQL)
+- [x] SQL generation (PostgreSQL dialect)
+- [ ] Additional SQL dialects (BigQuery, Snowflake, etc.)
 - [ ] Apache Beam streaming support
 
 ### Phase 3: Developer Experience 📋
+- [ ] YAML file includes for modular models
+- [ ] API and streaming data source support
 - [ ] Web-based modeling interface
 - [ ] Advanced validation and suggestions
 - [ ] Performance optimization

@@ -143,16 +143,3 @@ datasources:
         type: number
         description: Ground control time in seconds
 
-  # Example of external data integration
-  fighter_rankings:
-    type: api
-    endpoint: "https://api.ufc.com/rankings"
-    refresh_schedule: weekly
-    description: Current UFC fighter rankings by division
-    
-  # Example of streaming data for live events
-  live_fight_feed:
-    type: stream
-    source: kafka
-    topic: ufc_live_stats
-    description: Real-time fight statistics during live events

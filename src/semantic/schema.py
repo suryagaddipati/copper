@@ -22,17 +22,10 @@ class AggregationType(str, Enum):
 class Dimension(BaseModel):
     """Represents a dimension in the semantic model."""
     
-    sql: Optional[str] = None
-    expression: Optional[str] = None
+    expression: str  # Required: Copper expression
     type: DataType = DataType.STRING
     description: Optional[str] = None
     label: Optional[str] = None
-    
-    @validator('sql', 'expression')
-    def sql_or_expression_required(cls, v, values):
-        if not v and not values.get('sql') and not values.get('expression'):
-            raise ValueError('Either sql or expression must be provided')
-        return v
 
 
 class Measure(BaseModel):

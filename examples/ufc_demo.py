@@ -21,7 +21,7 @@ from examples.ufc.data_loader import UFCDataLoader
 def load_ufc_model():
     """Load UFC semantic model for analytics."""
     
-    # For now, create a simplified model since includes aren't implemented yet
+    # Create a simplified model for demo purposes
     model_def = {
         'name': 'ufc_analytics',
         'description': 'UFC/MMA analytics semantic model',

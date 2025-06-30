@@ -71,17 +71,11 @@ class Query:
     
     def to_sql(self, dialect: str = "standard") -> str:
         """Generate SQL for the query."""
-        from executors.sql_generator import SQLGenerator
+        from ..executors.sql_generator import SQLGenerator
         
         generator = SQLGenerator(self.semantic_model, dialect)
         return generator.generate(self)
     
-    def to_spark(self, spark_session=None):
-        """Execute the query using Spark backend."""
-        from executors.spark_executor import SparkExecutor
-        
-        executor = SparkExecutor(self.semantic_model, spark_session)
-        return executor.execute(self)
     
     def get_required_tables(self) -> List[str]:
         """Get list of tables required for this query."""

@@ -8,11 +8,14 @@ This is a complex multi-language project that implements a DAX-like expression l
 
 ## Current State
 
-⚠️ **Important**: The codebase was recently stripped down (commit `079fa45 remove everything`). The current branch `ui/barebones` contains only:
-- `prd.md` - Comprehensive project requirements document
-- `studio/.next/` - Next.js build artifacts from the previous web interface
-- `.claude/settings.local.json` - Claude configuration with extensive permissions
-- `.gitignore` - Multi-language ignore patterns
+✅ **Current Status**: The project has been rebuilt with a focused UFC analytics example implementation. The current branch `ui/barebones` contains:
+- Complete Python semantic layer implementation using src/ layout
+- ANTLR4 grammar for DAX-like expressions (`grammar/Copper.g4`)
+- Comprehensive UFC analytics example with real MMA data
+- YAML-based semantic modeling with Pydantic validation
+- Query builder API with Pandas execution engine
+- Full test suite and development utilities
+- Comprehensive schema reference documentation
 
 ## Historical Architecture (from git history)
 
@@ -68,9 +71,8 @@ The project previously had a rich multi-component architecture:
 
 ### Multi-Engine Execution
 - **Pandas**: Primary implementation with groupby, agg, join operations
-- **Spark**: Planned distributed processing support  
-- **SQL**: BigQuery dialect code generation
-- **Apache Beam**: Streaming analytics with windowing
+- **SQL Generation**: PostgreSQL dialect with support for additional dialects planned
+- **Apache Beam**: Streaming analytics with windowing (planned)
 
 ### Developer Experience
 - **Web Studio**: Visual interface for model development
@@ -80,28 +82,35 @@ The project previously had a rich multi-component architecture:
 
 ## Development Workflow
 
-### Build Commands (from historical Makefile)
+### Build Commands
 ```bash
-# Generate ANTLR parser
-make generate-parser
+# Install dependencies
+pip install -e .
 
-# Build web interface
-cd studio && npm run dev
-
-# Run API server
-cd api && python main.py
+# Generate ANTLR parser (requires Java)
+make parser
 
 # Run tests
-python -m pytest tests/
+pytest
 
-# Start full development environment
-./start.sh  # or ./start-manual.sh
+# Run UFC analytics demo
+python examples/ufc_demo.py
+
+# Format code
+make format
+
+# Type checking
+make typecheck
+
+# Clean generated files
+make clean
 ```
 
 ### Current Project Structure
 ```
 copper/
 ├── src/                       # Main Python package (source code)
+│   ├── __init__.py            # Package entry point
 │   ├── parser/                # ANTLR-based expression parser
 │   │   ├── antlr_parser.py    # Python parser implementation
 │   │   └── ast_nodes.py       # AST node definitions
@@ -118,55 +127,108 @@ copper/
 │   ├── test_semantic_model.py
 │   ├── test_query_builder.py
 │   └── test_pandas_executor.py
-├── examples/                  # Example models and demos
-│   ├── basic_demo.py          # Working demo script
-│   ├── ecommerce.copper       # Ecommerce semantic model
-│   └── saas_metrics.copper    # SaaS business metrics model
+├── examples/                  # UFC analytics demonstration
+│   ├── ufc/                   # UFC/MMA analytics with real data
+│   │   ├── data/              # Real UFC fight datasets (CSV)
+│   │   ├── datasources.yaml   # UFC data source definitions
+│   │   ├── model.yaml         # MMA analytics semantic model
+│   │   └── data_loader.py     # UFC data loading utilities
+│   └── ufc_demo.py            # UFC analytics demonstration script
 ├── setup.py                   # Python package configuration
 ├── requirements.txt           # Python dependencies
 ├── pytest.ini                # Test configuration
-└── Makefile                   # Build automation
+├── Makefile                   # Build automation
+├── README.md                  # Project documentation
+├── SCHEMA_REFERENCE.md        # Comprehensive schema documentation
+└── prd.md                     # Project requirements document
 ```
 
-## Use Cases & Examples
+## UFC Analytics Example
 
-### Basic Aggregation
+### UFC Data Model
 ```yaml
-measures:
-  revenue:
-    expression: SUM(Orders.total_amount)
-    type: number
+name: ufc_analytics
+description: UFC/MMA analytics semantic model
+
+datasources:
+  events:
+    type: table
+    table: ufc_events
+    description: UFC event information
+  fighters:
+    type: table
+    table: ufc_fighter_details
+    description: Fighter profiles
+  fight_results:
+    type: table
+    table: ufc_fight_results
+    description: Fight outcomes
+
+relationships:
+  - fight_results.event_id → events.event_id
+  - fight_results.fighter_1_id → fighters.fighter_id
+  - fight_results.fighter_2_id → fighters.fighter_id
 
 dimensions:
-  region:
-    sql: Customers.region
+  weight_class:
+    expression: fight_results.weight_class
     type: string
+    label: Weight Class
+    
+  nationality:
+    expression: fighters.nationality
+    type: string
+    label: Nationality
+
+measures:
+  total_fights:
+    expression: COUNT(fight_results.fight_id)
+    type: number
+    label: Total Fights
+    
+  finish_rate:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.method != "Decision") / COUNT(fight_results.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Finish Rate
 ```
 
+### Query Examples
 ```python
 import src as copper
-model = copper.load("model.yaml")
-query = copper.Query(model).dimensions(["region"]).measures(["revenue"])
-df = query.to_pandas()
+from examples.ufc.data_loader import UFCDataLoader
+
+# Load real UFC data
+loader = UFCDataLoader()
+ufc_data = loader.load_all_data()
+
+# Load semantic model
+model = copper.load("examples/ufc/model.yaml")
+
+# Analyze finish rates by weight class
+query = copper.Query(model) \
+    .dimensions(['weight_class']) \
+    .measures(['total_fights', 'finish_rate'])
+
+result = query.to_pandas(ufc_data)
+print(result)
 ```
 
-### Conditional Logic
+### Advanced UFC Analytics
 ```yaml
-measures:
-  is_premium:
-    expression: IF(Customers.tier = "Gold", 1, 0)
-    type: number
-```
+# Fighter performance metrics
+striking_accuracy:
+  expression: AVG(fight_details.significant_strikes_landed / fight_details.significant_strikes_attempted) * 100
+  type: number
+  format: "%.1f%%"
+  label: Striking Accuracy
 
-### Relationships & Joins
-```yaml
-relationships:
-  Orders.customer_id → Customers.id
-
-dimensions:
-  customer_region:
-    sql: Customers.region
-    type: string
+# Title fight analysis  
+title_fight_finish_rate:
+  expression: COUNT(fight_results.fight_id WHERE fight_results.is_title_fight = true AND fight_results.method != "Decision") / COUNT(fight_results.fight_id WHERE fight_results.is_title_fight = true) * 100
+  type: number
+  format: "%.1f%%"
+  label: Title Fight Finish Rate
 ```
 
 ## Development Environment Setup
@@ -178,9 +240,9 @@ dimensions:
 - **ANTLR 4.13.1** CLI tool
 
 ### Dependencies
-- **Python**: FastAPI, pandas, pytest, ANTLR4 runtime
-- **Node.js**: Next.js, React, Monaco Editor, Tailwind CSS
+- **Python**: pandas, pydantic, pytest, ANTLR4 runtime, PyYAML
 - **Java**: ANTLR complete JAR for parser generation
+- **Data**: Real UFC fight data in CSV format for demonstrations
 
 ## Testing Strategy
 
@@ -207,13 +269,17 @@ The project has extensive Claude permissions configured in `.claude/settings.loc
 - Python/npm package management
 - Playwright browser automation
 
-## Recovery Notes
+## Documentation
 
-To restore the project from the current bare state, you would need to:
-1. Check out the commit before "remove everything" (`8b56a55`)
-2. Restore the full directory structure
-3. Reinstall dependencies (Python packages, npm modules)
-4. Regenerate ANTLR parsers
-5. Rebuild the Next.js application
+- **SCHEMA_REFERENCE.md**: Comprehensive documentation of all Copper semantic modeling components
+- **README.md**: Quick start guide and project overview
+- **prd.md**: Complete project requirements and roadmap
+- **examples/ufc/**: Working UFC analytics demonstration with real MMA data
 
-The comprehensive `.gitignore` and build configurations suggest this was a mature, production-ready development environment before the recent reset.
+## Next Steps
+
+- Implement includes functionality for modular YAML files
+- Generate ANTLR parser from grammar (requires Java setup)
+- Add time-series analysis capabilities for fighter career progression
+- Implement multi-engine execution (Spark, SQL, Beam)
+- Create advanced MMA metrics like pound-for-pound rankings
