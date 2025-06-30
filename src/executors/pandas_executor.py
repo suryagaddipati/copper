@@ -360,16 +360,10 @@ class PandasExecutor:
         return result_df
     
     def _parse_sql_to_pandas(self, sql: str, df: pd.DataFrame, dataframes: Dict[str, pd.DataFrame]) -> str:
-        """Convert simple SQL expressions to Pandas expressions."""
-        # This is a very simplified SQL parser
-        # In practice, you'd want a more robust solution
-        
         if '.' in sql:
-            # Table.column reference
             parts = sql.split('.')
             table = parts[0]
             column = parts[1]
-            return f"df['{column}']"  # Assume column is already in joined df
+            return f"df['{column}']"
         else:
-            # Simple column reference
             return f"df['{sql}']"

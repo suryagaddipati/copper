@@ -1,4 +1,4 @@
-# Copper - Universal Semantic Layer
+# Copper: The Universal Semantic Layer
 
 ## Project Overview
 

@@ -11,20 +11,14 @@ from typing import Dict, Any
 
 
 class UFCDataLoader:
-    """Utility class for loading UFC data from CSV files."""
     
     def __init__(self, data_dir: str = None):
-        """Initialize the data loader.
-        
-        Args:
-            data_dir: Directory containing UFC CSV files. Defaults to current directory's data/ folder.
-        """
         if data_dir is None:
             data_dir = Path(__file__).parent / "data"
         self.data_dir = Path(data_dir)
     
     def load_events(self) -> pd.DataFrame:
-        """Load UFC events data."""
+
         events_file = self.data_dir / "ufc_events.csv"
         if not events_file.exists():
             raise FileNotFoundError(f"Events file not found: {events_file}")
@@ -34,7 +28,7 @@ class UFCDataLoader:
         return df
     
     def load_fighters(self) -> pd.DataFrame:
-        """Load UFC fighters data."""
+
         fighters_file = self.data_dir / "ufc_fighter_details.csv"
         if not fighters_file.exists():
             raise FileNotFoundError(f"Fighters file not found: {fighters_file}")
@@ -42,13 +36,13 @@ class UFCDataLoader:
         df = pd.read_csv(fighters_file)
         df['date_of_birth'] = pd.to_datetime(df['date_of_birth'])
         
-        # Calculate age
+
         df['age'] = (pd.Timestamp.now() - df['date_of_birth']).dt.days / 365.25
         
         return df
     
     def load_fight_results(self) -> pd.DataFrame:
-        """Load UFC fight results data."""
+
         results_file = self.data_dir / "ufc_fight_results.csv"
         if not results_file.exists():
             raise FileNotFoundError(f"Fight results file not found: {results_file}")
@@ -58,31 +52,26 @@ class UFCDataLoader:
         return df
     
     def load_fight_details(self) -> pd.DataFrame:
-        """Load UFC fight details/statistics data."""
+
         details_file = self.data_dir / "ufc_fight_details.csv"
         if not details_file.exists():
             raise FileNotFoundError(f"Fight details file not found: {details_file}")
         
         df = pd.read_csv(details_file)
         
-        # Calculate derived statistics
+
         df['striking_accuracy'] = (df['significant_strikes_landed'] / 
                                   df['significant_strikes_attempted']) * 100
         df['takedown_accuracy'] = (df['takedowns_landed'] / 
                                   df['takedowns_attempted']) * 100
         
-        # Handle division by zero
+
         df['striking_accuracy'] = df['striking_accuracy'].fillna(0)
         df['takedown_accuracy'] = df['takedown_accuracy'].fillna(0)
         
         return df
     
     def load_all_data(self) -> Dict[str, pd.DataFrame]:
-        """Load all UFC data into a dictionary of DataFrames.
-        
-        Returns:
-            Dictionary mapping table names to DataFrames, suitable for Copper queries.
-        """
         return {
             'events': self.load_events(),
             'fighters': self.load_fighters(), 
@@ -91,14 +80,6 @@ class UFCDataLoader:
         }
     
     def get_fighter_stats(self, fighter_name: str) -> Dict[str, Any]:
-        """Get comprehensive statistics for a specific fighter.
-        
-        Args:
-            fighter_name: Name of the fighter to analyze
-            
-        Returns:
-            Dictionary containing fighter statistics
-        """
         data = self.load_all_data()
         
         # Find fighter
@@ -144,14 +125,6 @@ class UFCDataLoader:
         }
     
     def get_event_summary(self, event_name: str) -> Dict[str, Any]:
-        """Get summary statistics for a specific event.
-        
-        Args:
-            event_name: Name of the event to analyze
-            
-        Returns:
-            Dictionary containing event statistics
-        """
         data = self.load_all_data()
         
         # Find event

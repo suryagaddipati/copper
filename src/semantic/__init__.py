@@ -1,1 +1,0 @@
-# Semantic modeling components

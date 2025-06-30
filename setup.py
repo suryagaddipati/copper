@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="copper",
     version="0.1.0",
-    description="Universal Semantic Layer - Define Once. Run Anywhere.",
+    description="Copper: The Universal Semantic Layer - Define Once. Run Anywhere.",
     packages=find_packages("src"),
     package_dir={"": "src"},
     python_requires=">=3.8",
@@ -20,7 +20,7 @@ setup(
             "black>=21.0",
             "mypy>=0.910",
         ],
-        "spark": ["pyspark>=3.0.0"],
+        "sql": ["sqlalchemy>=1.4.0"],
         "beam": ["apache-beam>=2.0.0"],
     },
     entry_points={

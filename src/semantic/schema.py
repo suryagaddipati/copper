@@ -74,6 +74,49 @@ class DataSource(BaseModel):
         return v
 
 
+class Connection(BaseModel):
+    """Represents a data connection with authentication and configuration."""
+    
+    name: str
+    type: str  # postgresql, mysql, api, file, etc.
+    host: Optional[str] = None
+    port: Optional[int] = None
+    database: Optional[str] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
+    connection_string: Optional[str] = None
+    api_endpoint: Optional[str] = None
+    api_key: Optional[str] = None
+    file_path: Optional[str] = None
+    options: Optional[Dict[str, Any]] = {}
+    description: Optional[str] = None
+
+
+class Table(BaseModel):
+    """Represents a logical table with schema information."""
+    
+    name: str
+    connection: str  # Reference to connection name
+    source: str  # Table name, view name, or query
+    type: str = "table"  # table, view, query, api_endpoint
+    schema: Optional[str] = None
+    columns: Optional[List[Dict[str, Any]]] = None
+    description: Optional[str] = None
+    refresh_schedule: Optional[str] = None
+
+
+class Model(BaseModel):
+    """Represents a semantic model with business logic."""
+    
+    name: str
+    description: Optional[str] = None
+    tables: List[str] = []  # References to table names
+    models: List[str] = []  # References to other model names
+    dimensions: Dict[str, Dimension] = {}
+    measures: Dict[str, Measure] = {}
+    relationships: List[Relationship] = []
+
+
 class SemanticModel(BaseModel):
     """Complete semantic model definition."""
     
@@ -84,7 +127,6 @@ class SemanticModel(BaseModel):
     dimensions: Dict[str, Dimension] = {}
     measures: Dict[str, Measure] = {}
     relationships: List[Relationship] = []
-    includes: Optional[List[str]] = None  # For file includes
     
     def get_dimension(self, name: str) -> Optional[Dimension]:
         """Get a dimension by name."""

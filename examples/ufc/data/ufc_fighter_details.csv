@@ -14,3 +14,88 @@ fighter_id,fighter_name,nickname,height_cm,weight_lbs,reach_cm,stance,date_of_bi
 13,Jorge Masvidal,Gamebred,180,170,188,Orthodox,1984-11-12,USA,Welterweight
 14,Nate Diaz,,183,170,193,Orthodox,1985-04-16,USA,Welterweight
 15,Daniel Cormier,DC,180,265,185,Orthodox,1979-03-20,USA,Heavyweight
+16,Stipe Miocic,,193,240,203,Orthodox,1982-08-19,USA,Heavyweight
+17,Francis Ngannou,The Predator,193,263,211,Orthodox,1986-09-05,Cameroon,Heavyweight
+18,Israel Adesanya,The Last Stylebender,193,185,203,Orthodox,1989-07-22,Nigeria,Middleweight
+19,Robert Whittaker,The Reaper,183,185,188,Orthodox,1991-12-20,Australia,Middleweight
+20,Kamaru Usman,The Nigerian Nightmare,183,170,193,Orthodox,1987-05-11,Nigeria,Welterweight
+21,Colby Covington,Chaos,180,170,183,Orthodox,1988-02-22,USA,Welterweight
+22,Gilbert Burns,Durinho,175,170,180,Orthodox,1986-07-20,Brazil,Welterweight
+23,Stephen Thompson,Wonderboy,188,170,193,Southpaw,1983-02-11,USA,Welterweight
+24,Max Holloway,Blessed,180,145,175,Orthodox,1991-12-04,USA,Featherweight
+25,Brian Ortega,T-City,180,145,175,Orthodox,1991-02-21,USA,Featherweight
+26,Yair Rodriguez,El Pantera,180,145,178,Southpaw,1992-10-06,Mexico,Featherweight
+27,Calvin Kattar,The Boston Finisher,175,145,178,Orthodox,1988-03-26,USA,Featherweight
+28,Jose Aldo,Junior,170,145,173,Orthodox,1986-09-09,Brazil,Featherweight
+29,Frankie Edgar,The Answer,168,145,170,Orthodox,1981-10-16,USA,Featherweight
+30,Charles Oliveira,Do Bronx,178,155,188,Orthodox,1989-10-17,Brazil,Lightweight
+31,Dustin Poirier,The Diamond,175,155,183,Orthodox,1989-01-19,USA,Lightweight
+32,Justin Gaethje,The Highlight,180,155,183,Orthodox,1988-11-14,USA,Lightweight
+33,Tony Ferguson,El Cucuy,180,155,188,Orthodox,1984-02-12,USA,Lightweight
+34,Rafael dos Anjos,RDA,175,155,178,Orthodox,1984-10-26,Brazil,Lightweight
+35,Michael Chandler,Iron,170,155,180,Orthodox,1986-04-24,USA,Lightweight
+36,Beneil Dariush,,180,155,188,Orthodox,1989-05-06,USA,Lightweight
+37,Dan Hooker,The Hangman,183,155,193,Orthodox,1990-02-13,New Zealand,Lightweight
+38,Paul Felder,The Irish Dragon,180,155,188,Orthodox,1985-04-25,USA,Lightweight
+39,Diego Sanchez,The Nightmare,175,155,178,Orthodox,1981-12-31,USA,Lightweight
+40,Jim Miller,A-10,175,155,178,Orthodox,1983-08-30,USA,Lightweight
+41,Aljamain Sterling,Funk Master,170,135,183,Orthodox,1989-07-31,USA,Bantamweight
+42,Petr Yan,No Mercy,170,135,170,Southpaw,1993-02-11,Russia,Bantamweight
+43,Cory Sandhagen,The Sandman,180,135,183,Orthodox,1992-04-20,USA,Bantamweight
+44,Rob Font,,175,135,183,Orthodox,1987-06-25,USA,Bantamweight
+45,Jose Aldo,Junior,170,135,173,Orthodox,1986-09-09,Brazil,Bantamweight
+46,Marlon Vera,Chito,175,135,178,Orthodox,1992-12-02,Ecuador,Bantamweight
+47,Pedro Munhoz,,168,135,173,Orthodox,1986-09-07,Brazil,Bantamweight
+48,Dominick Cruz,The Dominator,173,135,173,Switch,1985-03-09,USA,Bantamweight
+49,Urijah Faber,The California Kid,170,135,173,Orthodox,1979-05-14,USA,Bantamweight
+50,TJ Dillashaw,,168,135,173,Switch,1986-02-07,USA,Bantamweight
+51,Henry Cejudo,Triple C,163,125,160,Orthodox,1987-02-04,USA,Flyweight
+52,Deiveson Figueiredo,Deus da Guerra,168,125,170,Orthodox,1987-12-18,Brazil,Flyweight
+53,Brandon Moreno,The Assassin Baby,170,125,178,Orthodox,1993-12-07,Mexico,Flyweight
+54,Kai Kara-France,,168,125,173,Orthodox,1993-03-26,New Zealand,Flyweight
+55,Askar Askarov,,168,125,173,Orthodox,1992-10-24,Russia,Flyweight
+56,Alex Perez,,168,125,170,Orthodox,1992-03-21,USA,Flyweight
+57,Joseph Benavidez,,165,125,168,Orthodox,1984-07-31,USA,Flyweight
+58,Jussier Formiga,,163,125,160,Orthodox,1985-01-31,Brazil,Flyweight
+59,Matt Schnell,Danger,168,125,170,Orthodox,1990-01-15,USA,Flyweight
+60,Tim Elliott,,168,125,168,Orthodox,1987-02-24,USA,Flyweight
+61,Amanda Nunes,The Lioness,173,135,175,Orthodox,1988-05-30,Brazil,Women's Bantamweight
+62,Julianna Pena,The Venezuelan Vixen,170,135,173,Orthodox,1989-08-19,Venezuela,Women's Bantamweight
+63,Holly Holm,The Preacher's Daughter,175,135,178,Southpaw,1981-10-17,USA,Women's Bantamweight
+64,Miesha Tate,Cupcake,168,135,170,Orthodox,1986-08-18,USA,Women's Bantamweight
+65,Germaine de Randamie,The Iron Lady,175,135,178,Orthodox,1984-04-24,Netherlands,Women's Bantamweight
+66,Ronda Rousey,Rowdy,168,135,168,Orthodox,1987-02-01,USA,Women's Bantamweight
+67,Cat Zingano,Alpha,170,135,175,Orthodox,1982-07-01,USA,Women's Bantamweight
+68,Sara McMann,The Muscle Shark,173,135,175,Orthodox,1980-09-24,USA,Women's Bantamweight
+69,Alexis Davis,,168,135,170,Orthodox,1984-09-21,Canada,Women's Bantamweight
+70,Liz Carmouche,Girl-Rilla,165,135,168,Orthodox,1984-12-19,USA,Women's Bantamweight
+71,Rose Namajunas,Thug,165,115,160,Orthodox,1992-06-29,USA,Women's Strawweight
+72,Carla Esparza,Cookie Monster,155,115,155,Orthodox,1987-10-10,USA,Women's Strawweight
+73,Joanna Jedrzejczyk,Joanna Champion,165,115,165,Orthodox,1987-08-18,Poland,Women's Strawweight
+74,Jessica Andrade,Bate Estaca,155,115,155,Orthodox,1991-09-25,Brazil,Women's Strawweight
+75,Nina Ansaroff,,168,115,168,Orthodox,1986-07-19,USA,Women's Strawweight
+76,Claudia Gadelha,,163,115,163,Orthodox,1988-12-07,Brazil,Women's Strawweight
+77,Karolina Kowalkiewicz,,168,115,168,Orthodox,1985-10-15,Poland,Women's Strawweight
+78,Michelle Waterson,The Karate Hottie,163,115,160,Orthodox,1986-01-06,USA,Women's Strawweight
+79,Tecia Torres,The Tiny Tornado,155,115,155,Orthodox,1989-08-16,USA,Women's Strawweight
+80,Paige VanZant,12 Gauge,163,115,160,Orthodox,1994-03-26,USA,Women's Strawweight
+81,Valentina Shevchenko,Bullet,165,125,163,Southpaw,1988-03-07,Kyrgyzstan,Women's Flyweight
+82,Katlyn Chookagian,Blonde Fighter,175,125,175,Orthodox,1988-12-28,USA,Women's Flyweight
+83,Jennifer Maia,,163,125,163,Orthodox,1988-10-21,Brazil,Women's Flyweight
+84,Jessica Eye,Evil,170,125,168,Orthodox,1986-07-27,USA,Women's Flyweight
+85,Roxanne Modafferi,The Happy Warrior,168,125,165,Orthodox,1982-09-24,USA,Women's Flyweight
+86,Viviane Araujo,,160,125,160,Orthodox,1985-06-13,Brazil,Women's Flyweight
+87,Lauren Murphy,Lucky,163,125,163,Orthodox,1983-07-04,USA,Women's Flyweight
+88,Cynthia Calvillo,,163,125,160,Orthodox,1987-07-13,USA,Women's Flyweight
+89,Maycee Barber,The Future,163,125,163,Orthodox,1998-05-18,USA,Women's Flyweight
+90,Joanne Calderwood,JoJo,165,125,165,Orthodox,1986-12-23,Scotland,Women's Flyweight
+91,Jiri Prochazka,Denisa,193,205,203,Orthodox,1992-07-14,Czech Republic,Light Heavyweight
+92,Glover Teixeira,,185,205,193,Orthodox,1979-10-28,Brazil,Light Heavyweight
+93,Jan Blachowicz,,188,205,198,Orthodox,1983-02-24,Poland,Light Heavyweight
+94,Magomed Ankalaev,,188,205,193,Orthodox,1992-06-02,Russia,Light Heavyweight
+95,Anthony Smith,Lionheart,193,205,203,Orthodox,1988-07-26,USA,Light Heavyweight
+96,Thiago Santos,Marreta,188,205,193,Orthodox,1984-01-07,Brazil,Light Heavyweight
+97,Johnny Walker,,196,205,206,Orthodox,1992-03-30,Brazil,Light Heavyweight
+98,Dominick Reyes,,193,205,196,Orthodox,1989-12-26,USA,Light Heavyweight
+99,Corey Anderson,Overtime,193,205,203,Orthodox,1989-09-22,USA,Light Heavyweight
+100,Volkan Oezdemir,No Time,188,205,193,Orthodox,1989-07-19,Switzerland,Light Heavyweight

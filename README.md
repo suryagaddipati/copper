@@ -1,4 +1,4 @@
-# Copper - Universal Semantic Layer ☄️
+# Copper: The Universal Semantic Layer ☄️
 
 **Define Once. Run Anywhere.**
 
@@ -419,4 +419,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Copper** - Making data semantics portable across the modern data stack.
+**Copper: The Universal Semantic Layer** - Making data semantics portable across the modern data stack.

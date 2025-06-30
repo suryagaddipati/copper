@@ -14,3 +14,188 @@ fight_id,event_id,fighter_1_id,fighter_2_id,winner_id,method,round,time,weight_c
 13,7,2,3,2,Decision,5,5:00,Lightweight,true
 14,7,14,12,12,Submission,2,3:51,Lightweight,false
 15,8,5,6,5,Decision,5,5:00,Middleweight,true
+16,8,18,19,18,KO/TKO,5,1:03,Middleweight,false
+17,9,7,41,7,KO/TKO,1,2:37,Bantamweight,true
+18,9,11,31,31,KO/TKO,1,4:20,Lightweight,false
+19,10,31,32,32,KO/TKO,1,2:30,Lightweight,true
+20,10,20,21,21,KO/TKO,2,3:17,Welterweight,false
+21,11,3,25,3,Submission,4,3:04,Featherweight,true
+22,11,19,30,30,Submission,1,1:32,Middleweight,false
+23,12,61,62,62,Submission,2,4:19,Women's Bantamweight,true
+24,12,71,72,72,Submission,2,3:31,Women's Strawweight,false
+25,13,41,52,41,Decision,5,5:00,Bantamweight,true
+26,13,33,38,33,Submission,1,2:25,Lightweight,false
+27,14,6,18,6,KO/TKO,1,4:17,Light Heavyweight,true
+28,14,31,11,31,Submission,2,2:32,Lightweight,false
+29,15,4,20,4,Decision,5,5:00,Welterweight,true
+30,15,24,28,24,Decision,3,5:00,Featherweight,false
+31,16,1,17,1,Submission,1,2:04,Heavyweight,true
+32,16,30,34,30,Submission,1,4:32,Lightweight,false
+33,17,2,3,2,Decision,5,5:00,Lightweight,true
+34,17,19,22,19,KO/TKO,2,1:17,Middleweight,false
+35,18,92,93,92,Submission,1,1:49,Light Heavyweight,true
+36,18,73,74,74,KO/TKO,1,2:58,Women's Strawweight,false
+37,19,93,94,94,Decision,5,5:00,Light Heavyweight,true
+38,19,95,96,95,KO/TKO,1,0:53,Light Heavyweight,false
+39,20,18,6,6,KO/TKO,5,1:03,Middleweight,true
+40,20,31,11,31,Submission,2,2:32,Lightweight,false
+41,21,2,30,2,Submission,2,3:34,Lightweight,true
+42,21,20,13,20,Decision,5,5:00,Welterweight,false
+43,22,14,33,14,Decision,3,5:00,Welterweight,true
+44,22,36,37,36,Decision,3,5:00,Lightweight,false
+45,23,20,4,4,KO/TKO,5,0:56,Welterweight,true
+46,23,31,11,31,KO/TKO,1,2:17,Lightweight,false
+47,24,62,61,61,KO/TKO,5,1:13,Women's Bantamweight,true
+48,24,72,71,71,Submission,2,4:20,Women's Strawweight,false
+49,25,18,35,18,KO/TKO,2,2:01,Middleweight,true
+50,25,3,24,3,Decision,5,5:00,Featherweight,false
+51,26,92,91,91,Submission,2,0:28,Light Heavyweight,true
+52,26,10,71,10,Submission,2,3:18,Women's Strawweight,false
+53,27,30,32,30,Submission,1,1:38,Lightweight,true
+54,27,31,11,31,Decision,5,5:00,Lightweight,false
+55,28,3,26,3,Submission,3,3:25,Featherweight,true
+56,28,19,18,19,Decision,5,5:00,Middleweight,false
+57,29,21,13,21,KO/TKO,3,1:02,Welterweight,true
+58,29,24,29,24,KO/TKO,1,3:35,Featherweight,false
+59,30,18,19,18,Decision,5,5:00,Middleweight,true
+60,30,4,20,4,KO/TKO,1,1:18,Welterweight,false
+61,31,17,15,17,KO/TKO,2,4:45,Heavyweight,true
+62,31,52,51,52,Decision,5,5:00,Flyweight,false
+63,32,30,31,30,Submission,3,2:43,Lightweight,true
+64,32,18,19,18,KO/TKO,1,2:41,Middleweight,false
+65,33,20,21,20,Decision,5,5:00,Welterweight,true
+66,33,71,72,71,Decision,5,5:00,Women's Strawweight,false
+67,34,93,92,92,Submission,2,0:28,Light Heavyweight,true
+68,34,2,30,2,Decision,5,5:00,Lightweight,false
+69,35,3,25,3,Decision,5,5:00,Featherweight,true
+70,35,16,32,16,KO/TKO,1,2:06,Heavyweight,false
+71,36,16,17,17,KO/TKO,1,0:26,Heavyweight,true
+72,36,31,11,31,Decision,5,5:00,Lightweight,false
+73,37,31,11,11,KO/TKO,1,1:20,Lightweight,true
+74,37,16,15,16,KO/TKO,1,4:20,Heavyweight,false
+75,38,18,19,18,Decision,5,5:00,Middleweight,true
+76,38,71,72,71,Submission,1,2:58,Women's Strawweight,false
+77,39,30,35,30,Submission,3,4:28,Lightweight,true
+78,39,16,15,16,Decision,5,5:00,Heavyweight,false
+79,40,20,13,20,KO/TKO,1,0:50,Welterweight,true
+80,40,71,72,71,Decision,5,5:00,Women's Strawweight,false
+81,41,16,17,17,KO/TKO,2,0:52,Heavyweight,true
+82,41,30,31,30,Decision,5,5:00,Lightweight,false
+83,42,93,18,93,Submission,2,3:08,Light Heavyweight,true
+84,42,71,72,71,KO/TKO,1,1:08,Women's Strawweight,false
+85,43,20,22,20,KO/TKO,3,0:34,Welterweight,true
+86,43,31,11,31,Decision,5,5:00,Lightweight,false
+87,44,31,11,31,KO/TKO,2,2:32,Lightweight,true
+88,44,18,19,18,Decision,5,5:00,Middleweight,false
+89,45,52,53,52,Decision,5,5:00,Flyweight,true
+90,45,61,62,61,KO/TKO,1,3:51,Women's Bantamweight,false
+91,46,52,56,52,Submission,1,1:57,Flyweight,true
+92,46,31,33,31,KO/TKO,2,2:50,Lightweight,false
+93,47,12,32,12,Submission,2,1:34,Lightweight,true
+94,47,18,19,18,Decision,5,5:00,Middleweight,false
+95,48,18,19,18,KO/TKO,2,3:59,Middleweight,true
+96,48,31,11,31,Decision,5,5:00,Lightweight,false
+97,49,16,15,16,Decision,5,5:00,Heavyweight,true
+98,49,18,19,18,Decision,5,5:00,Middleweight,false
+99,50,20,13,20,Decision,5,5:00,Welterweight,true
+100,50,61,62,61,KO/TKO,1,2:20,Women's Bantamweight,false
+101,51,61,73,61,KO/TKO,1,0:51,Women's Bantamweight,true
+102,51,18,19,18,Decision,5,5:00,Middleweight,false
+103,52,33,32,32,Submission,5,3:49,Lightweight,true
+104,52,16,15,16,Decision,5,5:00,Heavyweight,false
+105,53,18,19,18,Decision,5,5:00,Middleweight,true
+106,53,31,11,31,KO/TKO,1,1:40,Lightweight,false
+107,54,15,1,1,Submission,2,1:26,Heavyweight,true
+108,54,20,13,20,Decision,5,5:00,Welterweight,false
+109,55,11,73,11,KO/TKO,1,0:40,Lightweight,true
+110,55,20,21,20,Decision,5,5:00,Welterweight,false
+111,56,20,21,20,Decision,5,5:00,Welterweight,true
+112,56,24,29,24,Decision,3,5:00,Featherweight,false
+113,57,13,14,13,Decision,3,5:00,Welterweight,true
+114,57,71,72,71,Submission,2,4:05,Women's Strawweight,false
+115,58,19,18,18,KO/TKO,2,2:04,Middleweight,true
+116,58,30,31,30,Decision,3,5:00,Lightweight,false
+117,59,12,31,12,Submission,3,2:06,Lightweight,true
+118,59,18,19,18,Decision,5,5:00,Middleweight,false
+119,60,15,16,16,KO/TKO,4,4:36,Heavyweight,true
+120,60,24,29,24,Decision,3,5:00,Featherweight,false
+121,61,24,29,24,Decision,3,5:00,Featherweight,true
+122,61,18,19,18,Decision,5,5:00,Middleweight,false
+123,62,1,96,1,Decision,5,5:00,Light Heavyweight,true
+124,62,30,31,30,KO/TKO,1,2:17,Lightweight,false
+125,63,51,43,51,KO/TKO,1,0:32,Bantamweight,true
+126,63,18,19,18,Decision,5,5:00,Middleweight,false
+127,64,71,74,74,Submission,1,2:07,Women's Strawweight,true
+128,64,30,31,30,Decision,3,5:00,Lightweight,false
+129,65,24,31,24,Decision,5,5:00,Featherweight,true
+130,65,95,96,95,Decision,3,5:00,Light Heavyweight,false
+131,66,1,96,1,KO/TKO,1,2:51,Light Heavyweight,true
+132,66,18,19,18,Decision,5,5:00,Middleweight,false
+133,67,18,28,18,KO/TKO,2,4:32,Middleweight,true
+134,67,30,31,30,Decision,3,5:00,Lightweight,false
+135,68,50,51,51,Submission,1,0:32,Bantamweight,true
+136,68,12,35,12,Submission,3,2:47,Lightweight,false
+137,69,1,15,1,KO/TKO,2,4:51,Heavyweight,true
+138,69,24,25,24,Decision,5,5:00,Featherweight,false
+139,70,15,16,15,KO/TKO,1,4:20,Heavyweight,true
+140,70,18,19,18,Decision,5,5:00,Middleweight,false
+141,71,15,16,15,Decision,5,5:00,Heavyweight,true
+142,71,18,19,18,Decision,5,5:00,Middleweight,false
+143,72,12,11,12,Submission,4,3:03,Lightweight,true
+144,72,20,23,20,Decision,5,5:00,Welterweight,false
+145,73,20,23,20,Decision,5,5:00,Welterweight,true
+146,73,50,27,50,KO/TKO,1,2:38,Bantamweight,false
+147,74,16,15,16,Decision,5,5:00,Heavyweight,true
+148,74,61,62,61,KO/TKO,1,4:29,Women's Bantamweight,false
+149,75,18,35,18,KO/TKO,1,2:59,Middleweight,true
+150,75,19,84,19,Decision,5,5:00,Middleweight,false
+151,76,19,84,19,Decision,5,5:00,Middleweight,true
+152,76,24,25,24,Decision,3,5:00,Featherweight,false
+153,77,61,62,61,Submission,2,3:16,Women's Bantamweight,true
+154,77,71,72,71,Decision,5,5:00,Women's Strawweight,false
+155,78,12,35,12,Submission,2,3:25,Lightweight,true
+156,78,18,19,18,Decision,5,5:00,Middleweight,false
+157,79,73,74,73,Submission,1,4:23,Women's Bantamweight,true
+158,79,20,23,20,Decision,3,5:00,Welterweight,false
+159,80,84,19,19,Decision,5,5:00,Middleweight,true
+160,80,30,31,30,KO/TKO,1,1:36,Lightweight,false
+161,81,16,17,16,Decision,5,5:00,Heavyweight,true
+162,81,18,19,18,Decision,5,5:00,Middleweight,false
+163,82,73,63,73,Decision,5,5:00,Women's Bantamweight,true
+164,82,71,72,71,KO/TKO,1,1:55,Women's Strawweight,false
+165,83,24,28,24,KO/TKO,3,4:51,Featherweight,true
+166,83,15,16,15,Decision,3,5:00,Heavyweight,false
+167,84,19,28,19,Decision,5,5:00,Middleweight,true
+168,84,71,72,71,Decision,5,5:00,Women's Strawweight,false
+169,85,33,38,33,KO/TKO,2,3:17,Lightweight,true
+170,85,18,19,18,Decision,5,5:00,Middleweight,false
+171,86,61,81,61,Decision,5,5:00,Women's Bantamweight,true
+172,86,30,31,30,Decision,3,5:00,Lightweight,false
+173,87,15,1,1,Submission,2,4:20,Light Heavyweight,true
+174,87,18,19,18,Decision,5,5:00,Middleweight,false
+175,88,84,19,19,KO/TKO,1,1:17,Middleweight,true
+176,88,30,31,30,Decision,3,5:00,Lightweight,false
+177,89,28,24,24,Submission,3,4:18,Featherweight,true
+178,89,16,15,16,Decision,5,5:00,Heavyweight,false
+179,90,16,34,16,KO/TKO,1,2:25,Heavyweight,true
+180,90,84,19,19,Decision,5,5:00,Middleweight,false
+181,91,15,35,15,KO/TKO,1,4:43,Light Heavyweight,true
+182,91,18,19,18,Decision,5,5:00,Middleweight,false
+183,92,20,23,20,Decision,5,5:00,Welterweight,true
+184,92,71,72,71,Decision,3,5:00,Women's Strawweight,false
+185,93,63,75,63,Decision,5,5:00,Women's Bantamweight,true
+186,93,30,31,30,KO/TKO,1,1:05,Lightweight,false
+187,94,61,66,61,Submission,1,0:48,Women's Bantamweight,true
+188,94,24,28,24,Decision,3,5:00,Featherweight,false
+189,95,24,28,24,Decision,5,5:00,Featherweight,true
+190,95,71,72,71,Submission,2,2:47,Women's Strawweight,false
+191,96,11,4,11,KO/TKO,2,4:02,Lightweight,true
+192,96,19,18,19,Decision,5,5:00,Middleweight,false
+193,97,19,63,19,Decision,5,5:00,Middleweight,true
+194,97,30,31,30,Decision,3,5:00,Lightweight,false
+195,98,16,17,16,KO/TKO,1,4:27,Heavyweight,true
+196,98,18,19,18,Decision,5,5:00,Middleweight,false
+197,99,14,11,14,Decision,5,5:00,Welterweight,true
+198,99,20,23,20,Decision,3,5:00,Welterweight,false
+199,100,20,23,20,Decision,5,5:00,Welterweight,true
+200,100,71,72,71,KO/TKO,1,2:26,Women's Strawweight,false

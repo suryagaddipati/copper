@@ -1,4 +1,4 @@
-# Copper Schema Reference
+# Copper: The Universal Semantic Layer - Schema Reference
 
 ## Overview
 
