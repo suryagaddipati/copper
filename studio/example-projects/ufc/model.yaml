@@ -1,0 +1,297 @@
+name: ufc_analytics
+description: UFC/MMA analytics semantic model for fight sports analysis
+
+# Data source definitions
+datasources:
+  events:
+    type: table
+    table: ufc_events
+    database: ufc_analytics
+    schema: core
+    description: UFC event information including dates, venues, and locations
+
+  fighters:
+    type: table
+    table: ufc_fighter_details
+    database: ufc_analytics
+    schema: core
+    description: Comprehensive fighter profiles and physical attributes
+
+  fight_results:
+    type: table
+    table: ufc_fight_results
+    database: ufc_analytics
+    schema: core
+    description: Fight outcomes and basic match information
+
+  fight_details:
+    type: table
+    table: ufc_fight_details
+    database: ufc_analytics
+    schema: core
+    description: Detailed fight statistics and performance metrics
+
+# Relationships between data sources
+relationships:
+  - fight_results.event_id → events.event_id
+  - fight_results.fighter_1_id → fighters.fighter_id
+  - fight_results.fighter_2_id → fighters.fighter_id
+  - fight_results.winner_id → fighters.fighter_id
+  - fight_details.fight_id → fight_results.fight_id
+  - fight_details.fighter_id → fighters.fighter_id
+
+# Dimensions for UFC analytics
+dimensions:
+  # Fighter dimensions
+  fighter_name:
+    expression: fighters.fighter_name
+    type: string
+    label: Fighter Name
+    description: Full name of the fighter
+
+  fighter_nickname:
+    expression: fighters.nickname
+    type: string
+    label: Fighter Nickname
+    description: Fighter's nickname or alias
+
+  nationality:
+    expression: fighters.nationality
+    type: string
+    label: Nationality
+    description: Fighter's country of origin
+
+  weight_class:
+    expression: fight_results.weight_class
+    type: string
+    label: Weight Class
+    description: Fighting weight division
+
+  stance:
+    expression: fighters.stance
+    type: string
+    label: Fighting Stance
+    description: Orthodox, Southpaw, or Switch stance
+
+  # Event dimensions
+  event_name:
+    expression: events.event_name
+    type: string
+    label: Event Name
+    description: Official UFC event name
+
+  event_location:
+    expression: events.location
+    type: string
+    label: Event Location
+    description: City and country where event took place
+
+  venue:
+    expression: events.venue
+    type: string
+    label: Venue
+    description: Arena or venue name
+
+  # Time dimensions
+  event_year:
+    expression: YEAR(events.event_date)
+    type: number
+    label: Event Year
+    description: Year when event occurred
+
+  event_month:
+    expression: MONTH(events.event_date)
+    type: number
+    label: Event Month
+    description: Month when event occurred
+
+  # Fight outcome dimensions
+  finish_method:
+    expression: fight_results.method
+    type: string
+    label: Finish Method
+    description: How the fight ended (Decision, KO/TKO, Submission)
+
+  fight_round:
+    expression: fight_results.round
+    type: number
+    label: Round
+    description: Round in which fight ended
+
+  title_fight_status:
+    expression: CASE
+      WHEN fight_results.is_title_fight = true THEN "Title Fight"
+      ELSE "Non-Title Fight"
+    type: string
+    label: Title Fight Status
+    description: Whether fight was for a championship
+
+  # Physical attribute dimensions
+  height_category:
+    expression: CASE
+      WHEN fighters.height_cm < 170 THEN "Short"
+      WHEN fighters.height_cm < 185 THEN "Average"
+      ELSE "Tall"
+    type: string
+    label: Height Category
+    description: Fighter height categorization
+
+  reach_advantage:
+    expression: CASE
+      WHEN fighters.reach_cm > fighters.height_cm + 5 THEN "Long Reach"
+      WHEN fighters.reach_cm < fighters.height_cm - 5 THEN "Short Reach"
+      ELSE "Average Reach"
+    type: string
+    label: Reach Category
+    description: Reach relative to height
+
+# Measures for UFC analytics
+measures:
+  # Fight count measures
+  total_fights:
+    expression: COUNT(fight_results.fight_id)
+    type: number
+    label: Total Fights
+    description: Number of fights
+
+  title_fights:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.is_title_fight = true)
+    type: number
+    label: Title Fights
+    description: Number of championship fights
+
+  # Win/loss measures
+  total_wins:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.winner_id = fighters.fighter_id)
+    type: number
+    label: Total Wins
+    description: Number of victories
+
+  knockout_wins:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.winner_id = fighters.fighter_id AND fight_results.method = "KO/TKO")
+    type: number
+    label: Knockout Wins
+    description: Wins by knockout or technical knockout
+
+  submission_wins:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.winner_id = fighters.fighter_id AND fight_results.method = "Submission")
+    type: number
+    label: Submission Wins
+    description: Wins by submission
+
+  decision_wins:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.winner_id = fighters.fighter_id AND fight_results.method = "Decision")
+    type: number
+    label: Decision Wins
+    description: Wins by judges' decision
+
+  # Performance percentages
+  win_rate:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.winner_id = fighters.fighter_id) / COUNT(fight_results.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Win Rate
+    description: Percentage of fights won
+
+  finish_rate:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.winner_id = fighters.fighter_id AND fight_results.method != "Decision") / COUNT(fight_results.fight_id WHERE fight_results.winner_id = fighters.fighter_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Finish Rate
+    description: Percentage of wins that were finishes (non-decisions)
+
+  knockout_percentage:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.method = "KO/TKO") / COUNT(fight_results.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Knockout Percentage
+    description: Percentage of fights ending in KO/TKO
+
+  # Striking statistics
+  avg_significant_strikes_landed:
+    expression: AVG(fight_details.significant_strikes_landed)
+    type: number
+    format: "%.1f"
+    label: Avg Significant Strikes Landed
+    description: Average significant strikes landed per fight
+
+  avg_significant_strikes_attempted:
+    expression: AVG(fight_details.significant_strikes_attempted)
+    type: number
+    format: "%.1f"
+    label: Avg Significant Strikes Attempted
+    description: Average significant strikes attempted per fight
+
+  striking_accuracy:
+    expression: AVG(fight_details.significant_strikes_landed / fight_details.significant_strikes_attempted) * 100
+    type: number
+    format: "%.1f%%"
+    label: Striking Accuracy
+    description: Average percentage of significant strikes that land
+
+  # Grappling statistics
+  avg_takedowns_landed:
+    expression: AVG(fight_details.takedowns_landed)
+    type: number
+    format: "%.1f"
+    label: Avg Takedowns Landed
+    description: Average takedowns landed per fight
+
+  takedown_accuracy:
+    expression: AVG(fight_details.takedowns_landed / fight_details.takedowns_attempted) * 100
+    type: number
+    format: "%.1f%%"
+    label: Takedown Accuracy
+    description: Average percentage of takedown attempts that succeed
+
+  avg_submission_attempts:
+    expression: AVG(fight_details.submission_attempts)
+    type: number
+    format: "%.1f"
+    label: Avg Submission Attempts
+    description: Average submission attempts per fight
+
+  # Control and pace measures
+  avg_control_time:
+    expression: AVG(fight_details.control_time_seconds) / 60
+    type: number
+    format: "%.1f minutes"
+    label: Avg Control Time
+    description: Average ground control time per fight in minutes
+
+  avg_knockdowns:
+    expression: AVG(fight_details.knockdowns)
+    type: number
+    format: "%.2f"
+    label: Avg Knockdowns
+    description: Average knockdowns scored per fight
+
+  # Event and promotion metrics
+  events_per_year:
+    expression: COUNT(DISTINCT events.event_id) / COUNT(DISTINCT YEAR(events.event_date))
+    type: number
+    format: "%.1f"
+    label: Events per Year
+    description: Average number of events per year
+
+  fights_per_event:
+    expression: COUNT(fight_results.fight_id) / COUNT(DISTINCT fight_results.event_id)
+    type: number
+    format: "%.1f"
+    label: Fights per Event
+    description: Average number of fights per event
+
+  # Advanced metrics
+  first_round_finish_rate:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.round = 1 AND fight_results.method != "Decision") / COUNT(fight_results.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: First Round Finish Rate
+    description: Percentage of fights ending in round 1
+
+  title_fight_finish_rate:
+    expression: COUNT(fight_results.fight_id WHERE fight_results.is_title_fight = true AND fight_results.method != "Decision") / COUNT(fight_results.fight_id WHERE fight_results.is_title_fight = true) * 100
+    type: number
+    format: "%.1f%%"
+    label: Title Fight Finish Rate
+    description: Percentage of title fights that end in finishes

@@ -117,6 +117,19 @@ class Model(BaseModel):
     relationships: List[Relationship] = []
 
 
+class Project(BaseModel):
+    """Simple project container for organizing definitions."""
+    
+    name: str
+    description: Optional[str] = None
+    version: str = "1.0.0"
+    
+    # References to component files (keep existing structure)
+    datasources_file: Optional[str] = "datasources.yaml"
+    model_file: Optional[str] = "model.yaml" 
+    connection_file: Optional[str] = "../connections/local_files.yaml"
+
+
 class SemanticModel(BaseModel):
     """Complete semantic model definition."""
     

@@ -1,7 +1,0 @@
-name: ufc_local_files
-type: file
-file_path: ./data
-description: Local CSV files for UFC analytics demo
-options:
-  file_format: csv
-  encoding: utf-8
