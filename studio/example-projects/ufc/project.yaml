@@ -1,8 +1,0 @@
-name: ufc
-description: UFC/MMA analytics semantic model
-version: "1.0.0"
-
-# Keep existing file structure - just reference them
-datasources_file: datasources.yaml
-model_file: model.yaml
-connection_file: ../connections/local_files.yaml
