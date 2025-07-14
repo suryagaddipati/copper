@@ -1,0 +1,9 @@
+[project]
+name = "ufc-prediction"
+version = "0.1.0"
+description = "UFC fight prediction analysis"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas",
+    "numpy",
+]

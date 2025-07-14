@@ -1,0 +1,92 @@
+UFC Fighter Feature Engineering Document
+========================================
+
+1. FIGHTING STYLE FEATURES
+   - primary_stance (orthodox, southpaw, switch)
+   - is_wrestler (boolean)
+   - is_jiu_jitsu_black_belt (boolean)
+   - fighting_style_category (striker, grappler, wrestler, well_rounded)
+
+2. GROUND GAME STRENGTH
+   a. percent_time_spent_on_ground (0-100%)
+   b. dominant_position_ground_time (seconds per fight)
+   c. wins_by_submission (count)
+   d. submission_attempts_per_fight (average)
+   e. takedown_accuracy (percentage)
+   f. takedown_defense (percentage)
+
+3. STRIKING CAPABILITIES
+   a. significant_strikes_per_minute (average)
+   b. striking_accuracy (percentage)
+   c. striking_defense (percentage)
+   d. knockdown_ratio (knockdowns per fight)
+   e. tko_ko_percentage (finish rate)
+   f. head_strike_percentage (target distribution)
+   g. body_strike_percentage (target distribution)
+   h. leg_strike_percentage (target distribution)
+
+4. PHYSICAL ATTRIBUTES
+   a. height_advantage (inches difference vs opponent)
+   b. reach_advantage (inches difference vs opponent)
+   c. weight_cutting_severity (walk-around weight vs fight weight)
+   d. body_fat_percentage (estimated conditioning)
+   e. age_at_fight_time (years)
+
+5. EXPERIENCE & CAREER METRICS
+   a. total_professional_fights (count)
+   b. ufc_fights_count (count)
+   c. years_active_professional (duration)
+   d. title_fight_experience (boolean)
+   e. five_round_fight_experience (count)
+   f. fights_per_year_recent (activity level)
+
+6. RECENT FORM & MOMENTUM
+   a. current_win_streak (count)
+   b. current_loss_streak (count)
+   c. wins_last_3_fights (0-3)
+   d. finish_rate_last_5_fights (percentage)
+   e. time_since_last_fight (months)
+   f. performance_trend (improving/declining/stable)
+
+7. DURABILITY & CONDITIONING
+   a. chin_strength_score (1-10 scale based on knockdowns taken)
+   b. cardio_rating (1-10 based on late-round performance)
+   c. times_knocked_down_career (count)
+   d. fights_gone_to_decision (percentage)
+   e. average_fight_time (seconds)
+   f. cut_susceptibility (cuts per fight average)
+
+8. SKILL VERSATILITY
+   a. versatility_score (1-10: specialist=1, well-rounded=10)
+   b. finish_method_diversity (submission, KO, decision ratios)
+   c. opponent_style_adaptability (performance vs different styles)
+   d. range_effectiveness (clinch, distance, ground performance)
+
+9. MENTAL & STRATEGIC FACTORS
+   a. fight_IQ_rating (1-10 based on tactical adjustments)
+   b. pressure_handling (performance in title fights)
+   c. comeback_ability (wins after being hurt/behind)
+   d. game_plan_execution (consistency with known strengths)
+
+10. OPPONENT-SPECIFIC FEATURES
+    a. style_matchup_favorability (-2 to +2 scale)
+    b. historical_performance_vs_similar_opponents
+    c. size_advantage_effectiveness
+    d. southpaw_vs_orthodox_performance
+
+FEATURE IMPORTANCE RANKING:
+High Priority: Recent form, striking stats, ground game, physical advantages
+Medium Priority: Experience metrics, durability, versatility
+Lower Priority: Mental factors, opponent-specific matchups
+
+DATA SOURCES:
+- UFC Stats API
+- Fight records databases
+- Video analysis for subjective measures
+- Betting odds for implied skill levels
+
+QUANTIFICATION METHODS:
+- Subjective scores (1-10): Use expert consensus or crowd-sourced ratings
+- Percentages: Calculate from historical fight data
+- Trend analysis: Use rolling averages over last 3-5 fights
+- Comparative metrics: Always relative to weight class averages
