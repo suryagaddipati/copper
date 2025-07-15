@@ -8,55 +8,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Copper is a portable semantic layer that compiles metric definitions and queries into runtime code across multiple engines.** The project motto is "Define Once. Run Anywhere. ☄️"
 
-This is a complex multi-language project that implements a DAX-like expression language parser and semantic modeling system with support for multiple execution engines (Pandas, Spark, SQL, Apache Beam).
+This is a Python-based project that implements a DAX-like expression language parser and semantic modeling system with support for multiple execution engines (Pandas, SQL generation, with planned support for Spark, Apache Beam).
 
 ## Current State
 
-✅ **Current Status**: The project is actively developed with both Python semantic layer and Next.js web studio:
+✅ **Current Status**: Active Python semantic layer implementation:
 - Complete Python semantic layer implementation using src/ layout
 - ANTLR4 grammar for DAX-like expressions (`grammar/Copper.g4`)
-- Next.js web studio with comprehensive UI (`studio/`)
 - SQL generation engine alongside Pandas execution
 - UFC analytics example with real MMA fight data
 - YAML-based semantic modeling with Pydantic validation
-- Full test coverage for both Python and TypeScript components
+- Comprehensive Python test coverage
 
-## Historical Architecture (from git history)
+⚠️ **Note**: The project previously had a Next.js web studio component, but it's not currently present in the codebase. The CLAUDE.md file contains historical references to frontend components that may have been removed.
 
-The project previously had a rich multi-component architecture:
+## Technology Stack
 
 ### Core Components
 - **Grammar & Parser**: ANTLR4-based DAX expression parser (`grammar/Copper.g4`)
 - **Python Core**: Expression parsing and semantic modeling (`src/parser/antlr_parser.py`)
-- **Web Studio**: Next.js-based development interface with Monaco editor
-- **API Backend**: Python FastAPI server for semantic model management
-- **Examples**: Multiple demo projects showcasing capabilities
+- **Examples**: UFC analytics example with real data
 
-### Technology Stack
-
-#### Languages & Frameworks
-- **Python**: Core semantic layer implementation, API backend
-- **TypeScript/JavaScript**: Next.js web interface, React components
-- **Java**: ANTLR parser generation
+### Languages & Frameworks
+- **Python**: Core semantic layer implementation
+- **Java**: ANTLR parser generation (build-time dependency)
 - **ANTLR4**: Grammar definition and parser generation
 
-#### Frontend (Next.js Studio)
-- **Framework**: Next.js with TypeScript
-- **Editor**: Monaco Editor with custom Copper language support
-- **UI**: React components for dashboard, model explorer, validation
-- **Styling**: Tailwind CSS
-- **State Management**: Custom hooks for connections, projects, parsing
-
-#### Backend (Python API)
-- **Framework**: FastAPI
-- **Features**: Connection management, project storage, query execution
-- **Database**: JSON-based storage for projects and connections
-- **Execution Engines**: Pandas (with planned Spark, SQL, Beam support)
-
-#### Build System
+### Build System
 - **Makefile**: Comprehensive build automation
-- **ANTLR**: Grammar compilation to multiple target languages
-- **npm/yarn**: Frontend dependency management
+- **ANTLR**: Grammar compilation to Python
 - **pip**: Python dependency management
 
 ## Key Features (from PRD)
@@ -89,7 +69,7 @@ The project previously had a rich multi-component architecture:
 
 ### Build Commands
 
-#### Python Backend
+#### Python Development
 ```bash
 # Development setup
 make dev-install     # Install with development dependencies
@@ -100,21 +80,19 @@ make parser         # Generate ANTLR parser (requires Java)
 make test           # Run pytest with coverage
 make format         # Code formatting with black
 make typecheck      # Type checking with mypy
+make lint           # Run format and typecheck
 make clean          # Clean generated files
 
 # Demo and examples
 make example        # Run basic demo
-python examples/ufc_demo.py  # UFC analytics demonstration
+python examples/ufc/explore.py  # UFC analytics demonstration
 ```
 
-#### Frontend Studio
+#### Specific Test Commands
 ```bash
-cd studio
-npm install         # Install dependencies
-npm run dev         # Development server (port 3001)
-npm run build       # Production build
-npm run test        # Jest test suite
-npm run lint        # ESLint checking
+pytest                              # Run all tests
+pytest tests/test_pandas_executor.py  # Run specific test file
+pytest --cov=src                   # Run with coverage reporting
 ```
 
 ### Current Project Structure
@@ -133,18 +111,6 @@ copper/
 │   └── executors/             # Execution engines
 │       ├── pandas_executor.py # Pandas backend implementation
 │       └── sql_generator.py   # Universal SQL generation
-├── studio/                    # Next.js web application
-│   ├── src/
-│   │   ├── app/               # Next.js app router pages
-│   │   ├── components/        # React UI components
-│   │   │   ├── DataVisualization.tsx  # Chart rendering
-│   │   │   ├── ProjectPanel.tsx       # Project browsing
-│   │   │   ├── QueryBuilder.tsx       # Query execution
-│   │   │   └── Sidebar.tsx            # Field selection
-│   │   └── lib/               # Utilities and core logic
-│   ├── public/                # Static assets and example projects
-│   ├── package.json           # Node.js dependencies
-│   └── jest.config.js         # Frontend test configuration
 ├── grammar/
 │   └── Copper.g4              # ANTLR grammar definition
 ├── tests/                     # Python test suite
@@ -152,19 +118,19 @@ copper/
 │   ├── test_query_builder.py  # Query API functionality
 │   ├── test_pandas_executor.py # Pandas execution engine
 │   └── test_sql_generator.py  # SQL generation
-├── example-projects/          # Modular example projects
-│   ├── ufc/                   # UFC/MMA analytics
-│   │   ├── data/              # Real UFC fight datasets (CSV)
-│   │   ├── datasources.yaml   # Data source definitions
-│   │   ├── model.yaml         # Semantic model
-│   │   ├── project.yaml       # Project configuration
-│   │   └── data_loader.py     # UFC data loading utilities
-│   └── analytics-example/     # General analytics example
+├── examples/                  # Example projects
+│   └── ufc/                   # UFC/MMA analytics
+│       ├── ufc_fights_all.csv # Real UFC fight dataset
+│       ├── explore.py         # UFC data exploration script
+│       └── README.md          # UFC example documentation
+├── docs/                      # Documentation (currently empty)
 ├── setup.py                   # Python package configuration
 ├── requirements.txt           # Python dependencies
 ├── pytest.ini                # Test configuration
 ├── Makefile                   # Build automation
-└── SCHEMA_REFERENCE.md        # Comprehensive schema documentation
+├── README.md                  # Main project documentation
+├── SCHEMA_REFERENCE.md        # Comprehensive schema documentation
+└── CLAUDE.md                  # This file
 ```
 
 ## UFC Analytics Example
@@ -220,22 +186,12 @@ measures:
 ### Query Examples
 ```python
 import src as copper
-from example_projects.ufc.data_loader import UFCDataLoader
 
-# Load real UFC data
-loader = UFCDataLoader()
-ufc_data = loader.load_all_data()
+# Load semantic model (when available)
+# model = copper.load("examples/ufc/model.yaml")
 
-# Load semantic model
-model = copper.load("example-projects/ufc/model.yaml")
-
-# Analyze finish rates by weight class
-query = copper.Query(model) \
-    .dimensions(['weight_class']) \
-    .measures(['total_fights', 'finish_rate'])
-
-result = query.to_pandas(ufc_data)
-print(result)
+# For now, explore the UFC data directly
+# See examples/ufc/explore.py for current UFC data exploration
 ```
 
 ### Advanced UFC Analytics
@@ -255,18 +211,19 @@ title_fight_finish_rate:
   label: Title Fight Finish Rate
 ```
 
-## Development Environment Setup
+## Key Dependencies
 
-### Prerequisites
-- **Python 3.8+** with pip
-- **Node.js 18+** with npm
-- **Java 8+** for ANTLR parser generation
-- **ANTLR 4.9.3** complete JAR
+### Python Libraries
+- **pandas**: Data manipulation and analysis
+- **pydantic**: Data validation and parsing
+- **pytest**: Testing framework
+- **ANTLR4 runtime**: Expression parsing
+- **PyYAML**: YAML file processing
 
-### Dependencies
-- **Python**: pandas, pydantic, pytest, ANTLR4 runtime, PyYAML
-- **Java**: ANTLR complete JAR for parser generation
-- **Data**: Real UFC fight data in CSV format for demonstrations
+### Development Tools
+- **black**: Code formatting
+- **mypy**: Type checking
+- **Java**: Required for ANTLR parser generation
 
 ## Testing Strategy
 
@@ -275,56 +232,44 @@ title_fight_finish_rate:
 pytest                    # Run all Python tests
 pytest tests/test_pandas_executor.py  # Run specific test file
 pytest --cov=src         # Run with coverage reporting
-```
-
-### Frontend Tests
-```bash
-cd studio
-npm test                 # Run Jest test suite
-npm test -- --watch     # Run tests in watch mode
+make test                 # Run tests via Makefile
 ```
 
 The project includes comprehensive testing:
 - **Python unit tests**: Parser validation, semantic model loading, query execution
-- **Frontend tests**: Expression parsing, semantic processing, validation logic
 - **Integration tests**: End-to-end query execution workflows
 - **Real data testing**: UFC analytics with actual MMA datasets
 
 ## Git Workflow
 
-- **main**: Primary development branch
-- **ui/barebones**: Current stripped-down branch
-- **feature/api-webapp**: API development branch
-- **ui/ufc**: Alternative UI branch
+- **main**: Primary development branch (current)
 
-## Claude Configuration
+## Prerequisites & Setup
 
-The project has extensive Claude permissions configured in `.claude/settings.local.json` including:
-- File system operations
-- Git operations  
-- Build system execution
-- Web development tools
-- Python/npm package management
-- Playwright browser automation
+### Required Tools
+- **Python 3.8+** with pip
+- **Java 8+** for ANTLR parser generation
+- **ANTLR 4.9.3** complete JAR (downloaded automatically by Makefile)
+
+### Setup Process
+1. `make dev-install` - Install Python dependencies
+2. `make parser` - Generate ANTLR parser (requires Java)
+3. `make test` - Verify installation
+
+### Important Notes
+- The Makefile references `copper/` directory for source code, but actual source is in `src/`
+- ANTLR parser generation creates files in `copper/parser/generated/` (may need adjustment)
+- Some Makefile targets may need updating to match current project structure
 
 ## Common Development Tasks
 
 ### Working with Semantic Models
 ```bash
-# Load and validate a YAML model
-python -c "import src as copper; model = copper.load('example-projects/ufc/model.yaml')"
+# Load and validate a YAML model (when model files exist)
+# python -c "import src as copper; model = copper.load('examples/ufc/model.yaml')"
 
-# Test query execution with real data
-python example-projects/ufc/data_loader.py
-```
-
-### Web Studio Development
-```bash
-# Start development server
-cd studio && npm run dev
-
-# Access at http://localhost:3001
-# Project data is served from studio/public/example-projects/
+# Explore UFC data directly
+python examples/ufc/explore.py
 ```
 
 ### Parser Development
@@ -336,6 +281,16 @@ make parser
 python -c "from src.parser.antlr_parser import CopperExpressionParser; parser = CopperExpressionParser()"
 ```
 
+### Package Development
+```bash
+# Install in development mode
+pip install -e .
+
+# Or use make targets
+make dev-install
+make setup
+```
+
 ## Architecture Notes
 
 ### Query Execution Flow
@@ -343,13 +298,23 @@ python -c "from src.parser.antlr_parser import CopperExpressionParser; parser = 
 2. **Query Building**: Fluent API constructs query objects
 3. **SQL Generation**: Universal SQL output for any dialect
 4. **Pandas Execution**: Direct DataFrame operations for in-memory data
-5. **DuckDB Integration**: WASM-based execution in web browser
 
-### Web Studio Components
-- **ProjectPanel**: Dynamic project loading from any URL
-- **Sidebar**: Dimension/measure field selection with drag-and-drop
-- **QueryBuilder**: SQL query execution and result display
-- **DataVisualization**: Multi-format chart rendering (bar, line, pie, scatter)
+### Core Components
+
+#### Parser (`src/parser/`)
+- **antlr_parser.py**: Main ANTLR-based expression parser
+- **ast_nodes.py**: AST node definitions for parsed expressions
+
+#### Semantic Layer (`src/semantic/`)
+- **schema.py**: Pydantic model definitions for YAML validation
+- **loader.py**: YAML model loading and validation
+
+#### Query Builder (`src/query/`)
+- **builder.py**: Fluent API for building queries
+
+#### Executors (`src/executors/`)
+- **pandas_executor.py**: Pandas-based execution engine
+- **sql_generator.py**: SQL generation for multiple dialects
 
 ### Expression Language
 The DAX-like expression syntax supports:
