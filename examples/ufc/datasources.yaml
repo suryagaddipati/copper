@@ -1,0 +1,5 @@
+datasources:
+  ufc_fights:
+    type: table
+    table: ufc_fights_all
+    description: Complete UFC fight dataset with fighter statistics, odds, and match results from 1993 to present

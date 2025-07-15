@@ -1,0 +1,39 @@
+name: ufc_analytics
+description: UFC/MMA fight analytics project with comprehensive semantic model for analyzing fight patterns, fighter performance, and betting outcomes
+version: "1.0.0"
+
+# File references
+datasources_file: "datasources.yaml"
+model_file: "model.yaml"
+
+# Project metadata
+tags:
+  - sports
+  - mma
+  - ufc
+  - analytics
+  - betting
+
+# Data overview
+data_sources:
+  - name: ufc_fights_all.csv
+    description: Complete UFC fight dataset from 1993 to present
+    records: ~7000
+    
+# Key metrics available
+key_metrics:
+  - total_fights
+  - finish_rate
+  - knockout_rate
+  - submission_rate
+  - title_fight_finish_rate
+  - favorite_win_rate
+  - underdog_win_rate
+  
+# Common analysis dimensions
+key_dimensions:
+  - weight_class
+  - event_year
+  - finish_method
+  - betting_outcome
+  - fight_duration_category
