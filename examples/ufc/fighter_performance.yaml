@@ -1,0 +1,211 @@
+name: fighter_performance
+description: UFC fighter statistics and performance metrics - focuses on fighter attributes, records, and combat statistics
+
+dimensions:
+  fighter1_name:
+    expression: ufc_fights.fighter1
+    type: string
+    label: Fighter 1
+    description: Name of the first fighter
+    
+  fighter2_name:
+    expression: ufc_fights.fighter2
+    type: string
+    label: Fighter 2
+    description: Name of the second fighter
+    
+  winner:
+    expression: ufc_fights.winner
+    type: string
+    label: Winner
+    description: Name of the winning fighter
+    
+  fighter1_stance:
+    expression: ufc_fights.fighter1_stance
+    type: string
+    label: Fighter 1 Stance
+    description: Fighting stance of fighter 1
+    
+  fighter2_stance:
+    expression: ufc_fights.fighter2_stance
+    type: string
+    label: Fighter 2 Stance
+    description: Fighting stance of fighter 2
+    
+  weight_class:
+    expression: ufc_fights.weight_class
+    type: string
+    label: Weight Class
+    description: Weight division for the fight
+    
+  # Calculated fighter categories
+  fighter1_experience_level:
+    expression: CASE
+      WHEN ufc_fights.fighter1_wins + ufc_fights.fighter1_losses < 5 THEN "Rookie"
+      WHEN ufc_fights.fighter1_wins + ufc_fights.fighter1_losses < 15 THEN "Developing"
+      WHEN ufc_fights.fighter1_wins + ufc_fights.fighter1_losses < 25 THEN "Veteran"
+      ELSE "Elite"
+    type: string
+    label: Fighter 1 Experience Level
+    description: Experience level based on total fights
+    
+  fighter2_experience_level:
+    expression: CASE
+      WHEN ufc_fights.fighter2_wins + ufc_fights.fighter2_losses < 5 THEN "Rookie"
+      WHEN ufc_fights.fighter2_wins + ufc_fights.fighter2_losses < 15 THEN "Developing"
+      WHEN ufc_fights.fighter2_wins + ufc_fights.fighter2_losses < 25 THEN "Veteran"
+      ELSE "Elite"
+    type: string
+    label: Fighter 2 Experience Level
+    description: Experience level based on total fights
+    
+  fighter1_age_category:
+    expression: CASE
+      WHEN ufc_fights.fighter1_age < 25 THEN "Young (Under 25)"
+      WHEN ufc_fights.fighter1_age < 30 THEN "Prime (25-29)"
+      WHEN ufc_fights.fighter1_age < 35 THEN "Experienced (30-34)"
+      ELSE "Veteran (35+)"
+    type: string
+    label: Fighter 1 Age Category
+    description: Age category for fighter 1
+    
+  fighter2_age_category:
+    expression: CASE
+      WHEN ufc_fights.fighter2_age < 25 THEN "Young (Under 25)"
+      WHEN ufc_fights.fighter2_age < 30 THEN "Prime (25-29)"
+      WHEN ufc_fights.fighter2_age < 35 THEN "Experienced (30-34)"
+      ELSE "Veteran (35+)"
+    type: string
+    label: Fighter 2 Age Category
+    description: Age category for fighter 2
+
+measures:
+  # Fighter physical averages
+  avg_fighter1_age:
+    expression: AVG(ufc_fights.fighter1_age)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 1 Age
+    description: Average age of fighter 1 across all fights
+    
+  avg_fighter2_age:
+    expression: AVG(ufc_fights.fighter2_age)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 2 Age
+    description: Average age of fighter 2 across all fights
+    
+  avg_fighter1_reach:
+    expression: AVG(ufc_fights.fighter1_reach)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 1 Reach
+    description: Average reach of fighter 1 in inches
+    
+  avg_fighter2_reach:
+    expression: AVG(ufc_fights.fighter2_reach)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 2 Reach
+    description: Average reach of fighter 2 in inches
+    
+  avg_fighter1_weight:
+    expression: AVG(ufc_fights.fighter1_weight)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 1 Weight
+    description: Average weight of fighter 1 in pounds
+    
+  avg_fighter2_weight:
+    expression: AVG(ufc_fights.fighter2_weight)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 2 Weight
+    description: Average weight of fighter 2 in pounds
+    
+  # Performance statistics
+  avg_fighter1_sig_strikes_pm:
+    expression: AVG(ufc_fights.fighter1_sig_strikes_pm)
+    type: number
+    format: "%.2f"
+    label: Average Fighter 1 Significant Strikes Per Minute
+    description: Average significant strikes landed per minute by fighter 1
+    
+  avg_fighter2_sig_strikes_pm:
+    expression: AVG(ufc_fights.fighter2_sig_strikes_pm)
+    type: number
+    format: "%.2f"
+    label: Average Fighter 2 Significant Strikes Per Minute
+    description: Average significant strikes landed per minute by fighter 2
+    
+  avg_fighter1_sig_strikes_acc:
+    expression: AVG(ufc_fights.fighter1_sig_strikes_acc)
+    type: number
+    format: "%.1f%%"
+    label: Average Fighter 1 Striking Accuracy
+    description: Average striking accuracy of fighter 1
+    
+  avg_fighter2_sig_strikes_acc:
+    expression: AVG(ufc_fights.fighter2_sig_strikes_acc)
+    type: number
+    format: "%.1f%%"
+    label: Average Fighter 2 Striking Accuracy
+    description: Average striking accuracy of fighter 2
+    
+  avg_fighter1_takedown_acc:
+    expression: AVG(ufc_fights.fighter1_takedown_acc)
+    type: number
+    format: "%.1f%%"
+    label: Average Fighter 1 Takedown Accuracy
+    description: Average takedown accuracy of fighter 1
+    
+  avg_fighter2_takedown_acc:
+    expression: AVG(ufc_fights.fighter2_takedown_acc)
+    type: number
+    format: "%.1f%%"
+    label: Average Fighter 2 Takedown Accuracy
+    description: Average takedown accuracy of fighter 2
+    
+  # Win streak analysis
+  avg_fighter1_win_streak:
+    expression: AVG(ufc_fights.fighter1_win_streak)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 1 Win Streak
+    description: Average win streak of fighter 1 going into fights
+    
+  avg_fighter2_win_streak:
+    expression: AVG(ufc_fights.fighter2_win_streak)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 2 Win Streak
+    description: Average win streak of fighter 2 going into fights
+    
+  # Record analysis
+  avg_fighter1_wins:
+    expression: AVG(ufc_fights.fighter1_wins)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 1 Wins
+    description: Average number of wins for fighter 1 going into fights
+    
+  avg_fighter2_wins:
+    expression: AVG(ufc_fights.fighter2_wins)
+    type: number
+    format: "%.1f"
+    label: Average Fighter 2 Wins
+    description: Average number of wins for fighter 2 going into fights
+    
+  avg_fighter1_ko_percentage:
+    expression: AVG(ufc_fights.fighter1_ko_wins / (ufc_fights.fighter1_wins + 0.01)) * 100
+    type: number
+    format: "%.1f%%"
+    label: Average Fighter 1 KO Percentage
+    description: Average percentage of wins by KO/TKO for fighter 1
+    
+  avg_fighter2_ko_percentage:
+    expression: AVG(ufc_fights.fighter2_ko_wins / (ufc_fights.fighter2_wins + 0.01)) * 100
+    type: number
+    format: "%.1f%%"
+    label: Average Fighter 2 KO Percentage
+    description: Average percentage of wins by KO/TKO for fighter 2

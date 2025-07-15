@@ -1,0 +1,192 @@
+name: event_analytics
+description: UFC event and venue analysis - focuses on event performance, attendance, and historical trends
+
+dimensions:
+  event_name:
+    expression: ufc_fights.event_name
+    type: string
+    label: Event Name
+    description: Name of the UFC event
+    
+  event_date:
+    expression: ufc_fights.event_date
+    type: date
+    label: Event Date
+    description: Date when the fight took place
+    
+  event_year:
+    expression: YEAR(ufc_fights.event_date)
+    type: number
+    label: Event Year
+    description: Year when the fight took place
+    
+  location:
+    expression: ufc_fights.location
+    type: string
+    label: Location
+    description: City and state/country where the fight occurred
+    
+  venue:
+    expression: ufc_fights.venue
+    type: string
+    label: Venue
+    description: Specific venue where the fight took place
+    
+  data_source:
+    expression: ufc_fights.data_source
+    type: string
+    label: Data Source
+    description: Source of the data
+    
+  # Calculated event dimensions
+  event_era:
+    expression: CASE
+      WHEN YEAR(ufc_fights.event_date) <= 2000 THEN "Early UFC (1993-2000)"
+      WHEN YEAR(ufc_fights.event_date) <= 2010 THEN "Growth Era (2001-2010)"
+      WHEN YEAR(ufc_fights.event_date) <= 2020 THEN "Modern Era (2011-2020)"
+      ELSE "Current Era (2021+)"
+    type: string
+    label: Event Era
+    description: Historical era categorization
+    
+  event_type:
+    expression: CASE
+      WHEN ufc_fights.event_name LIKE "UFC %" AND ufc_fights.event_name NOT LIKE "% UFC %" THEN "Numbered Event"
+      WHEN ufc_fights.event_name LIKE "%Fight Night%" THEN "Fight Night"
+      WHEN ufc_fights.event_name LIKE "%TUF%" THEN "TUF Finale"
+      ELSE "Special Event"
+    type: string
+    label: Event Type
+    description: Type of UFC event
+    
+  has_attendance_data:
+    expression: CASE
+      WHEN ufc_fights.attendance IS NOT NULL THEN "Yes"
+      ELSE "No"
+    type: string
+    label: Has Attendance Data
+    description: Whether attendance data is available
+    
+  has_ppv_data:
+    expression: CASE
+      WHEN ufc_fights.ppv_buys IS NOT NULL THEN "Yes"
+      ELSE "No"
+    type: string
+    label: Has PPV Data
+    description: Whether PPV buy data is available
+
+measures:
+  # Event counts
+  total_events:
+    expression: COUNT(DISTINCT ufc_fights.event_name)
+    type: number
+    label: Total Events
+    description: Total number of unique UFC events
+    
+  total_fights:
+    expression: COUNT(ufc_fights.fight_id)
+    type: number
+    label: Total Fights
+    description: Total number of fights across all events
+    
+  avg_fights_per_event:
+    expression: COUNT(ufc_fights.fight_id) / COUNT(DISTINCT ufc_fights.event_name)
+    type: number
+    format: "%.1f"
+    label: Average Fights Per Event
+    description: Average number of fights per event
+    
+  # Attendance metrics
+  avg_event_attendance:
+    expression: AVG(ufc_fights.attendance)
+    type: number
+    format: "%.0f"
+    label: Average Event Attendance
+    description: Average live attendance at events
+    
+  max_event_attendance:
+    expression: MAX(ufc_fights.attendance)
+    type: number
+    format: "%.0f"
+    label: Maximum Event Attendance
+    description: Highest recorded event attendance
+    
+  min_event_attendance:
+    expression: MIN(ufc_fights.attendance)
+    type: number
+    format: "%.0f"
+    label: Minimum Event Attendance
+    description: Lowest recorded event attendance
+    
+  # PPV metrics
+  avg_ppv_buys:
+    expression: AVG(ufc_fights.ppv_buys)
+    type: number
+    format: "%.0f"
+    label: Average PPV Buys
+    description: Average pay-per-view buys
+    
+  max_ppv_buys:
+    expression: MAX(ufc_fights.ppv_buys)
+    type: number
+    format: "%.0f"
+    label: Maximum PPV Buys
+    description: Highest recorded PPV buys
+    
+  # Title fight concentration
+  title_fights_per_event:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true) / COUNT(DISTINCT ufc_fights.event_name)
+    type: number
+    format: "%.2f"
+    label: Title Fights Per Event
+    description: Average number of title fights per event
+    
+  events_with_title_fights:
+    expression: COUNT(DISTINCT ufc_fights.event_name WHERE ufc_fights.title_fight = true)
+    type: number
+    label: Events With Title Fights
+    description: Number of events that had title fights
+    
+  # Finish rate by era
+  finish_rate_by_event:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method != "Decision") / COUNT(ufc_fights.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Event Finish Rate
+    description: Percentage of fights that end before decision
+    
+  # Venue analysis
+  unique_venues:
+    expression: COUNT(DISTINCT ufc_fights.venue)
+    type: number
+    label: Unique Venues
+    description: Number of unique venues used
+    
+  unique_locations:
+    expression: COUNT(DISTINCT ufc_fights.location)
+    type: number
+    label: Unique Locations
+    description: Number of unique locations/cities
+    
+  # Yearly trends
+  events_per_year:
+    expression: COUNT(DISTINCT ufc_fights.event_name) / COUNT(DISTINCT YEAR(ufc_fights.event_date))
+    type: number
+    format: "%.1f"
+    label: Events Per Year
+    description: Average number of events per year
+    
+  fights_per_year:
+    expression: COUNT(ufc_fights.fight_id) / COUNT(DISTINCT YEAR(ufc_fights.event_date))
+    type: number
+    format: "%.0f"
+    label: Fights Per Year
+    description: Average number of fights per year
+    
+  # International events
+  international_event_percentage:
+    expression: COUNT(DISTINCT ufc_fights.event_name WHERE ufc_fights.location NOT LIKE "%USA%" AND ufc_fights.location NOT LIKE "%US%" AND ufc_fights.location NOT LIKE "%United States%") / COUNT(DISTINCT ufc_fights.event_name) * 100
+    type: number
+    format: "%.1f%%"
+    label: International Event Percentage
+    description: Percentage of events held outside the US

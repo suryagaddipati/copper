@@ -1,0 +1,110 @@
+name: fight_analysis
+description: UFC fight outcome and method analysis - focuses on how fights end and finish rates
+
+dimensions:
+  weight_class:
+    expression: ufc_fights.weight_class
+    type: string
+    label: Weight Class
+    description: Weight division for the fight
+    
+  finish_method:
+    expression: ufc_fights.method
+    type: string
+    label: Finish Method
+    description: Method of victory (KO/TKO, SUB, Decision, etc.)
+    
+  finish_type:
+    expression: CASE
+      WHEN ufc_fights.method = "KO/TKO" THEN "Knockout"
+      WHEN ufc_fights.method = "SUB" THEN "Submission"
+      WHEN ufc_fights.method = "Decision" THEN "Decision"
+      ELSE "Other"
+    type: string
+    label: Finish Type
+    description: Simplified finish method categorization
+    
+  fight_duration_category:
+    expression: CASE 
+      WHEN ufc_fights.round = 1 THEN "Round 1"
+      WHEN ufc_fights.round = 2 THEN "Round 2"
+      WHEN ufc_fights.round = 3 THEN "Round 3"
+      WHEN ufc_fights.round >= 4 THEN "Championship Rounds"
+      ELSE "Unknown"
+    type: string
+    label: Fight Duration Category
+    description: Categorized fight duration
+    
+  is_title_fight:
+    expression: ufc_fights.title_fight
+    type: boolean
+    label: Title Fight
+    description: Whether this was a title fight
+    
+  gender:
+    expression: ufc_fights.gender
+    type: string
+    label: Gender Division
+    description: Gender division (Male/Female)
+
+measures:
+  total_fights:
+    expression: COUNT(ufc_fights.fight_id)
+    type: number
+    label: Total Fights
+    description: Total number of fights
+    
+  finish_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method != "Decision") / COUNT(ufc_fights.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Finish Rate
+    description: Percentage of fights that end before decision
+    
+  knockout_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method = "KO/TKO") / COUNT(ufc_fights.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Knockout Rate
+    description: Percentage of fights that end by KO/TKO
+    
+  submission_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method = "SUB") / COUNT(ufc_fights.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Submission Rate
+    description: Percentage of fights that end by submission
+    
+  decision_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method = "Decision") / COUNT(ufc_fights.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Decision Rate
+    description: Percentage of fights that go to decision
+    
+  title_fight_count:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true)
+    type: number
+    label: Title Fight Count
+    description: Number of title fights
+    
+  title_fight_finish_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true AND ufc_fights.method != "Decision") / COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true) * 100
+    type: number
+    format: "%.1f%%"
+    label: Title Fight Finish Rate
+    description: Percentage of title fights that end before decision
+    
+  avg_fight_rounds:
+    expression: AVG(ufc_fights.round)
+    type: number
+    format: "%.2f"
+    label: Average Fight Rounds
+    description: Average number of rounds fights last
+    
+  round_1_finish_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.round = 1) / COUNT(ufc_fights.fight_id) * 100
+    type: number
+    format: "%.1f%%"
+    label: Round 1 Finish Rate
+    description: Percentage of fights that end in round 1

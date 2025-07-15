@@ -1,0 +1,152 @@
+name: betting_analysis
+description: UFC betting odds and market analysis - focuses on betting favorites, underdogs, and market efficiency
+
+dimensions:
+  betting_outcome:
+    expression: CASE
+      WHEN ufc_fights.betting_outcome = "favorite" THEN "Favorite Won"
+      WHEN ufc_fights.betting_outcome = "underdog" THEN "Underdog Won"
+      ELSE "No Betting Data"
+    type: string
+    label: Betting Outcome
+    description: Whether the favorite or underdog won
+    
+  favorite_fighter:
+    expression: ufc_fights.favorite
+    type: string
+    label: Betting Favorite
+    description: Name of the betting favorite
+    
+  underdog_fighter:
+    expression: ufc_fights.underdog
+    type: string
+    label: Betting Underdog
+    description: Name of the betting underdog
+    
+  weight_class:
+    expression: ufc_fights.weight_class
+    type: string
+    label: Weight Class
+    description: Weight division for the fight
+    
+  finish_method:
+    expression: ufc_fights.method
+    type: string
+    label: Finish Method
+    description: Method of victory (KO/TKO, SUB, Decision, etc.)
+    
+  is_title_fight:
+    expression: ufc_fights.title_fight
+    type: boolean
+    label: Title Fight
+    description: Whether this was a title fight
+    
+  # Calculated betting dimensions
+  odds_category:
+    expression: CASE
+      WHEN ufc_fights.fighter1_odds > 0 AND ufc_fights.fighter2_odds > 0 THEN "Pick Em"
+      WHEN ABS(ufc_fights.fighter1_odds) <= 150 OR ABS(ufc_fights.fighter2_odds) <= 150 THEN "Heavy Favorite"
+      WHEN ABS(ufc_fights.fighter1_odds) <= 300 OR ABS(ufc_fights.fighter2_odds) <= 300 THEN "Moderate Favorite"
+      ELSE "Big Underdog"
+    type: string
+    label: Odds Category
+    description: Categorization of betting odds spread
+    
+  ranking_matchup:
+    expression: CASE
+      WHEN ufc_fights.fighter1_rank IS NOT NULL AND ufc_fights.fighter2_rank IS NOT NULL THEN "Ranked vs Ranked"
+      WHEN ufc_fights.fighter1_rank IS NOT NULL OR ufc_fights.fighter2_rank IS NOT NULL THEN "Ranked vs Unranked"
+      ELSE "Unranked vs Unranked"
+    type: string
+    label: Ranking Matchup
+    description: Type of ranking matchup
+
+measures:
+  # Basic betting metrics
+  total_fights_with_odds:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome IS NOT NULL)
+    type: number
+    label: Total Fights With Odds
+    description: Total number of fights with betting data
+    
+  favorite_win_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "favorite") / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome IS NOT NULL) * 100
+    type: number
+    format: "%.1f%%"
+    label: Favorite Win Rate
+    description: Percentage of fights where the betting favorite won
+    
+  underdog_win_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "underdog") / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome IS NOT NULL) * 100
+    type: number
+    format: "%.1f%%"
+    label: Underdog Win Rate
+    description: Percentage of fights where the betting underdog won
+    
+  # Title fight betting
+  title_fight_favorite_win_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true AND ufc_fights.betting_outcome = "favorite") / COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true AND ufc_fights.betting_outcome IS NOT NULL) * 100
+    type: number
+    format: "%.1f%%"
+    label: Title Fight Favorite Win Rate
+    description: Percentage of title fights where the favorite won
+    
+  # Finish method and betting
+  favorite_knockout_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "favorite" AND ufc_fights.method = "KO/TKO") / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "favorite") * 100
+    type: number
+    format: "%.1f%%"
+    label: Favorite Knockout Rate
+    description: Percentage of favorite wins that end by KO/TKO
+    
+  underdog_knockout_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "underdog" AND ufc_fights.method = "KO/TKO") / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "underdog") * 100
+    type: number
+    format: "%.1f%%"
+    label: Underdog Knockout Rate
+    description: Percentage of underdog wins that end by KO/TKO
+    
+  favorite_submission_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "favorite" AND ufc_fights.method = "SUB") / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "favorite") * 100
+    type: number
+    format: "%.1f%%"
+    label: Favorite Submission Rate
+    description: Percentage of favorite wins that end by submission
+    
+  underdog_submission_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "underdog" AND ufc_fights.method = "SUB") / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "underdog") * 100
+    type: number
+    format: "%.1f%%"
+    label: Underdog Submission Rate
+    description: Percentage of underdog wins that end by submission
+    
+  # Odds analysis
+  avg_fighter1_odds:
+    expression: AVG(ufc_fights.fighter1_odds)
+    type: number
+    format: "%.0f"
+    label: Average Fighter 1 Odds
+    description: Average betting odds for fighter 1
+    
+  avg_fighter2_odds:
+    expression: AVG(ufc_fights.fighter2_odds)
+    type: number
+    format: "%.0f"
+    label: Average Fighter 2 Odds
+    description: Average betting odds for fighter 2
+    
+  # Ranking and betting correlation
+  ranked_favorite_win_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "favorite" AND (ufc_fights.fighter1_rank IS NOT NULL OR ufc_fights.fighter2_rank IS NOT NULL)) / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome IS NOT NULL AND (ufc_fights.fighter1_rank IS NOT NULL OR ufc_fights.fighter2_rank IS NOT NULL)) * 100
+    type: number
+    format: "%.1f%%"
+    label: Ranked Fighter Favorite Win Rate
+    description: Favorite win rate in fights involving ranked fighters
+    
+  # Upset analysis
+  big_upset_rate:
+    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome = "underdog" AND (ABS(ufc_fights.fighter1_odds) >= 300 OR ABS(ufc_fights.fighter2_odds) >= 300)) / COUNT(ufc_fights.fight_id WHERE ufc_fights.betting_outcome IS NOT NULL AND (ABS(ufc_fights.fighter1_odds) >= 300 OR ABS(ufc_fights.fighter2_odds) >= 300)) * 100
+    type: number
+    format: "%.1f%%"
+    label: Big Upset Rate
+    description: Rate of upsets when odds are 3:1 or greater
