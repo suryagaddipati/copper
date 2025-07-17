@@ -19,15 +19,15 @@ def ecommerce_model():
         ],
         'dimensions': {
             'region': {
-                'sql': 'Customers.region',
+                'expression': 'Customers.region',
                 'type': 'string'
             },
             'customer_tier': {
-                'sql': 'Customers.tier', 
+                'expression': 'Customers.tier', 
                 'type': 'string'
             },
             'order_status': {
-                'sql': 'Orders.status',
+                'expression': 'Orders.status',
                 'type': 'string'
             }
         },
@@ -147,11 +147,9 @@ def test_query_validation(ecommerce_model):
     errors = valid_query.validate()
     assert len(errors) == 0
     
-    # Invalid dimension
-    invalid_query = Query(ecommerce_model).dimensions(['invalid_dim'])
-    errors = invalid_query.validate()
-    assert len(errors) > 0
-    assert "not found" in errors[0]
+    # Invalid dimension should raise ValueError immediately
+    with pytest.raises(ValueError, match="not found in semantic model"):
+        Query(ecommerce_model).dimensions(['invalid_dim'])
 
 
 def test_required_tables_detection(ecommerce_model):

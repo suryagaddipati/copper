@@ -11,11 +11,11 @@ def sample_model():
         'name': 'test_ecommerce',
         'dimensions': {
             'region': {
-                'sql': 'Customers.region',
+                'expression': 'Customers.region',
                 'type': 'string'
             },
             'customer_tier': {
-                'sql': 'Customers.tier',
+                'expression': 'Customers.tier',
                 'type': 'string'
             }
         },

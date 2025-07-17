@@ -1,24 +1,28 @@
 # Copper Build System
 
-.PHONY: clean build test parser install dev-install
+.PHONY: clean build test parser install dev-install sync
 
 # Python environment
-PYTHON := python3
-ANTLR_JAR := antlr-4.9.3-complete.jar
+PYTHON := uv run python
+ANTLR_JAR := antlr-4.13.2-complete.jar
 ANTLR_URL := https://www.antlr.org/download/$(ANTLR_JAR)
 
 # Directories
 GRAMMAR_DIR := grammar
 PARSER_DIR := copper/parser/generated
-SRC_DIR := copper
+SRC_DIR := src
+
+# Sync dependencies from lock file
+sync:
+	uv sync
 
 # Install development dependencies
 dev-install:
-	pip install -e ".[dev]"
+	uv sync --dev
 
 # Install package
 install:
-	pip install -e .
+	uv sync
 
 # Download ANTLR if not present
 $(ANTLR_JAR):
@@ -45,16 +49,16 @@ build: parser
 	$(PYTHON) setup.py build
 
 # Run tests
-test:
-	pytest tests/ -v --cov=$(SRC_DIR)
+test: dev-install
+	$(PYTHON) -m pytest tests/ -v --cov=$(SRC_DIR)
 
 # Format code
-format:
-	black $(SRC_DIR) tests/
+format: dev-install
+	$(PYTHON) -m black $(SRC_DIR) tests/
 
 # Type checking
-typecheck:
-	mypy $(SRC_DIR)
+typecheck: dev-install
+	$(PYTHON) -m mypy $(SRC_DIR)
 
 # Lint code
 lint: format typecheck
@@ -65,3 +69,7 @@ setup: dev-install parser
 # Run example
 example:
 	$(PYTHON) examples/basic_demo.py
+
+# UFC examples
+ufc-explore:
+	cd examples/ufc && $(PYTHON) explore.py

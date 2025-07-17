@@ -6,11 +6,11 @@ from src.semantic.loader import SemanticModelLoader
 def test_dimension_creation():
     """Test creating dimensions."""
     dim = Dimension(
-        sql="Customers.region",
+        expression="Customers.region",
         type="string",
         description="Customer region"
     )
-    assert dim.sql == "Customers.region"
+    assert dim.expression == "Customers.region"
     assert dim.type == "string"
 
 
@@ -43,7 +43,7 @@ def test_semantic_model_loader():
         'name': 'test_model',
         'dimensions': {
             'region': {
-                'sql': 'Customers.region',
+                'expression': 'Customers.region',
                 'type': 'string'
             }
         },
@@ -68,7 +68,7 @@ def test_semantic_model_loader():
     # Test dimension retrieval
     region_dim = model.get_dimension('region')
     assert region_dim is not None
-    assert region_dim.sql == 'Customers.region'
+    assert region_dim.expression == 'Customers.region'
     
     # Test measure retrieval
     revenue_measure = model.get_measure('revenue')

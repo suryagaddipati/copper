@@ -22,9 +22,9 @@ class CopperParser:
     
     def parse(self, expression: str) -> ASTNode:
         try:
-            from generated.CopperLexer import CopperLexer
-            from generated.CopperParser import CopperParser as GeneratedParser
-            from generated.CopperBaseVisitor import CopperBaseVisitor
+            from copper.parser.generated.grammar.CopperLexer import CopperLexer
+            from copper.parser.generated.grammar.CopperParser import CopperParser as GeneratedParser
+            from copper.parser.generated.grammar.CopperVisitor import CopperVisitor
             
             input_stream = antlr4.InputStream(expression)
             lexer = CopperLexer(input_stream)

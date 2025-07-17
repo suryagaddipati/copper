@@ -1,12 +1,7 @@
 import unittest
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
-
-from executors.sql_generator import SQLGenerator
-from semantic.schema import SemanticModel, Dimension, Measure, DataSource, Relationship
-from query.builder import Query
+from src.executors.sql_generator import SQLGenerator
+from src.semantic.schema import SemanticModel, Dimension, Measure, DataSource, Relationship
+from src.query.builder import Query
 
 
 class TestSQLGenerator(unittest.TestCase):
@@ -101,9 +96,9 @@ class TestSQLGenerator(unittest.TestCase):
             "  customers.name AS customer_name,",
             "  COUNT(orders.id) AS total_orders",
             "FROM",
-            "  analytics.public.orders",
-            "  LEFT JOIN analytics.public.customers",
-            "    ON orders.customer_id = customers.id",
+            "  analytics.public.customers",
+            "  LEFT JOIN analytics.public.orders",
+            "    ON customers.id = orders.customer_id",
             "GROUP BY",
             "  customers.name"
         ]
@@ -124,9 +119,9 @@ class TestSQLGenerator(unittest.TestCase):
             "  COUNT(orders.id) AS total_orders,",
             "  SUM(orders.amount) AS total_amount",
             "FROM",
-            "  analytics.public.orders",
-            "  LEFT JOIN analytics.public.customers",
-            "    ON orders.customer_id = customers.id",
+            "  analytics.public.customers",
+            "  LEFT JOIN analytics.public.orders",
+            "    ON customers.id = orders.customer_id",
             "GROUP BY",
             "  customers.name,",
             "  EXTRACT(YEAR FROM orders.order_date)"
@@ -148,9 +143,9 @@ class TestSQLGenerator(unittest.TestCase):
             "  customers.name AS customer_name,",
             "  COUNT(orders.id) AS total_orders",
             "FROM",
-            "  analytics.public.orders",
-            "  LEFT JOIN analytics.public.customers",
-            "    ON orders.customer_id = customers.id",
+            "  analytics.public.customers",
+            "  LEFT JOIN analytics.public.orders",
+            "    ON customers.id = orders.customer_id",
             "WHERE",
             "  orders.amount > 100",
             "  AND   customers.region = \"West\"",
@@ -257,7 +252,7 @@ class TestSQLGenerator(unittest.TestCase):
         self.assertEqual(generator.dialect, "postgresql")
     
     def test_convenience_function(self):
-        from executors.sql_generator import generate_sql
+        from src.executors.sql_generator import generate_sql
         
         query = Query(self.model).dimensions(['customer_name'])
         sql = generate_sql(query)

@@ -170,10 +170,10 @@ class PandasExecutor:
         # Add dimensions
         for dim_name in query._dimensions:
             dimension = self.semantic_model.get_dimension(dim_name)
-            if dimension.sql:
+            if hasattr(dimension, 'sql') and dimension.sql:
                 # For now, assume simple column reference
                 column_expr = self._parse_sql_to_pandas(dimension.sql, main_df, dataframes)
-            elif dimension.expression:
+            elif hasattr(dimension, 'expression') and dimension.expression:
                 ast = self.parser.parse(dimension.expression)
                 generator = PandasCodeGenerator(dataframes)
                 column_expr = ast.accept(generator)

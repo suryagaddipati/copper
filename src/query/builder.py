@@ -71,8 +71,12 @@ class Query:
         
         for dim_name in self._dimensions:
             dimension = self.semantic_model.get_dimension(dim_name)
-            if dimension and dimension.sql:
-                required_tables.update(self._extract_table_names(dimension.sql))
+            if dimension:
+                if hasattr(dimension, 'sql') and dimension.sql:
+                    required_tables.update(self._extract_table_names(dimension.sql))
+                elif hasattr(dimension, 'expression') and dimension.expression:
+                    ast = self.parser.parse(dimension.expression)
+                    required_tables.update(self._extract_tables_from_ast(ast))
         
         for measure_name in self._measures:
             measure = self.semantic_model.get_measure(measure_name)

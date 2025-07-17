@@ -72,7 +72,8 @@ This is a Python-based project that implements a DAX-like expression language pa
 #### Python Development
 ```bash
 # Development setup
-make dev-install     # Install with development dependencies
+make sync           # Sync dependencies from lock file
+make dev-install    # Install with development dependencies
 make setup          # Full setup including parser generation
 
 # Core development commands
@@ -85,14 +86,14 @@ make clean          # Clean generated files
 
 # Demo and examples
 make example        # Run basic demo
-python examples/ufc/explore.py  # UFC analytics demonstration
+make ufc-explore    # UFC analytics demonstration
 ```
 
 #### Specific Test Commands
 ```bash
-pytest                              # Run all tests
-pytest tests/test_pandas_executor.py  # Run specific test file
-pytest --cov=src                   # Run with coverage reporting
+uv run python -m pytest                              # Run all tests
+uv run python -m pytest tests/test_pandas_executor.py  # Run specific test file
+uv run python -m pytest --cov=src                   # Run with coverage reporting
 ```
 
 ### Current Project Structure
@@ -221,6 +222,7 @@ title_fight_finish_rate:
 - **PyYAML**: YAML file processing
 
 ### Development Tools
+- **uv**: Fast Python package manager and environment manager
 - **black**: Code formatting
 - **mypy**: Type checking
 - **Java**: Required for ANTLR parser generation
@@ -247,29 +249,31 @@ The project includes comprehensive testing:
 ## Prerequisites & Setup
 
 ### Required Tools
-- **Python 3.8+** with pip
+- **Python 3.8+** with uv package manager
 - **Java 8+** for ANTLR parser generation
 - **ANTLR 4.9.3** complete JAR (downloaded automatically by Makefile)
 
 ### Setup Process
-1. `make dev-install` - Install Python dependencies
-2. `make parser` - Generate ANTLR parser (requires Java)
-3. `make test` - Verify installation
+1. `make sync` - Sync dependencies from lock file
+2. `make dev-install` - Install with development dependencies
+3. `make parser` - Generate ANTLR parser (requires Java)
+4. `make test` - Verify installation
 
 ### Important Notes
+- The project uses **uv** for Python dependency management
+- All Python commands run through `uv run python` for proper environment isolation
 - The Makefile references `copper/` directory for source code, but actual source is in `src/`
 - ANTLR parser generation creates files in `copper/parser/generated/` (may need adjustment)
-- Some Makefile targets may need updating to match current project structure
 
 ## Common Development Tasks
 
 ### Working with Semantic Models
 ```bash
 # Load and validate a YAML model (when model files exist)
-# python -c "import src as copper; model = copper.load('examples/ufc/model.yaml')"
+# uv run python -c "import src as copper; model = copper.load('examples/ufc/model.yaml')"
 
 # Explore UFC data directly
-python examples/ufc/explore.py
+make ufc-explore
 ```
 
 ### Parser Development
@@ -278,17 +282,17 @@ python examples/ufc/explore.py
 make parser
 
 # Test expression parsing
-python -c "from src.parser.antlr_parser import CopperExpressionParser; parser = CopperExpressionParser()"
+uv run python -c "from src.parser.antlr_parser import CopperExpressionParser; parser = CopperExpressionParser()"
 ```
 
 ### Package Development
 ```bash
-# Install in development mode
-pip install -e .
-
-# Or use make targets
+# Sync dependencies and install in development mode
+make sync
 make dev-install
-make setup
+
+# Or just sync from lock file
+make sync
 ```
 
 ## Architecture Notes

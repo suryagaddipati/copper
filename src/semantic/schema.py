@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional, Union, Any
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from enum import Enum
 
 
@@ -42,14 +42,13 @@ class Measure(BaseModel):
 class Relationship(BaseModel):
     """Represents a relationship between tables."""
     
+    model_config = ConfigDict(populate_by_name=True)
+    
     from_table: str = Field(..., alias="from")
     to_table: str = Field(..., alias="to")
     from_column: str
     to_column: str
     cardinality: str = "many_to_one"  # one_to_one, one_to_many, many_to_one, many_to_many
-    
-    class Config:
-        allow_population_by_field_name = True
 
 
 class DataSource(BaseModel):
@@ -66,10 +65,11 @@ class DataSource(BaseModel):
     description: Optional[str] = None
     columns: Optional[List[Dict[str, str]]] = None
     
-    @validator('sql', 'table', 'endpoint')
-    def source_identifier_required(cls, v, values):
+    @field_validator('sql', 'table', 'endpoint')
+    @classmethod
+    def source_identifier_required(cls, v, info):
         # At least one source identifier must be provided
-        if not any([v, values.get('sql'), values.get('table'), values.get('endpoint')]):
+        if not any([v, info.data.get('sql'), info.data.get('table'), info.data.get('endpoint')]):
             raise ValueError('At least one of sql, table, or endpoint must be provided')
         return v
 
