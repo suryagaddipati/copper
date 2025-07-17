@@ -1,9 +1,7 @@
 name: fight_analysis
 description: UFC fight outcome and method analysis - focuses on how fights end and finish rates
 
-tables:
-  ufc_fights:
-    table: ufc_fights_all
+include: "datasources.yaml"
 
 dimensions:
   weight_class:
@@ -11,13 +9,13 @@ dimensions:
     type: string
     label: Weight Class
     description: Weight division for the fight
-    
+
   finish_method:
     expression: ufc_fights.method
     type: string
     label: Finish Method
     description: Method of victory (KO/TKO, SUB, Decision, etc.)
-    
+
   finish_type:
     expression: CASE
       WHEN ufc_fights.method = "KO/TKO" THEN "Knockout"
@@ -27,9 +25,9 @@ dimensions:
     type: string
     label: Finish Type
     description: Simplified finish method categorization
-    
+
   fight_duration_category:
-    expression: CASE 
+    expression: CASE
       WHEN ufc_fights.round = 1 THEN "Round 1"
       WHEN ufc_fights.round = 2 THEN "Round 2"
       WHEN ufc_fights.round = 3 THEN "Round 3"
@@ -38,13 +36,13 @@ dimensions:
     type: string
     label: Fight Duration Category
     description: Categorized fight duration
-    
+
   is_title_fight:
     expression: ufc_fights.title_fight
     type: boolean
     label: Title Fight
     description: Whether this was a title fight
-    
+
   gender:
     expression: ufc_fights.gender
     type: string
@@ -57,7 +55,7 @@ measures:
     type: number
     label: Total Fights
     description: Total number of fights
-    
+
   avg_fight_rounds:
     expression: AVG(ufc_fights.round)
     type: number

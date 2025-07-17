@@ -33,7 +33,10 @@ def run_semantic_model(model_path, data_path):
         print(f"\nMeasures:")
         
         data_dict = {}
-        if hasattr(model, 'tables') and model.tables:
+        if hasattr(model, 'datasources') and model.datasources:
+            for ds_name, ds_config in model.datasources.items():
+                data_dict[ds_name] = df
+        elif hasattr(model, 'tables') and model.tables:
             for table_name, table_config in model.tables.items():
                 data_dict[table_name] = df
         else:
