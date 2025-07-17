@@ -54,23 +54,25 @@ class Relationship(BaseModel):
 class DataSource(BaseModel):
     """Represents a data source in the semantic model."""
     
-    type: str = "table"  # table, view, api, stream, etc.
+    type: str = "table"  # table, view, api, stream, file, etc.
     sql: Optional[str] = None
     database: Optional[str] = None
     schema: Optional[str] = None
     table: Optional[str] = None
     endpoint: Optional[str] = None  # for API sources
     topic: Optional[str] = None     # for streaming sources
+    file_path: Optional[str] = None  # for file-based sources
+    format: Optional[str] = None     # csv, json, parquet, etc.
     refresh_schedule: Optional[str] = None
     description: Optional[str] = None
     columns: Optional[List[Dict[str, str]]] = None
     
-    @field_validator('sql', 'table', 'endpoint')
+    @field_validator('sql', 'table', 'endpoint', 'file_path')
     @classmethod
     def source_identifier_required(cls, v, info):
         # At least one source identifier must be provided
-        if not any([v, info.data.get('sql'), info.data.get('table'), info.data.get('endpoint')]):
-            raise ValueError('At least one of sql, table, or endpoint must be provided')
+        if not any([v, info.data.get('sql'), info.data.get('table'), info.data.get('endpoint'), info.data.get('file_path')]):
+            raise ValueError('At least one of sql, table, endpoint, or file_path must be provided')
         return v
 
 

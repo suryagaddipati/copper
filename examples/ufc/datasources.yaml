@@ -1,5 +1,7 @@
 datasources:
   ufc_fights:
-    type: table
+    type: file
+    file_path: ufc_fights_all.csv
+    format: csv
     table: ufc_fights_all
     description: Complete UFC fight dataset with fighter statistics, odds, and match results from 1993 to present
