@@ -1,6 +1,10 @@
 name: fight_analysis
 description: UFC fight outcome and method analysis - focuses on how fights end and finish rates
 
+tables:
+  ufc_fights:
+    table: ufc_fights_all
+
 dimensions:
   weight_class:
     expression: ufc_fights.weight_class
@@ -54,57 +58,9 @@ measures:
     label: Total Fights
     description: Total number of fights
     
-  finish_rate:
-    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method != "Decision") / COUNT(ufc_fights.fight_id) * 100
-    type: number
-    format: "%.1f%%"
-    label: Finish Rate
-    description: Percentage of fights that end before decision
-    
-  knockout_rate:
-    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method = "KO/TKO") / COUNT(ufc_fights.fight_id) * 100
-    type: number
-    format: "%.1f%%"
-    label: Knockout Rate
-    description: Percentage of fights that end by KO/TKO
-    
-  submission_rate:
-    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method = "SUB") / COUNT(ufc_fights.fight_id) * 100
-    type: number
-    format: "%.1f%%"
-    label: Submission Rate
-    description: Percentage of fights that end by submission
-    
-  decision_rate:
-    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.method = "Decision") / COUNT(ufc_fights.fight_id) * 100
-    type: number
-    format: "%.1f%%"
-    label: Decision Rate
-    description: Percentage of fights that go to decision
-    
-  title_fight_count:
-    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true)
-    type: number
-    label: Title Fight Count
-    description: Number of title fights
-    
-  title_fight_finish_rate:
-    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true AND ufc_fights.method != "Decision") / COUNT(ufc_fights.fight_id WHERE ufc_fights.title_fight = true) * 100
-    type: number
-    format: "%.1f%%"
-    label: Title Fight Finish Rate
-    description: Percentage of title fights that end before decision
-    
   avg_fight_rounds:
     expression: AVG(ufc_fights.round)
     type: number
     format: "%.2f"
     label: Average Fight Rounds
     description: Average number of rounds fights last
-    
-  round_1_finish_rate:
-    expression: COUNT(ufc_fights.fight_id WHERE ufc_fights.round = 1) / COUNT(ufc_fights.fight_id) * 100
-    type: number
-    format: "%.1f%%"
-    label: Round 1 Finish Rate
-    description: Percentage of fights that end in round 1
