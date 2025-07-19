@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import Dict, Any, List, Optional
-from ..semantic.schema import SemanticModel, Dimension, Measure
+# No longer using semantic schema - using direct execution
 from ..parser.antlr_parser import CopperParser
 from ..parser.ast_nodes import *
 

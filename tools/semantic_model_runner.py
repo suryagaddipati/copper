@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generic Semantic Model Runner
+Generic Semantic Model Runner - Using New Model Architecture
 """
 
 import pandas as pd
@@ -10,11 +10,16 @@ import argparse
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-import src as copper
+from src.model import load_model
 
-def run_semantic_model(model_path, data_path):
-    df = pd.read_csv(data_path)
-    model = copper.load(model_path)
+def run_semantic_model(model_path):
+    model = load_model(model_path)
+    
+    # Load data from datasource
+    from pathlib import Path
+    model_dir = Path(model_path).parent
+    datasource = next(iter(model.datasources.values()))
+    df = datasource.load(base_path=model_dir)
     
     print(f"Dataset: {df.shape[0]} rows, {df.shape[1]} columns")
     print(f"Model: {model.name}")
@@ -33,26 +38,21 @@ def run_semantic_model(model_path, data_path):
         print(f"\nMeasures:")
         
         data_dict = {}
-        if hasattr(model, 'datasources') and model.datasources:
-            for ds_name, ds_config in model.datasources.items():
-                data_dict[ds_name] = df
-        elif hasattr(model, 'tables') and model.tables:
-            for table_name, table_config in model.tables.items():
-                data_dict[table_name] = df
-        else:
-            data_dict = {'default_table': df}
+        for ds_name in model.datasources.keys():
+            data_dict[ds_name] = df
         
         for measure_name, measure in model.measures.items():
             print(f"{measure.label}: {measure.expression}")
             
-            query = copper.Query(model).measures([measure_name])
-            result = query.to_pandas(data_dict)
-            value = result[measure_name].iloc[0]
-            
-            if hasattr(measure, 'format') and measure.format:
-                print(f"  Result: {measure.format % value}")
-            else:
-                print(f"  Result: {value}")
+            try:
+                value = measure.calculate(model, data_dict)
+                
+                if hasattr(measure, 'format') and measure.format:
+                    print(f"  Result: {measure.format % value}")
+                else:
+                    print(f"  Result: {value}")
+            except Exception as e:
+                print(f"  Error calculating: {e}")
             print()
     
     print(f"\nDataset Overview:")
@@ -65,22 +65,20 @@ def run_semantic_model(model_path, data_path):
 def main():
     parser = argparse.ArgumentParser(description='Run semantic models with their datasets')
     parser.add_argument('model_path', help='Path to the semantic model YAML file')
-    parser.add_argument('data_path', help='Path to the CSV data file')
     
     args = parser.parse_args()
-    run_semantic_model(args.model_path, args.data_path)
+    run_semantic_model(args.model_path)
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         ufc_dir = os.path.join(script_dir, '..', 'examples', 'ufc')
         model_path = os.path.join(ufc_dir, 'fight_analysis.yaml')
-        data_path = os.path.join(ufc_dir, 'ufc_fights_all.csv')
         
-        if os.path.exists(model_path) and os.path.exists(data_path):
-            run_semantic_model(model_path, data_path)
+        if os.path.exists(model_path):
+            run_semantic_model(model_path)
         else:
-            print("Usage: python semantic_model_runner.py <model_path> <data_path>")
-            print("Example: python semantic_model_runner.py fight_analysis.yaml ufc_fights_all.csv")
+            print("Usage: python semantic_model_runner.py <model_path>")
+            print("Example: python semantic_model_runner.py fight_analysis.yaml")
     else:
         main()
