@@ -9,7 +9,6 @@ import src as copper
 
 
 class Measure(BaseModel):
-    """Measure with expression and calculate method."""
     
     expression: str
     type: DataType = DataType.NUMBER
@@ -18,16 +17,21 @@ class Measure(BaseModel):
     format: Optional[str] = None
     
     def calculate(self, model, data_dict: Dict[str, Any]) -> Any:
-        """Calculate the measure value using direct pandas execution."""
-        from ..executors.pandas_executor import PandasExecutor
+        from ..executors.pandas_executor import PandasCodeGenerator
         from ..parser.antlr_parser import CopperParser
+        import numpy as np
         
-        # Parse the expression
         parser = CopperParser()
         ast = parser.parse(self.expression)
         
-        # Execute directly with pandas
-        executor = PandasExecutor()
-        result = executor.execute(ast, data_dict)
+        generator = PandasCodeGenerator(data_dict)
+        code = ast.accept(generator)
         
-        return result
+        local_vars = data_dict.copy()
+        local_vars['np'] = np
+        
+        try:
+            result = eval(code, {"__builtins__": {}}, local_vars)
+            return result
+        except Exception as e:
+            raise ValueError(f"Could not evaluate measure expression '{code}': {e}")

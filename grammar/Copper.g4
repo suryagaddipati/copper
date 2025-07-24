@@ -1,6 +1,4 @@
 grammar Copper;
-
-// Parser Rules
 expression
     : logicalOrExpression
     ;
@@ -125,8 +123,6 @@ literal
     | NULL
     ;
 
-// Lexer Rules
-// Keywords
 SUM         : 'SUM';
 COUNT       : 'COUNT';
 AVG         : 'AVG';
@@ -152,7 +148,6 @@ ISNULL      : 'ISNULL';
 ISBLANK     : 'ISBLANK';
 NULL        : 'NULL';
 
-// Operators
 EQUALS              : '=';
 NOT_EQUALS          : '<>' | '!=';
 LESS_THAN           : '<';
@@ -164,13 +159,11 @@ MINUS               : '-';
 MULTIPLY            : '*';
 DIVIDE              : '/';
 
-// Delimiters
 LPAREN      : '(';
 RPAREN      : ')';
 COMMA       : ',';
 DOT         : '.';
 
-// Literals
 NUMBER
     : [0-9]+ ('.' [0-9]+)?
     | '.' [0-9]+
@@ -188,7 +181,6 @@ BOOLEAN
     | 'false'
     ;
 
-// Identifiers
 IDENTIFIER
     : [a-zA-Z_][a-zA-Z0-9_]*
     ;
@@ -197,13 +189,12 @@ QUOTED_IDENTIFIER
     : '[' (~[[\]'\r\n])* ']'
     ;
 
-// Whitespace and Comments
 WS
     : [ \t\r\n]+ -> skip
     ;
 
 LINE_COMMENT
-    : '//' ~[\r\n]* -> skip
+    : ~[\r\n]* -> skip
     ;
 
 BLOCK_COMMENT

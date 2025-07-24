@@ -1,14 +1,3 @@
-"""
-New simplified model architecture for Copper.
-
-Implements the 4-class design from docs/model.md:
-- DataSource: Data source metadata
-- Dimension: Dimension with expression  
-- Measure: Measure with calculate() method
-- Model: Container for dimensions and measures
-- SemanticModel: Top-level with load() method
-"""
-
 from .datasource import DataSource
 from .dimension import Dimension, DataType
 from .measure import Measure

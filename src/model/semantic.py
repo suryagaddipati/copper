@@ -4,7 +4,6 @@ from .datasource import DataSource
 from .dimension import Dimension
 from .measure import Measure
 class Model(BaseModel):
-    """Model containing dimensions and measures."""
     
     name: str
     description: Optional[str] = None
@@ -14,7 +13,6 @@ class Model(BaseModel):
 
 
 class SemanticModel(BaseModel):
-    """Top-level semantic model container."""
     
     name: str
     description: Optional[str] = None
@@ -22,7 +20,6 @@ class SemanticModel(BaseModel):
     
     @classmethod
     def load(cls, models: List[Model], name: str = "semantic_model", description: str = None) -> "SemanticModel":
-        """Load semantic model from list of models."""
         return cls(
             name=name,
             description=description,

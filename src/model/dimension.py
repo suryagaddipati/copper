@@ -11,7 +11,6 @@ class DataType(str, Enum):
 
 
 class Dimension(BaseModel):
-    """Dimension with expression and metadata."""
     
     expression: str
     type: DataType = DataType.STRING

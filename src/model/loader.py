@@ -8,11 +8,9 @@ from .semantic import Model, SemanticModel
 
 
 class ModelLoader:
-    """Loader for new model architecture."""
     
     @staticmethod
     def load_from_file(file_path: Union[str, Path]) -> Model:
-        """Load model from YAML file."""
         path = Path(file_path)
         if not path.exists():
             raise FileNotFoundError(f"Model file not found: {file_path}")
@@ -24,31 +22,24 @@ class ModelLoader:
     
     @staticmethod
     def load_from_dict(data: Dict[str, Any], base_path: Path = None) -> Model:
-        """Load model from dictionary data."""
-        # Process includes first
         if 'include' in data and base_path:
             data = ModelLoader._process_includes(data, base_path)
         
-        # Load datasources
         datasources = {}
         if 'datasources' in data:
             for name, ds_def in data['datasources'].items():
                 datasources[name] = DataSource(**ds_def)
         
-        # Load dimensions
         dimensions = {}
         if 'dimensions' in data:
             for name, dim_def in data['dimensions'].items():
-                # Convert type string to enum
                 if 'type' in dim_def:
                     dim_def['type'] = DataType(dim_def['type'])
                 dimensions[name] = Dimension(**dim_def)
         
-        # Load measures
         measures = {}
         if 'measures' in data:
             for name, measure_def in data['measures'].items():
-                # Convert type string to enum
                 if 'type' in measure_def:
                     measure_def['type'] = DataType(measure_def['type'])
                 measures[name] = Measure(**measure_def)
@@ -63,12 +54,10 @@ class ModelLoader:
     
     @staticmethod
     def _process_includes(data: Dict[str, Any], base_path: Path) -> Dict[str, Any]:
-        """Process include directives."""
         include_spec = data.get('include')
         if not include_spec:
             return data
         
-        # Support both single include and list of includes
         if isinstance(include_spec, str):
             include_files = [include_spec]
         elif isinstance(include_spec, list):
@@ -76,7 +65,6 @@ class ModelLoader:
         else:
             raise ValueError(f"Invalid include format: {include_spec}")
         
-        # Load and merge included files
         merged_data = data.copy()
         
         for include_file in include_files:
@@ -87,10 +75,8 @@ class ModelLoader:
             with open(include_path, 'r') as f:
                 include_data = yaml.safe_load(f)
             
-            # Merge the included data
             merged_data = ModelLoader._merge_data(merged_data, include_data)
         
-        # Remove the include directive from the final data
         if 'include' in merged_data:
             del merged_data['include']
         
@@ -98,28 +84,22 @@ class ModelLoader:
     
     @staticmethod
     def _merge_data(base_data: Dict[str, Any], include_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Merge included data into base data."""
         merged = base_data.copy()
         
-        # Define sections that should be merged (not overwritten)
         merge_sections = ['datasources', 'dimensions', 'measures']
         
         for key, value in include_data.items():
             if key in merge_sections and key in merged:
-                # Merge dictionaries
                 if isinstance(merged[key], dict) and isinstance(value, dict):
-                    merged[key] = {**value, **merged[key]}  # Base data takes precedence
+                    merged[key] = {**value, **merged[key]}
                 else:
-                    # Keep base data if types don't match
+                    pass
                     pass
             elif key not in merged:
-                # Add new keys from included file
                 merged[key] = value
-            # If key exists in base but not in merge_sections, keep base value
         
         return merged
 
 
 def load_model(file_path: Union[str, Path]) -> Model:
-    """Load model from file."""
     return ModelLoader.load_from_file(file_path)

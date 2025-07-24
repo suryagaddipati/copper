@@ -4,19 +4,16 @@ from dataclasses import dataclass
 
 
 class ASTNode(ABC):
-    """Base class for all AST nodes."""
     
     @abstractmethod
     def accept(self, visitor):
-        """Accept a visitor for the visitor pattern."""
         pass
 
 
 @dataclass
 class Literal(ASTNode):
-    """Represents literal values (numbers, strings, booleans, null)."""
     value: Any
-    type: str  # 'number', 'string', 'boolean', 'null'
+    type: str
     
     def accept(self, visitor):
         return visitor.visit_literal(self)
@@ -24,7 +21,6 @@ class Literal(ASTNode):
 
 @dataclass
 class Identifier(ASTNode):
-    """Represents an identifier (variable name, column name)."""
     name: str
     
     def accept(self, visitor):
@@ -33,7 +29,6 @@ class Identifier(ASTNode):
 
 @dataclass
 class ColumnReference(ASTNode):
-    """Represents a column reference (Table.column or just column)."""
     table: Optional[str]
     column: str
     
@@ -43,7 +38,6 @@ class ColumnReference(ASTNode):
 
 @dataclass
 class BinaryOperation(ASTNode):
-    """Represents binary operations (+, -, *, /, =, <, >, etc.)."""
     left: ASTNode
     operator: str
     right: ASTNode
@@ -54,7 +48,6 @@ class BinaryOperation(ASTNode):
 
 @dataclass
 class UnaryOperation(ASTNode):
-    """Represents unary operations (NOT, -)."""
     operator: str
     operand: ASTNode
     
@@ -64,7 +57,6 @@ class UnaryOperation(ASTNode):
 
 @dataclass
 class FunctionCall(ASTNode):
-    """Represents function calls."""
     function_name: str
     arguments: List[ASTNode]
     
@@ -74,7 +66,6 @@ class FunctionCall(ASTNode):
 
 @dataclass
 class IfExpression(ASTNode):
-    """Represents IF(condition, true_value, false_value)."""
     condition: ASTNode
     true_value: ASTNode
     false_value: ASTNode
@@ -85,14 +76,12 @@ class IfExpression(ASTNode):
 
 @dataclass
 class SwitchCase:
-    """Represents a single case in a SWITCH expression."""
     condition: ASTNode
     value: ASTNode
 
 
 @dataclass
 class SwitchExpression(ASTNode):
-    """Represents SWITCH(expr, case1, value1, case2, value2, default)."""
     expression: ASTNode
     cases: List[SwitchCase]
     default_value: Optional[ASTNode] = None
@@ -103,14 +92,12 @@ class SwitchExpression(ASTNode):
 
 @dataclass
 class WhenClause:
-    """Represents a WHEN clause in a CASE expression."""
     condition: ASTNode
     value: ASTNode
 
 
 @dataclass
 class CaseExpression(ASTNode):
-    """Represents CASE WHEN ... THEN ... ELSE ... END."""
     when_clauses: List[WhenClause]
     else_value: Optional[ASTNode] = None
     
@@ -119,7 +106,6 @@ class CaseExpression(ASTNode):
 
 
 class ASTVisitor(ABC):
-    """Abstract visitor for AST nodes."""
     
     @abstractmethod
     def visit_literal(self, node: Literal):

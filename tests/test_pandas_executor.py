@@ -7,7 +7,6 @@ from src.query.builder import Query
 
 @pytest.fixture
 def ecommerce_model():
-    """Create ecommerce semantic model."""
     model_def = {
         'name': 'ecommerce',
         'tables': {
@@ -51,7 +50,6 @@ def ecommerce_model():
 
 @pytest.fixture
 def ecommerce_data():
-    """Create ecommerce test data."""
     orders = pd.DataFrame({
         'id': [1, 2, 3, 4, 5],
         'customer_id': [1, 2, 1, 3, 2],
@@ -72,36 +70,29 @@ def ecommerce_data():
 
 
 def test_simple_dimension_query(ecommerce_model, ecommerce_data):
-    """Test simple dimension-only query."""
     query = Query(ecommerce_model).dimensions(['region'])
     
     try:
         result = query.to_pandas(ecommerce_data)
         assert 'region' in result.columns
-        # Should have unique regions
-        assert len(result) <= 3  # We have 3 customers with regions
+        assert len(result) <= 3
     except Exception as e:
-        # Expected to fail with current simplified implementation
         assert "Could not evaluate" in str(e) or "name 'np' is not defined" in str(e)
 
 
 def test_simple_measure_query(ecommerce_model, ecommerce_data):
-    """Test simple measure-only query."""
     query = Query(ecommerce_model).measures(['revenue'])
     
     try:
         result = query.to_pandas(ecommerce_data)
         assert 'revenue' in result.columns
-        # Should have single row with total revenue
         expected_revenue = ecommerce_data['Orders']['total_amount'].sum()
         assert len(result) == 1
     except Exception as e:
-        # Expected to fail with current simplified implementation
         assert "Could not evaluate" in str(e) or "name 'np' is not defined" in str(e)
 
 
 def test_dimension_and_measure_query(ecommerce_model, ecommerce_data):
-    """Test query with both dimensions and measures."""
     query = Query(ecommerce_model) \
         .dimensions(['region']) \
         .measures(['revenue', 'order_count'])
@@ -112,16 +103,13 @@ def test_dimension_and_measure_query(ecommerce_model, ecommerce_data):
         assert 'revenue' in result.columns
         assert 'order_count' in result.columns
         
-        # Should be grouped by region
-        assert len(result) <= 3  # Number of unique regions
+        assert len(result) <= 3
     except Exception as e:
-        # Expected to fail with current simplified implementation
         print(f"Expected error (implementation limitation): {e}")
-        assert True  # This is expected with current simplified implementation
+        assert True
 
 
 def test_query_with_filters(ecommerce_model, ecommerce_data):
-    """Test query with filters."""
     query = Query(ecommerce_model) \
         .dimensions(['region']) \
         .measures(['revenue']) \
@@ -130,36 +118,28 @@ def test_query_with_filters(ecommerce_model, ecommerce_data):
     try:
         result = query.to_pandas(ecommerce_data)
         
-        # Should only include shipped orders
         shipped_orders = ecommerce_data['Orders'][ecommerce_data['Orders']['status'] == 'shipped']
         expected_revenue = shipped_orders['total_amount'].sum()
         
     except Exception as e:
-        # Expected to fail with current simplified implementation
         print(f"Expected error (implementation limitation): {e}")
         assert True
 
 
 def test_query_validation(ecommerce_model):
-    """Test query validation works."""
-    # Valid query
     valid_query = Query(ecommerce_model).dimensions(['region']).measures(['revenue'])
     errors = valid_query.validate()
     assert len(errors) == 0
     
-    # Invalid dimension should raise ValueError immediately
     with pytest.raises(ValueError, match="not found in semantic model"):
         Query(ecommerce_model).dimensions(['invalid_dim'])
 
 
 def test_required_tables_detection(ecommerce_model):
-    """Test detection of required tables."""
     query = Query(ecommerce_model) \
         .dimensions(['region']) \
         .measures(['revenue'])
     
     required_tables = query.get_required_tables()
-    # Should detect that we need both Orders and Customers tables
-    # Note: This may not work perfectly with current simplified implementation
     print(f"Required tables: {required_tables}")
     assert isinstance(required_tables, list)
