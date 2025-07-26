@@ -24,11 +24,11 @@ class DataSource(BaseModel):
         if not os.path.isabs(file_path) and base_path:
             file_path = base_path / file_path
         
-        if self.format == "csv" or file_path.endswith('.csv'):
+        if self.format == "csv" or file_path.suffix == '.csv':
             return pd.read_csv(file_path)
-        elif self.format == "parquet" or file_path.endswith('.parquet'):
+        elif self.format == "parquet" or file_path.suffix == '.parquet':
             return pd.read_parquet(file_path)
-        elif self.format == "json" or file_path.endswith('.json'):
+        elif self.format == "json" or file_path.suffix == '.json':
             return pd.read_json(file_path)
         else:
             return pd.read_csv(file_path)
