@@ -20,8 +20,8 @@ class DataSource(BaseModel):
         if not self.file_path:
             raise ValueError("file_path is required for file datasource")
         
-        file_path = self.file_path
-        if not os.path.isabs(file_path) and base_path:
+        file_path = Path(self.file_path)
+        if not file_path.is_absolute() and base_path:
             file_path = base_path / file_path
         
         if self.format == "csv" or file_path.suffix == '.csv':
