@@ -27,6 +27,7 @@ import duckdb
 import os
 import re
 from pathlib import Path
+from bs4 import BeautifulSoup
 
 def clean_column_name(name):
     """Clean and standardize column names"""
@@ -44,6 +45,79 @@ def clean_column_name(name):
     
     return name
 
+def align_dataframe_columns(df, existing_col_names):
+    """
+    Align DataFrame columns with existing table schema
+    Add missing columns with NULL values, remove extra columns
+    """
+    # Create a copy to avoid modifying original
+    df_aligned = df.copy()
+    
+    # Add missing columns with NULL values
+    for col in existing_col_names:
+        if col not in df_aligned.columns:
+            df_aligned[col] = None
+            print(f"      Added missing column: {col}")
+    
+    # Remove extra columns not in existing schema
+    extra_cols = [col for col in df_aligned.columns if col not in existing_col_names]
+    if extra_cols:
+        print(f"      Dropping extra columns: {extra_cols}")
+        df_aligned = df_aligned.drop(columns=extra_cols)
+    
+    # Reorder columns to match existing table
+    df_aligned = df_aligned[existing_col_names]
+    
+    return df_aligned
+
+def parse_html_file(html_file, target_sheet_name):
+    """
+    Parse HTML file that contains demographic data tables
+    Returns DataFrame for the target sheet name
+    """
+    try:
+        with open(html_file, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        
+        soup = BeautifulSoup(html_content, 'lxml')
+        
+        # Find all tables in the HTML
+        tables = soup.find_all('table')
+        
+        if not tables:
+            print(f"    No tables found in HTML file")
+            return None
+        
+        # For CPS HTML files, usually the first large table contains the data
+        # Try to find a table that looks like demographic data
+        for i, table in enumerate(tables):
+            try:
+                df = pd.read_html(str(table), header=0)[0]
+                
+                # Check if this looks like a demographic data table
+                if len(df) > 10 and len(df.columns) > 5:  # Reasonable size for demographics
+                    print(f"    Found suitable table {i+1} with {df.shape[0]} rows, {df.shape[1]} columns")
+                    return df
+                    
+            except Exception as e:
+                continue
+        
+        # If no suitable table found, try the largest table
+        if tables:
+            try:
+                df = pd.read_html(str(tables[0]), header=0)[0]
+                print(f"    Using first table as fallback: {df.shape[0]} rows, {df.shape[1]} columns")
+                return df
+            except Exception as e:
+                print(f"    Error parsing HTML table: {e}")
+                return None
+        
+        return None
+        
+    except Exception as e:
+        print(f"    Error parsing HTML file: {e}")
+        return None
+
 def parse_excel_sheet(excel_file, sheet_name):
     """
     Parse Excel sheet with multi-row headers
@@ -51,8 +125,37 @@ def parse_excel_sheet(excel_file, sheet_name):
     """
     print(f"  Processing sheet: {sheet_name}")
     
-    # Read raw data without headers
-    df_raw = pd.read_excel(excel_file, sheet_name=sheet_name, header=None)
+    # Determine engine based on file extension and try multiple engines
+    file_path = str(excel_file)
+    engine = None
+    
+    if file_path.endswith('.xlsx'):
+        engine = 'openpyxl'
+    elif file_path.endswith('.xls'):
+        engine = 'xlrd'
+    
+    # Check if file is actually HTML disguised as Excel
+    try:
+        with open(excel_file, 'r', encoding='utf-8') as f:
+            first_line = f.readline().strip().lower()
+            if ('<!doctype html' in first_line or 
+                first_line.startswith('<html') or 
+                '<html' in first_line):
+                print(f"    Detected HTML file disguised as Excel, parsing HTML tables")
+                return parse_html_file(excel_file, sheet_name)
+    except Exception:
+        pass  # Continue with Excel parsing
+    
+    # Try multiple engines if format detection fails
+    for attempt_engine in [engine, 'xlrd', 'openpyxl', None]:
+        try:
+            df_raw = pd.read_excel(excel_file, sheet_name=sheet_name, header=None, engine=attempt_engine)
+            break
+        except Exception as e:
+            if attempt_engine is None:
+                print(f"    Error: Could not read with any engine: {e}")
+                return None
+            continue
     
     if df_raw.empty:
         print(f"    Warning: Sheet {sheet_name} is empty")
@@ -126,9 +229,21 @@ def parse_excel_sheet(excel_file, sheet_name):
     
     return df_data
 
-def import_demographics_file(excel_file, school_year, conn):
+def import_demographics_file(excel_file, school_year, conn, global_tables_created):
     """Import all sheets from a demographics Excel file"""
     print(f"\nImporting {excel_file} for school year {school_year}")
+    
+    # Check if file is actually HTML disguised as Excel
+    try:
+        with open(excel_file, 'r', encoding='utf-8') as f:
+            first_line = f.readline().strip().lower()
+            if ('<!doctype html' in first_line or 
+                first_line.startswith('<html') or 
+                '<html' in first_line):
+                print(f"  Detected HTML file disguised as Excel")
+                return import_html_demographics_file(excel_file, school_year, conn, global_tables_created)
+    except Exception:
+        pass  # Continue with Excel parsing
     
     try:
         excel_obj = pd.ExcelFile(excel_file)
@@ -162,26 +277,94 @@ def import_demographics_file(excel_file, school_year, conn):
             # Add school year as first column
             df.insert(0, 'school_year', school_year)
             
-            # Create or append to table
-            if table_name in processed_tables:
-                # Append to existing table
-                df.to_sql(table_name, conn, if_exists='append', index=False)
-                print(f"    Appended to {table_name} table")
-            else:
-                # Create new table (replace if exists)
-                df.to_sql(table_name, conn, if_exists='replace', index=False)
-                print(f"    Created {table_name} table")
-                processed_tables.append(table_name)
+            # Create or append to table based on global state
+            try:
+                if table_name in global_tables_created:
+                    # For append, we need to handle schema mismatches
+                    # Get existing table schema first
+                    existing_columns = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+                    existing_col_names = [col[1] for col in existing_columns]
+                    
+                    # Align new DataFrame columns with existing table
+                    df_aligned = align_dataframe_columns(df, existing_col_names)
+                    
+                    # Append to existing table
+                    df_aligned.to_sql(table_name, conn, if_exists='append', index=False)
+                    print(f"    Appended to {table_name} table")
+                else:
+                    # Create new table (replace if exists)
+                    df.to_sql(table_name, conn, if_exists='replace', index=False)
+                    print(f"    Created {table_name} table")
+                    global_tables_created.add(table_name)
+            except Exception as e:
+                print(f"    Error importing to {table_name}: {e}")
+                # Try to continue with next sheet
+                continue
             
             # Get final row count
             result = conn.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()
             total_rows = result[0]
             print(f"    {table_name} now has {total_rows} total rows")
+            processed_tables.append(table_name)
         
         return processed_tables
         
     except Exception as e:
         print(f"Error processing {excel_file}: {e}")
+        return []
+
+def import_html_demographics_file(html_file, school_year, conn, global_tables_created):
+    """Import demographics data from HTML file disguised as Excel"""
+    try:
+        # Parse HTML and extract main demographic table
+        df = parse_html_file(html_file, 'Schools')  # Try to get schools data
+        
+        if df is None or df.empty:
+            print(f"  No usable data found in HTML file")
+            return []
+        
+        # Add school year as first column
+        df.insert(0, 'school_year', school_year)
+        
+        # Clean column names
+        df.columns = [clean_column_name(col) for col in df.columns]
+        
+        # Remove percentage columns
+        pct_columns = [col for col in df.columns if 'pct' in col.lower() or 'percent' in col.lower()]
+        if pct_columns:
+            df = df.drop(columns=pct_columns)
+            print(f"  Removed {len(pct_columns)} percentage columns from HTML data")
+        
+        # Determine table type based on content (default to schools for HTML files)
+        table_name = 'schools'
+        
+        # Import to database
+        try:
+            if table_name in global_tables_created:
+                # Get existing table schema and align columns
+                existing_columns = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+                existing_col_names = [col[1] for col in existing_columns]
+                df_aligned = align_dataframe_columns(df, existing_col_names)
+                df_aligned.to_sql(table_name, conn, if_exists='append', index=False)
+                print(f"  Appended HTML data to {table_name} table")
+            else:
+                df.to_sql(table_name, conn, if_exists='replace', index=False)
+                print(f"  Created {table_name} table from HTML data")
+                global_tables_created.add(table_name)
+            
+            # Get final row count
+            result = conn.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()
+            total_rows = result[0]
+            print(f"  {table_name} now has {total_rows} total rows")
+            
+            return [table_name]
+            
+        except Exception as e:
+            print(f"  Error importing HTML data to {table_name}: {e}")
+            return []
+            
+    except Exception as e:
+        print(f"Error processing HTML file {html_file}: {e}")
         return []
 
 def main():
@@ -229,8 +412,9 @@ def main():
     
     
     all_processed_tables = set()
+    global_tables_created = set()  # Track which tables have been created globally
     
-    # Process each file
+    # Process each file in chronological order
     for file_path in sorted(racial_ethnic_files):
         # Extract year from filename
         filename = file_path.name
@@ -246,7 +430,7 @@ def main():
             else:
                 school_year = "unknown"
         
-        processed = import_demographics_file(file_path, school_year, conn)
+        processed = import_demographics_file(file_path, school_year, conn, global_tables_created)
         all_processed_tables.update(processed)
     
     # Final database summary
