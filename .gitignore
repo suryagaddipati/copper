@@ -153,3 +153,7 @@ worktrees/
 
 # Gemini
 Gemini.md
+
+# CPS Demographics Data Downloads
+examples/cps/data/downloads/
+examples/cps/data/*.duckdb
