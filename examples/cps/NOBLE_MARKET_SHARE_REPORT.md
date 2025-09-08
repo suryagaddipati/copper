@@ -50,63 +50,6 @@ Neighborhoods with competitive landscape:
 | Bronzeville | 1,030 | 318 | 30.9% | **About 1 in 3 kids** go to Noble (DRW) |
 | Englewood | 2,641 | 575 | 21.8% | **About 1 in 4 kids** go to Noble (ACADEMY) |
 
-## Copper-Generated SQL Queries
-
-### Query 1: Total Enrollment by Neighborhood
-```sql
-SELECT CASE 
-    WHEN School_Name ILIKE '%NOBLE - ACADEMY%' THEN 'Englewood'
-    WHEN School_Name ILIKE '%NOBLE - BAKER%' THEN 'West Side'
-    WHEN School_Name ILIKE '%NOBLE - BUTLER%' THEN 'West Town'
-    WHEN School_Name ILIKE '%NOBLE - DRW%' THEN 'Bronzeville'
-    -- ... (full neighborhood mapping)
-    ELSE 'Other Areas'
-END AS neighborhood, 
-school_year, 
-SUM(column_3) AS total_enrollment, 
-COUNT(DISTINCT School_ID) AS total_schools
-FROM schools
-WHERE school_year = '2021-2022'
-GROUP BY neighborhood, school_year
-```
-
-### Query 2: Noble School Enrollment
-```sql
-SELECT neighborhood, 
-school_year, 
-SUM(CASE WHEN School_Name ILIKE '%noble%' THEN column_3 ELSE 0 END) AS noble_enrollment,
-COUNT(DISTINCT CASE WHEN School_Name ILIKE '%noble%' THEN School_ID END) AS noble_schools_count
-FROM (-- Subquery with neighborhood mapping) AS mapped_schools
-WHERE school_year = '2021-2022'
-GROUP BY neighborhood, school_year
-```
-
-### Query 3: Market Share Analysis (Complete CTE)
-```sql
-WITH neighborhood_mapping AS (
-    SELECT school_year, School_Name, School_ID, column_3 as enrollment,
-           CASE 
-               WHEN School_Name ILIKE '%NOBLE - ACADEMY%' THEN 'Englewood'
-               -- ... (complete neighborhood mapping logic)
-           END as neighborhood,
-           (School_Name ILIKE '%noble%') as is_noble
-    FROM schools 
-    WHERE school_year = '2021-2022' AND School_ID IS NOT NULL
-),
-neighborhood_stats AS (
-    SELECT neighborhood,
-           COUNT(DISTINCT School_ID) as total_schools,
-           SUM(enrollment) as total_enrollment,
-           SUM(CASE WHEN is_noble THEN enrollment ELSE 0 END) as noble_enrollment
-    FROM neighborhood_mapping 
-    GROUP BY neighborhood
-)
-SELECT neighborhood, total_enrollment, noble_enrollment,
-       ROUND((noble_enrollment * 100.0) / total_enrollment, 1) as market_share_pct,
-       ROUND(total_enrollment * 1.0 / noble_enrollment, 1) as student_ratio
-FROM neighborhood_stats
-ORDER BY market_share_pct DESC
-```
 
 ## Noble Schools by Location
 
